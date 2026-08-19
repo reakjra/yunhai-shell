@@ -1,0 +1,87 @@
+# end-4 illogical-impulse base, flattened from the meta packages (official repos)
+
+# audio
+cava
+pavucontrol-qt
+wireplumber
+pipewire-pulse
+libdbusmenu-gtk3
+playerctl
+
+# backlight
+geoclue
+brightnessctl
+ddcutil
+
+# basic
+bc
+cliphist
+cmake
+curl
+wget
+ripgrep
+jq
+xdg-user-dirs
+rsync
+go-yq
+
+# fonts / themes / terminal
+breeze
+eza
+fish
+fontconfig
+kitty
+starship
+ttf-jetbrains-mono-nerd
+
+# hyprland
+hyprland
+hypridle
+hyprlock
+hyprpicker
+hyprsunset
+hyprshot
+wl-clipboard
+
+# kde bits
+bluedevil
+gnome-keyring
+networkmanager
+plasma-nm
+polkit-kde-agent
+dolphin
+systemsettings
+
+# portals
+xdg-desktop-portal
+xdg-desktop-portal-kde
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
+
+# python toolchain
+clang
+uv
+gtk4
+libadwaita
+libsoup3
+libportal-gtk4
+gobject-introspection
+
+# screencapture
+slurp
+swappy
+tesseract
+tesseract-data-eng
+wf-recorder
+
+# toolkit
+upower
+wtype
+ydotool
+
+# widgets
+fuzzel
+glib2
+imagemagick
+songrec
+translate-shell

@@ -1,0 +1,16 @@
+click
+dbus-python
+kde-material-you-colors
+libsass
+loguru
+material-color-utilities
+materialyoucolor
+numpy
+opencv-contrib-python
+pillow
+psutil
+pycairo
+pygobject
+pywayland
+setproctitle
+tqdm

@@ -1,0 +1,13 @@
+[general]
+framerate = 30
+bars = 30
+
+[output]
+method = raw
+raw_target = /dev/stdout
+data_format = ascii
+channels = mono
+mono_option = average
+
+[smoothing]
+noise_reduction = 25

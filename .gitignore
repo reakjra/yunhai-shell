@@ -1,0 +1,8 @@
+*.qsb
+*.bak
+*.orig
+__pycache__/
+*.pyc
+dots/quickshell/yunhai/scripts/desktop/clipboard/fileclip
+dots/quickshell/yunhai/scripts/desktop/clipboard/wlr-data-control-unstable-v1-*
+dots/hypr/custom/scripts/mpvpaper_thumbnails/

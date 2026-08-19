@@ -1,0 +1,61 @@
+[config]
+version_check = false
+
+[templates.m3colors]
+input_path = '~/.config/matugen/templates/colors.json'
+output_path = '~/.local/state/quickshell/yunhai/user/generated/colors.json'
+
+[templates.discord_midnight]
+input_path = '~/.config/matugen/templates/discord/midnight.theme.css'
+output_path = '~/.config/Vencord/themes/midnight-matugen.theme.css'
+
+[templates.hyprland]
+input_path = '~/.config/matugen/templates/hyprland/colors.conf'
+output_path = '~/.config/hypr/hyprland/colors.conf'
+
+# Dual output during 0.54 -> 0.55 lua migration. Drop the .conf one above once on 0.55.
+[templates.hyprland_lua]
+input_path = '~/.config/matugen/templates/hyprland/colors.lua'
+output_path = '~/.config/hypr/hyprland/colors.lua'
+
+[templates.hyprlock]
+input_path = '~/.config/matugen/templates/hyprland/hyprlock-colors.conf'
+output_path = '~/.config/hypr/hyprlock/colors.conf'
+
+[templates.fuzzel]
+input_path = '~/.config/matugen/templates/fuzzel/fuzzel_theme.ini'
+output_path = '~/.config/fuzzel/fuzzel_theme.ini'
+
+[templates.gtk3]
+input_path = '~/.config/matugen/templates/gtk-3.0/gtk.css'
+output_path = '~/.config/gtk-3.0/gtk.css'
+
+[templates.gtk4]
+input_path = '~/.config/matugen/templates/gtk-4.0/gtk.css'
+output_path = '~/.config/gtk-4.0/gtk.css'
+
+[templates.kde_colors]
+input_path = '~/.config/matugen/templates/kde/color.txt'
+output_path = '~/.local/state/quickshell/yunhai/user/generated/color.txt'
+
+[templates.wallpaper]
+input_path = '~/.config/matugen/templates/wallpaper.txt'
+output_path = '~/.local/state/quickshell/yunhai/user/generated/wallpaper/path.txt'
+
+[templates.neovim]
+input_path = "~/.config/matugen/templates/nvim/nvim.lua"
+output_path = "~/.config/nvim/lua/config/matugen_colors.lua"
+
+# vscode matugen-theme extension (haikalllp) watches these
+[templates.vscode_raw]
+input_path = '~/.config/matugen/templates/vscode/vscode-colors'
+output_path = '~/.cache/matugen/vscode-colors'
+
+[templates.vscode_json]
+input_path = '~/.config/matugen/templates/vscode/vscode-colors.json'
+output_path = '~/.cache/matugen/vscode-colors.json'
+
+# steam millenium
+[templates.millennium]
+input_path = '~/.config/matugen/templates/millenium_material.json'
+output_path = '~/.steam/steam/steamui/skins/Material-Theme/css/main/colors/matugen.css'

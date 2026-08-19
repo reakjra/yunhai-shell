@@ -1,0 +1,20 @@
+# yunhai extras on top of the end-4 base (official repos)
+
+qt6-shadertools
+pacman-contrib
+lm_sensors
+pciutils
+ffmpeg
+grim
+libnotify
+xdg-utils
+libsecret
+plasma-systemmonitor
+wlr-protocols
+base-devel
+git
+
+# hyprpm plugin builds (hyprbars)
+cpio
+meson
+ninja

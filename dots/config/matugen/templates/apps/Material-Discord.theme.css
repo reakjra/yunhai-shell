@@ -1,0 +1,188 @@
+/**
+ * @name Material Discord (Cohesive Squircle Edit - Final Perfected Version!)
+ * @version 3.0.5
+ * @description A highly cohesive, sleek edit of Material Discord with zero visual clutter.
+ * @author CapnKitten (Edited for maximum aesthetic!)
+ *
+ * @website http://github.com/CapnKitten
+ * @source https://github.com/CapnKitten/BetterDiscord/blob/master/Themes/Material-Discord/css/source.css
+ */
+
+@import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/source.css);
+
+/* Material You addon */
+@import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/addons/material-you/source.css);
+
+/* 🌙 MATERIAL YOU DARK THEME SETTINGS */
+.theme-dark {
+	--saturation-modifier: 0.15;
+	--lightness-modifier: 0.225;
+	--text-lightness-modifier: 1.0;
+	--ui-darkness-modifier: 1.0;
+
+	--matugen-background: {{ colors.surface.default.hex }};
+	--matugen-background-low: {{ colors.surface_container_lowest.default.hex }};
+	--matugen-background-high: {{ colors.surface_container_high.default.hex }};
+	--matugen-foreground: {{ colors.surface_container.default.hex }};
+	--matugen-hover: {{ colors.surface_variant.default.hex }};
+
+	--app-bg: var(--matugen-background-low);
+	--main-color: var(--matugen-background);
+	--main-alt: var(--matugen-background-low);
+	--status-picker-color: var(--matugen-background-high);
+	--message-color: transparent;
+	--message-color-hover: var(--matugen-hover);
+	--message-color-alt: var(--matugen-background-high);
+	--attachment-color: var(--matugen-background-high);
+	--main-textarea-color: var(--matugen-foreground);
+	--separator-color: var(--matugen-background-high);
+	--card-color-filled: var(--matugen-background-high);
+	--card-color-hover: var(--matugen-hover);
+	--card-color-active: var(--matugen-hover);
+	--card-color-alt: var(--matugen-background-high);
+	--card-border-color: var(--matugen-background-high);
+	--input-color: var(--matugen-foreground);
+	--input-color-alt: var(--matugen-foreground);
+}
+
+/* ☀️ MATERIAL YOU LIGHT THEME SETTINGS */
+.theme-light {
+	--saturation-modifier: 0.15;
+	--lightness-modifier: 1.0;
+	--text-lightness-modifier: 1.0;
+
+	--matugen-background: {{ colors.surface.default.hex }};
+	--matugen-background-low: {{ colors.surface_container_lowest.default.hex }};
+	--matugen-background-high: {{ colors.surface_container_highest.default.hex }};
+	--matugen-foreground: {{ colors.surface_container.default.hex }};
+	--matugen-hover: {{ colors.surface_variant.default.hex }};
+
+	--app-bg: var(--matugen-background-low);
+	--main-color: var(--matugen-background);
+	--main-alt: var(--matugen-background-low);
+	--status-picker-color: var(--matugen-background-high);
+	--message-color: transparent;
+	--message-color-hover: var(--matugen-hover);
+	--message-color-alt: var(--matugen-background-high);
+	--attachment-color: var(--matugen-background-high);
+	--main-textarea-color: var(--matugen-foreground);
+	--separator-color: var(--matugen-background-high);
+	--card-color-filled: var(--matugen-background-high);
+	--card-color-hover: var(--matugen-hover);
+	--card-color-active: var(--matugen-hover);
+	--card-color-alt: var(--matugen-background-high);
+	--card-border-color: var(--matugen-background-high);
+	--input-color: var(--matugen-foreground);
+	--input-color-alt: var(--matugen-foreground);
+}
+
+:root {
+	/* ACCENT HSL AND TEXT COLOR SETTINGS */
+	--accent-hue: {{ colors.primary.default.hue }};
+	--accent-saturation: 71%;
+	--accent-lightness: 61%;
+	--accent-text-color: hsl(0,0%,100%);
+	--accent-button-action: hsl(0,0%,100%);
+
+	/* ALERT HSL AND TEXT COLOR SETTINGS */
+	--alert-hue: 0;
+	--alert-saturation: 85%;
+	--alert-lightness: 61%;
+	--alert-text-color: hsl(0,0%,100%);
+
+	/* WARNING HSL AND TEXT COLOR SETTINGS*/
+	--warning-hue: 40;
+	--warning-saturation: 86.4%;
+	--warning-lightness: 56.9%;
+	--warning-text-color: hsl(0,0%,100%);
+
+	/* ✨ MESSAGE SETTINGS - Sleek Squircles! ✨ */
+	--message-radius: 14px;
+	--message-padding-top: 8px;
+	--message-padding-side: 12px;
+
+	/* MESSAGE MEDIA SETTINGS */
+	--media-radius: 10px;
+
+	/* ✨ CARD SETTINGS - Sleek Squircles! ✨ */
+	--card-radius: 8px;
+	--card-radius-big: 16px;
+
+	/* BUTTON SETTINGS */
+	--button-height: 36px;
+	--button-padding: 0 24px;
+	--button-action-color: hsl(0,0%,100%);
+
+	/* INPUT SETTINGS */
+	--input-height: 36px;
+	--input-padding: 0 12px;
+
+	/* ✨ POPOUT AND MODAL SETTINGS - Sleek Squircles! ✨ */
+	--popout-radius: 8px;
+	--popout-radius-big: 16px;
+
+	/* TOOLTIP SETTINGS */
+	--tooltip-color: hsl(0,0%,38%,0.9);
+	--tooltip-text-color: hsl(0,0%,87%);
+	--tooltip-font-size: 12px;
+	--tooltip-padding: 8px;
+	--tooltip-radius: 8px;
+
+	/* SCROLLBAR SETTINGS */
+	--scrollbar-width: 10px;
+	--scrollbar-thin-width: 6px;
+}
+
+/* ==========================================
+ *  ✨ THE "NO VISUAL NOISE" OVERRIDES ✨
+ *  ========================================== */
+
+/* 👤 1. PROFILE POPOUT FIX (NUKING THE SNEAKY ACCENT COLORS!) */
+/* Targeting everything including ::before elements to kill hidden theme gradients */
+[class^="userProfileOuter_"],
+[class^="userProfileOuter_"]::before,
+[class^="userProfileInner_"],
+[class^="userProfileInner_"]::before,
+[class^="userPopoutOuter_"],
+[class^="userPopoutInner_"],
+[class^="userPopoutInner_"]::before,
+[class^="profilePanel_"],
+[class^="profilePanel_"]::before,
+[class^="overlayBackground_"] {
+	background: var(--matugen-background) !important;
+	background-color: var(--matugen-background) !important;
+	background-image: none !important; /* This kills the green gradients! */
+	box-shadow: none !important;
+}
+
+[class^="userPopoutOuter_"] {
+	border: 1px solid var(--matugen-background-high) !important;
+}
+
+/* 💊 2. DOUBLE PILL FIX */
+/* Makes the inner text area transparent so it merges with the sleek outer squircle */
+[class^="channelTextArea_"] [class^="scrollableContainer_"] {
+	background-color: var(--matugen-foreground) !important;
+	border-radius: 14px !important;
+}
+[class^="channelTextArea_"] [class^="textArea_"],
+[class^="channelTextArea_"] [class*="textArea_"] {
+	background-color: transparent !important;
+}
+
+/* 🖱️ 3. RIGHT-CLICK DIALOG & SUBMENU FIX */
+/* Forces all menus and nested submenus to use the sleek background, switching perfectly in light/dark mode! */
+[class^="menu_"],
+[class^="submenu_"] {
+	background-color: var(--matugen-background) !important;
+	background-image: none !important; /* Destroys any theme-injected accent colors */
+	border-radius: 12px !important;
+	border: 1px solid var(--matugen-foreground) !important;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Keeps the hover sleek and avoids changing text colors so light mode stays readable! */
+[class^="item_"]:hover,
+[class^="item_"][class*="focused_"] {
+	background-color: var(--matugen-hover) !important;
+}

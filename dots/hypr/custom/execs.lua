@@ -1,0 +1,2 @@
+-- user territory, yunhai never overwrites this file
+-- see hyprland/execs.lua for the rice defaults

@@ -1,0 +1,12 @@
+# prompted one by one at install time, format: package | why you might want it
+
+intel-gpu-tools | gpu stats on intel igpus (resources widget)
+nvidia-utils | nvidia-smi for gpu stats, skip if not on nvidia
+fprintd | fingerprint unlock on the lock screen
+cloudflare-warp-bin | warp toggle in quick settings
+easyeffects | audio effects integration
+plasma-browser-integration | firefox media playtime on the music widget (~600MiB of kde deps if you have none)
+tinyxml2 | microtex dep, latex rendering in the ai sidebar
+gtkmm3 | microtex dep
+gtksourceviewmm | microtex dep
+cairomm | microtex dep
