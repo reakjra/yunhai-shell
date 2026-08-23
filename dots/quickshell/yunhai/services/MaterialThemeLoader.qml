@@ -258,6 +258,12 @@ Singleton {
             `color244              #${h("m3error")}`,
             `color245              #${h("m3outlineVariant")}`,
             ``,
+            `active_tab_foreground   #${h("term7")}`,
+            `active_tab_background   #${h("m3onSecondary")}`,
+            `inactive_tab_foreground #${h("m3outline")}`,
+            `inactive_tab_background #${h("term0")}`,
+            `tab_bar_background      #${h("term0")}`,
+            ``,
         ]
         const contentB64 = Qt.btoa(lines.join("\n"))
         Quickshell.execDetached(["python3", "-c", `
