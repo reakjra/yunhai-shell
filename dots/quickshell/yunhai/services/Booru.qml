@@ -21,6 +21,7 @@ Singleton {
     property var responses: []
     property int runningRequests: 0
     property var defaultUserAgent: Config.options?.networking?.userAgent || "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    readonly property string apiUserAgent: "yunhai-shell/1.0 (booru viewer)"
     property var providerList: Object.keys(providers).filter(provider => provider !== "system" && providers[provider].api)
     readonly property var booruKeys: KeyringStorage.keyringData?.booruKeys ?? {}
 
@@ -35,8 +36,8 @@ Singleton {
             property var onFinished
             property bool finished: false
             running: false
-            command: ["curl", "-s", "-L", "--compressed",
-                "-H", "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+            command: ["curl", "-g", "-s", "-L", "--compressed",
+                "-H", `User-Agent: ${root.apiUserAgent}`,
                 "-H", "Accept: application/json, text/plain, */*",
                 "-H", "Accept-Language: en-US,en;q=0.5",
                 requestUrl]
