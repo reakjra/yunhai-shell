@@ -23,3 +23,5 @@ fish_variables
 hyprland/*.conf
 functions/build-layer.fish
 functions/rin-patches.fish
+plugin/build/
+imports/

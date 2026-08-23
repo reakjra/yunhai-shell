@@ -4,6 +4,9 @@
 -- The folder within ~/.config/quickshell containing the config
 hl.env("qsConfig", "yunhai")
 
+-- Compiled QML modules built by the shell's install.sh
+hl.env("QML_IMPORT_PATH", os.getenv("HOME") .. "/.config/quickshell/yunhai/imports")
+
 -- Apps
 -- PULL REQUESTS ADDING MORE WILL NOT BE ACCEPTED, CONFIG FOR YOURSELF
 terminal =

@@ -25,83 +25,42 @@ StyledOverlayWidget {
     property int sortStateCpu: 0
     property int sortStateRam: 0
 
-    function applySorting(procs) {
-        let sorted = procs.slice()
+    property var displayedProcesses: []
 
-        if (sortStateProcess !== 0) {
-            sorted.sort((a, b) => {
-                const nameA = a.name.toLowerCase()
-                const nameB = b.name.toLowerCase()
-                return sortStateProcess === 1 ?
-                    nameA.localeCompare(nameB) :
-                    nameB.localeCompare(nameA)
-            })
-        } else if (sortStateCpu !== 0) {
-            sorted.sort((a, b) => {
-                return sortStateCpu === 1 ?
-                    b.cpuPercent - a.cpuPercent :
-                    a.cpuPercent - b.cpuPercent
-            })
-        } else if (sortStateRam !== 0) {
-            sorted.sort((a, b) => {
-                return sortStateRam === 1 ?
-                    b.memoryKb - a.memoryKb :
-                    a.memoryKb - b.memoryKb
-            })
-        }
-
-        return sorted
+    function syncProcesses() {
+        if (root.expandedPid === "") root.displayedProcesses = ProcessMonitor.processes
     }
 
-    property var filteredProcesses: {
-        const search = searchText.trim().toLowerCase()
-
-        if (search === "") {
-            return ProcessMonitor.processes
-        }
-
-        return ProcessMonitor.processes.filter(proc =>
-        proc.name.toLowerCase().includes(search) ||
-        proc.fullCommand.toLowerCase().includes(search) ||
-        proc.pid.toString().includes(search)
-        )
+    Binding {
+        target: ProcessMonitor
+        property: "filter"
+        value: root.searchText.trim()
+    }
+    Binding {
+        target: ProcessMonitor
+        property: "sortKey"
+        value: root.sortStateProcess !== 0 ? ProcessMonitor.sortByName
+            : root.sortStateRam !== 0 ? ProcessMonitor.sortByMemory
+            : ProcessMonitor.sortByCpu
+    }
+    Binding {
+        target: ProcessMonitor
+        property: "sortDescending"
+        value: root.sortStateProcess !== 0 ? root.sortStateProcess !== 1 : root.sortStateCpu !== 0 ? root.sortStateCpu === 1 : root.sortStateRam !== 0 ? root.sortStateRam === 1 : true
     }
 
-    property var displayedProcesses: applySorting(filteredProcesses)
-
-    Timer {
-        id: modelRefreshTimer
-        interval: 130
-        repeat: false
-        onTriggered: {
-            displayedProcesses = applySorting(filteredProcesses)
+    Connections {
+        target: ProcessMonitor
+        function onProcessesChanged() {
+            root.syncProcesses()
         }
-    } // since i dont know how to prevent overlapping smartly, this will avoid most of it when searching
+    }
 
     onSearchTextChanged: {
-        if (expandedPid !== "") {
-            expandedPid = ""
-        }
-
-        displayedProcesses = []
-        modelRefreshTimer.restart()
+        if (expandedPid !== "") expandedPid = ""
     }
 
-    onExpandedPidChanged: {
-        if (expandedPid === "") {
-            displayedProcesses = applySorting(filteredProcesses)
-        }
-    }
-
-    onFilteredProcessesChanged: {
-        if (expandedPid === "") {
-            modelRefreshTimer.restart()
-        }
-    }
-
-    onSortStateProcessChanged: { displayedProcesses = applySorting(filteredProcesses) }
-    onSortStateCpuChanged: { displayedProcesses = applySorting(filteredProcesses) }
-    onSortStateRamChanged: { displayedProcesses = applySorting(filteredProcesses) }
+    onExpandedPidChanged: root.syncProcesses()
 
     contentItem: OverlayBackground {
         radius: root.contentRadius
@@ -149,7 +108,7 @@ StyledOverlayWidget {
 
                         StyledText {
                             anchors.centerIn: parent
-                            text: root.filteredProcesses.length
+                            text: root.displayedProcesses.length
                             color: Appearance.colors.colOnSecondaryContainer
                             font.pixelSize: Appearance.font.pixelSize.small
                         }
@@ -159,7 +118,7 @@ StyledOverlayWidget {
                             hoverEnabled: true
 
                             StyledToolTip {
-                                text: Translation.tr("%1 processes found").arg(root.filteredProcesses.length)
+                                text: Translation.tr("%1 processes found").arg(root.displayedProcesses.length)
                             }
                         }
                     }
@@ -388,7 +347,7 @@ StyledOverlayWidget {
                             clip: true
 
                             Behavior on height {
-                                enabled: !ProcessMonitor.updating && !modelRefreshTimer.running
+                                enabled: !ProcessMonitor.updating
                                 NumberAnimation {
                                     duration: Appearance.animation.elementMoveFast.duration
                                     easing.type: Appearance.animation.elementMoveFast.type
@@ -662,8 +621,8 @@ StyledOverlayWidget {
 
                     StyledText {
                         text: root.searchText.trim() !== "" ?
-                        Translation.tr("Showing %1 of %2").arg(root.filteredProcesses.length).arg(ProcessMonitor.processes.length) :
-                        Translation.tr("Total: %1").arg(ProcessMonitor.processes.length)
+                        Translation.tr("Showing %1 of %2").arg(root.displayedProcesses.length).arg(ProcessMonitor.totalCount) :
+                        Translation.tr("Total: %1").arg(ProcessMonitor.totalCount)
                         color: Appearance.colors.colOnSecondaryContainer
                         font.pixelSize: Appearance.font.pixelSize.smallie
                     }

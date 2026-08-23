@@ -12,7 +12,7 @@ HYPR_DST="$HOME/.config/hypr"
 BACKUP_DIR="$HOME/.local/state/yunhai/backup-$(date +%Y%m%d-%H%M%S)"
 
 ASSUME_YES=0 DO_AUR=1 SKIP_SYSUPDATE=0 HYPRBARS_TODO=0
-PHASES=(deps setups files build)
+PHASES=(deps setups files build plugins)
 for a in "$@"; do case $a in
     -y) ASSUME_YES=1 ;;
     --no-aur) DO_AUR=0 ;;
@@ -20,9 +20,10 @@ for a in "$@"; do case $a in
     --deps-only)   PHASES=(deps) ;;
     --setups-only) PHASES=(setups) ;;
     --files-only)  PHASES=(files) ;;
-    --build-only)  PHASES=(build) ;;
+    --build-only|--recompile) PHASES=(build) ;;
+    --plugins-only) PHASES=(plugins) ;;
     -h|--help)
-        echo "usage: ./install.sh [-y] [--no-aur] [--skip-sysupdate] [--deps-only|--setups-only|--files-only|--build-only]"
+        echo "usage: ./install.sh [-y] [--no-aur] [--skip-sysupdate] [--deps-only|--setups-only|--files-only|--build-only|--recompile|--plugins-only]"
         exit 0 ;;
     *) die "unknown flag: $a" ;;
 esac; done
@@ -119,7 +120,11 @@ if has_phase build; then
     log "compiled $n shaders"
 
     x bash "$QS_DST/scripts/desktop/clipboard/build.sh"
+    x bash "$QS_DST/plugin/build.sh"
+fi
 
+if has_phase plugins; then
+    step "compositor plugins"
     if command -v hyprpm &>/dev/null && ask "install hyprbars via hyprpm? (title bars for the akebono family)"; then
         hyprpm_do() { hyprpm "$@" || sudo -E hyprpm "$@"; }
         if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then

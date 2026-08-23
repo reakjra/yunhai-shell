@@ -768,7 +768,7 @@ Singleton {
                 property bool enableSwap: true
 
                 property JsonObject gpu: JsonObject {
-                    // Manual card override (e.g., "card1" for AMD_GPU_CARD/INTEL_GPU_CARD)
+                    // Manual card override, matched against GpuDevice.card (e.g. "card1")
                     property string dgpuCard: ""
                     property string igpuCard: ""
 
