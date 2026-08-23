@@ -87,6 +87,8 @@ GridView {
                     Layout.maximumWidth: root.listMode ? cell.width * 0.5 : cell.width
                     horizontalAlignment: root.listMode ? Text.AlignLeft : Text.AlignHCenter
                     elide: Text.ElideRight
+                    fontSizeMode: Text.HorizontalFit
+                    minimumPixelSize: Math.round(root.glyphSize * 0.55)
                     text: cell.glyph
                     font.pixelSize: root.glyphSize
                     color: Appearance.colors.colOnLayer0

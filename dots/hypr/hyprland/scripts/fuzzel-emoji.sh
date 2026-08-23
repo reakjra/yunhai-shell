@@ -78,6 +78,7 @@ exit
 🥵 hot face face feverish heat red sweating
 🥶 cold face face blue freezing frozen frostbite icicles
 🥴 woozy face face dizzy intoxicated tipsy wavy
+🫪 distorted face woe
 😵 dizzy face spent unconscious xox dizzy
 🤯 exploding head face shocked mind blown
 🤠 cowboy hat face face cowgirl hat
@@ -137,6 +138,16 @@ exit
 🙈 see no evil monkey monkey animal nature haha
 🙉 hear no evil monkey animal monkey nature
 🙊 speak no evil monkey monkey animal nature omg
+🫠 melting face hot heat
+🫢 face with open eyes and hand over mouth silence secret shock surprise
+🫣 face with peeking eye scared frightening embarrassing
+🫡 saluting face respect salute
+🫥 dotted line face invisible lonely isolation depression
+🫤 face with diagonal mouth skeptic confuse frustrated indifferent
+🥹 face holding back tears touched gratitude
+😶‍🌫️ face in clouds shower steam dream
+😮‍💨 face exhaling relieve relief tired sigh
+😵‍💫 face with spiral eyes sick ill confused nauseous nausea
 💋 kiss mark face lips love like affection valentines
 💌 love letter email like affection envelope valentines
 💘 heart with arrow love like heart affection valentines
@@ -150,6 +161,8 @@ exit
 ❣️ heart exclamation decoration love
 💔 broken heart sad sorry break heart heartbreak
 ❤️ red heart love like valentines
+❤️‍🔥 heart on fire passionate enthusiastic
+❤️‍🩹 mending heart broken heart bandage wounded
 🧡 orange heart love like affection valentines
 💛 yellow heart love like affection valentines
 💚 green heart love like affection valentines
@@ -203,6 +216,13 @@ exit
 🤝 handshake agreement shake
 🙏 folded hands please hope wish namaste highfive pray
 ✍️ writing hand lower left ballpoint pen stationery write compose
+🫱 rightwards hand palm offer
+🫲 leftwards hand palm offer
+🫳 palm down hand palm drop
+🫴 palm up hand lift offer demand
+🫰 hand with index finger and thumb crossed heart love money expensive krkiss
+🫵 index pointing at the viewer you recruit
+🫶 heart hands love appreciation support
 💅 nail polish beauty manicure finger fashion nail
 🤳 selfie camera phone
 💪 flexed biceps arm flex hand summer strong biceps
@@ -220,6 +240,7 @@ exit
 👁️ eye face look see watch stare
 👅 tongue mouth playful
 👄 mouth mouth kiss
+🫦 biting lip flirt sexy pain worry
 👶 baby child boy girl toddler
 🧒 child gender-neutral young
 👦 boy man male guy teenager
@@ -228,6 +249,8 @@ exit
 👱 person blond hair hairstyle
 👨 man mustache father dad guy classy sir moustache
 🧔 man beard person bewhiskered
+🧔‍♂️ man beard facial hair
+🧔‍♀️ woman beard facial hair
 👨‍🦰 man red hair hairstyle
 👨‍🦱 man curly hair hairstyle
 👨‍🦳 man white hair old elder
@@ -338,6 +361,7 @@ exit
 👷‍♀️ woman construction worker female human wip build construction worker labor woman
 🤴 prince boy man male crown royal king
 👸 princess girl woman female blond crown royal queen
+🫅 person with crown royalty power
 👳 person wearing turban headdress
 👳‍♂️ man wearing turban male indian hinduism arabs
 👳‍♀️ woman wearing turban female indian hinduism arabs woman
@@ -346,6 +370,8 @@ exit
 🤵 man in tuxedo couple marriage wedding groom
 👰 bride with veil couple marriage wedding woman bride
 🤰 pregnant woman baby
+🫃 pregnant man baby belly
+🫄 pregnant person baby belly
 🤱 breast feeding nursing baby
 👼 baby angel heaven wings halo
 🎅 santa claus festival man male xmas father christmas
@@ -1828,31 +1854,6 @@ exit
 🪧 placard announcement
 ⚧️ transgender symbol lgbtq
 🏳️‍⚧️ transgender flag lgbtq
-😶‍🌫️ face in clouds shower steam dream
-😮‍💨 face exhaling relieve relief tired sigh
-😵‍💫 face with spiral eyes sick ill confused nauseous nausea
-❤️‍🔥 heart on fire passionate enthusiastic
-❤️‍🩹 mending heart broken heart bandage wounded
-🧔‍♂️ man beard facial hair
-🧔‍♀️ woman beard facial hair
-🫠 melting face hot heat
-🫢 face with open eyes and hand over mouth silence secret shock surprise
-🫣 face with peeking eye scared frightening embarrassing
-🫡 saluting face respect salute
-🫥 dotted line face invisible lonely isolation depression
-🫤 face with diagonal mouth skeptic confuse frustrated indifferent
-🥹 face holding back tears touched gratitude
-🫱 rightwards hand palm offer
-🫲 leftwards hand palm offer
-🫳 palm down hand palm drop
-🫴 palm up hand lift offer demand
-🫰 hand with index finger and thumb crossed heart love money expensive
-🫵 index pointing at the viewer you recruit
-🫶 heart hands love appreciation support
-🫦 biting lip flirt sexy pain worry
-🫅 person with crown royalty power
-🫃 pregnant man baby belly
-🫄 pregnant person baby belly
 🧌 troll mystical monster
 🪸 coral ocean sea reef
 🪷 lotus flower calm meditation
@@ -1886,3 +1887,4 @@ AH↗️HA↘️HA↗️HA↘️ pekora arrows hahaha rabbit
 𝕏  twitter x logo
 👉👈 etou ughhhhhhh shy
 👉👌 put it in imagination perv
+😭🙏 brother
