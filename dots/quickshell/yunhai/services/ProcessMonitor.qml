@@ -18,7 +18,7 @@ Singleton {
 
     readonly property var processes: ProcessTable.processes
     readonly property int totalCount: ProcessTable.totalCount
-    readonly property bool updating: false
+    readonly property bool warmingUp: ProcessTable.warmingUp
 
     onActiveChanged: ProcessTable.active = root.active
     onFilterChanged: ProcessTable.filter = root.filter

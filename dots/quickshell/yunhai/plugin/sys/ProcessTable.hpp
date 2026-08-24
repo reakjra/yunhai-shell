@@ -21,6 +21,7 @@ private:
     Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
     Q_PROPERTY(QList<ProcessEntry*> processes READ processes NOTIFY processesChanged)
     Q_PROPERTY(int totalCount READ totalCount NOTIFY processesChanged)
+    Q_PROPERTY(bool warmingUp READ warmingUp NOTIFY warmingUpChanged)
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
     Q_PROPERTY(SortKey sortKey READ sortKey WRITE setSortKey NOTIFY sortChanged)
     Q_PROPERTY(bool sortDescending READ sortDescending WRITE setSortDescending NOTIFY sortChanged)
@@ -36,6 +37,8 @@ public:
 
     [[nodiscard]] QList<ProcessEntry*> processes() const { return this->bProcesses; }
     [[nodiscard]] int totalCount() const { return static_cast<int>(this->allProcesses.length()); }
+
+    [[nodiscard]] bool warmingUp() const { return this->bWarmingUp; }
 
     [[nodiscard]] QString filter() const { return this->bFilter; }
     void setFilter(const QString& filter);
@@ -54,6 +57,7 @@ signals:
     void activeChanged();
     void intervalChanged();
     void processesChanged();
+    void warmingUpChanged();
     void filterChanged();
     void sortChanged();
 
@@ -70,6 +74,7 @@ private:
     QString bFilter;
     SortKey bSortKey = ProcessTable::Cpu;
     bool bSortDescending = true;
+    bool bWarmingUp = true;
     quint64 lastTotalTicks = 0;
     double memoryTotalKb = 0;
     long ticksPerSecond = 100;

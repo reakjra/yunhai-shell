@@ -14,7 +14,7 @@ StyledOverlayWidget {
     minimumWidth: 300
     minimumHeight: 300
 
-    Component.onCompleted: ProcessMonitor.active = Qt.binding(() => root.visible)
+    Component.onCompleted: ProcessMonitor.active = Qt.binding(() => root.visible && root.expandedPid === "")
     Component.onDestruction: ProcessMonitor.active = false
 
     property string searchText: ""
@@ -24,12 +24,6 @@ StyledOverlayWidget {
     property int sortStateProcess: 0
     property int sortStateCpu: 0
     property int sortStateRam: 0
-
-    property var displayedProcesses: []
-
-    function syncProcesses() {
-        if (root.expandedPid === "") root.displayedProcesses = ProcessMonitor.processes
-    }
 
     Binding {
         target: ProcessMonitor
@@ -49,18 +43,13 @@ StyledOverlayWidget {
         value: root.sortStateProcess !== 0 ? root.sortStateProcess !== 1 : root.sortStateCpu !== 0 ? root.sortStateCpu === 1 : root.sortStateRam !== 0 ? root.sortStateRam === 1 : true
     }
 
-    Connections {
-        target: ProcessMonitor
-        function onProcessesChanged() {
-            root.syncProcesses()
-        }
+    onVisibleChanged: {
+        if (!root.visible) root.expandedPid = ""
     }
 
     onSearchTextChanged: {
         if (expandedPid !== "") expandedPid = ""
     }
-
-    onExpandedPidChanged: root.syncProcesses()
 
     contentItem: OverlayBackground {
         radius: root.contentRadius
@@ -108,7 +97,7 @@ StyledOverlayWidget {
 
                         StyledText {
                             anchors.centerIn: parent
-                            text: root.displayedProcesses.length
+                            text: ProcessMonitor.processes.length
                             color: Appearance.colors.colOnSecondaryContainer
                             font.pixelSize: Appearance.font.pixelSize.small
                         }
@@ -118,7 +107,7 @@ StyledOverlayWidget {
                             hoverEnabled: true
 
                             StyledToolTip {
-                                text: Translation.tr("%1 processes found").arg(root.displayedProcesses.length)
+                                text: Translation.tr("%1 processes found").arg(ProcessMonitor.processes.length)
                             }
                         }
                     }
@@ -285,10 +274,29 @@ StyledOverlayWidget {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+                // Loading state
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    visible: ProcessMonitor.warmingUp
+                    spacing: 12
+
+                    MaterialLoadingIndicator {
+                        Layout.alignment: Qt.AlignHCenter
+                        implicitSize: 48
+                    }
+
+                    StyledText {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: Translation.tr("Loading processes...")
+                        color: Appearance.colors.colOnSurfaceVariant
+                        font.pixelSize: Appearance.font.pixelSize.large
+                    }
+                }
+
                 // Empty state message
                 ColumnLayout {
                     anchors.centerIn: parent
-                    visible: root.displayedProcesses.length === 0
+                    visible: !ProcessMonitor.warmingUp && ProcessMonitor.processes.length === 0
                     spacing: 12
 
                     MaterialSymbol {
@@ -316,7 +324,7 @@ StyledOverlayWidget {
                 // Process list
                 ScrollView {
                     anchors.fill: parent
-                    visible: root.displayedProcesses.length > 0
+                    visible: ProcessMonitor.processes.length > 0
                     clip: true
 
                     ScrollBar.vertical: ScrollBar {
@@ -337,7 +345,7 @@ StyledOverlayWidget {
 
                         model: ScriptModel {
                             objectProp: "pid"
-                            values: root.displayedProcesses
+                            values: ProcessMonitor.processes
                         }
 
                         delegate: Item {
@@ -347,7 +355,7 @@ StyledOverlayWidget {
                             clip: true
 
                             Behavior on height {
-                                enabled: !ProcessMonitor.updating
+                                enabled: !ProcessMonitor.warmingUp
                                 NumberAnimation {
                                     duration: Appearance.animation.elementMoveFast.duration
                                     easing.type: Appearance.animation.elementMoveFast.type
@@ -466,15 +474,14 @@ StyledOverlayWidget {
                                                 }
 
                                                 onClicked: {
+                                                    const pid = modelData.pid
                                                     // If this process is expanded, close it first
-                                                    if (root.expandedPid === modelData.pid) {
+                                                    if (root.expandedPid === pid) {
                                                         root.expandedPid = ""
                                                     }
                                                     // Kill the processs
-                                                    ProcessMonitor.killProcess(modelData.pid)
+                                                    ProcessMonitor.killProcess(pid)
                                                 }
-
-                                                // The pause prevents flickering due the refreshing.
 
                                                 StyledToolTip {
                                                     text: Translation.tr("Kill (PID: %1)").arg(modelData.pid)
@@ -621,7 +628,7 @@ StyledOverlayWidget {
 
                     StyledText {
                         text: root.searchText.trim() !== "" ?
-                        Translation.tr("Showing %1 of %2").arg(root.displayedProcesses.length).arg(ProcessMonitor.totalCount) :
+                        Translation.tr("Showing %1 of %2").arg(ProcessMonitor.processes.length).arg(ProcessMonitor.totalCount) :
                         Translation.tr("Total: %1").arg(ProcessMonitor.totalCount)
                         color: Appearance.colors.colOnSecondaryContainer
                         font.pixelSize: Appearance.font.pixelSize.smallie
@@ -634,7 +641,7 @@ StyledOverlayWidget {
                         width: 6
                         height: 6
                         radius: 3
-                        color: ProcessMonitor.updating ?
+                        color: ProcessMonitor.warmingUp ?
                         Appearance.colors.colTertiary :
                         Appearance.colors.colPrimary
                     }
@@ -644,13 +651,13 @@ StyledOverlayWidget {
                         width: 6
                         height: 6
                         radius: 1
-                        color: ProcessMonitor.updating ?
+                        color: ProcessMonitor.warmingUp ?
                         Appearance.colors.colTertiary :
                         Appearance.colors.colPrimary
                     }
 
                     StyledText {
-                        text: ProcessMonitor.updating ? Translation.tr("Updating...") : root.expandedPid !== "" ? Translation.tr("Paused") : Translation.tr("Live")
+                        text: ProcessMonitor.warmingUp ? Translation.tr("Loading...") : root.expandedPid !== "" ? Translation.tr("Paused") : Translation.tr("Live")
                         color: Appearance.colors.colOnSecondaryContainer
                         font.pixelSize: Appearance.font.pixelSize.smallie
                     }

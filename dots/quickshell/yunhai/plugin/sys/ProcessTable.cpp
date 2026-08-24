@@ -5,11 +5,15 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>
+#include <algorithm>
+#include <compare>
 #include <pwd.h>
 #include <signal.h>
 #include <unistd.h>
 
 namespace {
+
+constexpr int WARMUP_SAMPLE_DELAY_MS = 300;
 
 const QStringList INTERPRETERS = {
     QStringLiteral("python"),  QStringLiteral("python2"), QStringLiteral("python3"), QStringLiteral("node"),
@@ -70,6 +74,7 @@ void ProcessTable::setActive(bool active) {
     if (active == this->timer.isActive()) return;
     if (active) {
         this->refresh();
+        if (this->bWarmingUp) QTimer::singleShot(WARMUP_SAMPLE_DELAY_MS, this, &ProcessTable::refresh);
         this->timer.start();
     } else {
         this->timer.stop();
@@ -104,6 +109,7 @@ QString ProcessTable::userName(uint uid) {
 
 void ProcessTable::refresh() {
     const auto totalTicks = this->totalCpuTicks();
+    const auto hadPriorSample = this->lastTotalTicks != 0;
     const auto totalDelta = totalTicks > this->lastTotalTicks ? totalTicks - this->lastTotalTicks : 0;
 
     for (auto* entry: std::as_const(this->entries)) entry->setSeen(false);
@@ -166,10 +172,21 @@ void ProcessTable::refresh() {
         }
     }
 
+    if (this->bWarmingUp && hadPriorSample) {
+        this->bWarmingUp = false;
+        emit this->warmingUpChanged();
+    }
+
     this->rebuildView();
 }
 
 void ProcessTable::rebuildView() {
+    if (this->bWarmingUp) {
+        this->bProcesses.clear();
+        emit this->processesChanged();
+        return;
+    }
+
     QList<ProcessEntry*> view;
     view.reserve(this->allProcesses.length());
 
@@ -185,16 +202,17 @@ void ProcessTable::rebuildView() {
 
     const auto key = this->bSortKey;
     const auto descending = this->bSortDescending;
-    const auto less = [key](const ProcessEntry* a, const ProcessEntry* b) {
+    const auto compare = [key](const ProcessEntry* a, const ProcessEntry* b) -> std::weak_ordering {
         switch (key) {
-            case ProcessTable::Name: return a->name().compare(b->name(), Qt::CaseInsensitive) < 0;
-            case ProcessTable::Memory: return a->memoryKb() < b->memoryKb();
-            default: return a->cpuPercent() < b->cpuPercent();
+            case ProcessTable::Name: return a->name().compare(b->name(), Qt::CaseInsensitive) <=> 0;
+            case ProcessTable::Memory: return std::weak_order(a->memoryKb(), b->memoryKb());
+            default: return std::weak_order(a->cpuPercent(), b->cpuPercent());
         }
     };
 
-    std::sort(view.begin(), view.end(), [&less, descending](const ProcessEntry* a, const ProcessEntry* b) {
-        return descending ? less(b, a) : less(a, b);
+    std::sort(view.begin(), view.end(), [&compare, descending](const ProcessEntry* a, const ProcessEntry* b) {
+        const auto ordering = descending ? compare(b, a) : compare(a, b);
+        return ordering == 0 ? a->pidValue() < b->pidValue() : ordering < 0;
     });
 
     this->bProcesses = view;
