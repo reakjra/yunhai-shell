@@ -9,6 +9,7 @@ import QtQuick.Layouts
 RippleButton {
     id: root
     property string displayText: ""
+    property string iconName: ""
     colBackground: Appearance.colors.colLayer2
 
     implicitWidth: contentItem.implicitWidth + horizontalPadding * 2
@@ -16,16 +17,25 @@ RippleButton {
 
     contentItem: Item {
         anchors.centerIn: parent
-        implicitWidth: languageRow.implicitWidth
-        implicitHeight: languageText.implicitHeight
+        implicitWidth: contentRow.implicitWidth
+        implicitHeight: label.implicitHeight
         RowLayout {
-            id: languageRow
+            id: contentRow
             anchors.centerIn: parent
             spacing: 0
-            StyledText {
-                id: languageText
+            MaterialSymbol {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.leftMargin: 5
+                Layout.rightMargin: 4
+                visible: root.iconName.length > 0
+                iconSize: Appearance.font.pixelSize.large
+                text: root.iconName
+                color: Appearance.colors.colOnLayer2
+            }
+            StyledText {
+                id: label
+                Layout.alignment: Qt.AlignVCenter
+                Layout.leftMargin: root.iconName.length > 0 ? 0 : 5
                 text: root.displayText
                 color: Appearance.colors.colOnLayer2
                 font.pixelSize: Appearance.font.pixelSize.small

@@ -11,23 +11,95 @@ import Quickshell.Io
 Item {
     id: root
 
-    // Sizes
     property real padding: 4
-
-    // Widgets
     property var inputField: inputCanvas.inputTextArea
-
-    // Widget variables
-    property bool translationFor: false
     property string translatedText: ""
-    property list<string> languages: []
+    property string detectedSource: ""
 
-    // Options
-    property string targetLanguage: Config.options.language.translator.targetLanguage
-    property string sourceLanguage: Config.options.language.translator.sourceLanguage
-    property string hostLanguage: targetLanguage
+    readonly property string targetLanguage: Config.options.language.translator.targetLanguage
+    readonly property string sourceLanguage: Config.options.language.translator.sourceLanguage
 
-    // DeepL
+    readonly property var autoEntry: ({
+        code: "auto",
+        label: Translation.tr("Automatic")
+    })
+    readonly property var catalogEntries: [root.autoEntry].concat(LanguageCatalog.entries.map(entry => ({
+        code: entry.code,
+        label: entry.name
+    })))
+    readonly property var sourceEntries: root.useDeepL ? deeplSourceLanguages.entries : root.catalogEntries
+    readonly property var targetEntries: root.useDeepL ? deeplTargetLanguages.entries : root.catalogEntries
+
+    onSourceEntriesChanged: root.resolveLanguage(false)
+    onTargetEntriesChanged: root.resolveLanguage(true)
+
+    function labelFor(entries: var, code: string): string {
+        const match = entries.find(entry => entry.code === code);
+        return match ? match.label : LanguageCatalog.nameFor(code);
+    }
+
+    function setLanguage(isTarget: bool, code: string) {
+        const key = isTarget ? "targetLanguage" : "sourceLanguage";
+        if (Config.options.language.translator[key] === code)
+            return;
+        Config.options.language.translator[key] = code;
+        translateTimer.restart();
+    }
+
+    function normalizeInto(entries: var, code: string): string {
+        if (code === "auto" || entries.some(entry => entry.code === code))
+            return code;
+        const base = code.split("-")[0];
+        const match = entries.find(entry => entry.code === base) ?? entries.find(entry => entry.code.startsWith(base + "-"));
+        return match ? match.code : "auto";
+    }
+
+    function swapLanguages() {
+        const detected = root.detectedSource.length > 0 ? LanguageCatalog.codeFor(root.detectedSource) : "auto";
+        const source = root.sourceLanguage !== "auto" ? root.sourceLanguage : detected;
+        const target = root.targetLanguage;
+        const translated = root.translatedText;
+        root.setLanguage(true, root.normalizeInto(root.targetEntries, source));
+        root.setLanguage(false, root.normalizeInto(root.sourceEntries, target));
+        if (translated.length > 0)
+            root.inputField.text = translated;
+    }
+
+    function resolveLanguage(isTarget: bool) {
+        const entries = isTarget ? root.targetEntries : root.sourceEntries;
+        if (entries.length <= 1)
+            return;
+        const code = LanguageCatalog.codeFor(isTarget ? root.targetLanguage : root.sourceLanguage);
+        root.setLanguage(isTarget, root.normalizeInto(entries, code));
+    }
+
+    readonly property var providers: [
+        {
+            code: "deepl",
+            label: "DeepL"
+        },
+        {
+            code: "auto",
+            label: Translation.tr("Automatic")
+        },
+        {
+            code: "google",
+            label: "Google"
+        },
+        {
+            code: "bing",
+            label: "Bing"
+        }
+    ]
+    readonly property string provider: Config.options.sidebar.translator.useDeepL ? "deepl" : Config.options.language.translator.engine
+
+    function setProvider(code: string) {
+        Config.options.sidebar.translator.useDeepL = code === "deepl";
+        if (code !== "deepl")
+            Config.options.language.translator.engine = code;
+        translateTimer.restart();
+    }
+
     readonly property string deeplApiKey: KeyringStorage.keyringData?.apiKeys?.deepl ?? ""
     readonly property bool useDeepL: Config.options.sidebar.translator.useDeepL && deeplApiKey.length > 0
     readonly property bool deeplMissingKey: Config.options.sidebar.translator.useDeepL && deeplApiKey.length === 0
@@ -35,39 +107,36 @@ Item {
     Component.onCompleted: {
         if (Config.options.sidebar.translator.useDeepL && !KeyringStorage.loaded)
             KeyringStorage.fetchKeyringData();
-        else
-            reloadLanguages();
-    }
-
-    onUseDeepLChanged: {
-        // Reset languages to auto since trans and DeepL use incompatible codes
-        root.targetLanguage = "auto";
-        root.sourceLanguage = "auto";
-        Config.options.language.translator.targetLanguage = "auto";
-        Config.options.language.translator.sourceLanguage = "auto";
         reloadLanguages();
     }
+
+    onUseDeepLChanged: reloadLanguages()
+    onDeeplApiKeyChanged: reloadLanguages()
+
     function reloadLanguages() {
-        root.languages = [];
-        if (useDeepL)
-            getDeeplLanguagesProc.running = true;
+        LanguageCatalog.load();
+        if (!Config.options.sidebar.translator.useDeepL || root.deeplApiKey.length === 0)
+            return;
+        deeplSourceLanguages.start(root.deeplApiKey);
+        deeplTargetLanguages.start(root.deeplApiKey);
+    }
+
+    property string selectorMode: ""
+    readonly property bool selectorIsProvider: root.selectorMode === "provider"
+    readonly property bool selectorIsTarget: root.selectorMode === "target"
+    readonly property var selectorEntries: root.selectorIsProvider ? root.providers : (root.selectorIsTarget ? root.targetEntries : root.sourceEntries)
+    readonly property string selectorCurrent: root.selectorIsProvider ? root.provider : (root.selectorIsTarget ? root.targetLanguage : root.sourceLanguage)
+
+    function applySelection(code: string) {
+        if (root.selectorIsProvider)
+            root.setProvider(code);
         else
-            getLanguagesProc.running = true;
+            root.setLanguage(root.selectorIsTarget, code);
     }
 
-    // States
-    property bool showLanguageSelector: false
-    property bool languageSelectorTarget: false
-
-    function showLanguageSelectorDialog(isTargetLang: bool) {
-        root.languageSelectorTarget = isTargetLang;
-        root.showLanguageSelector = true
-    }
-
-    onFocusChanged: (focus) => {
-        if (focus) {
-            root.inputField.forceActiveFocus()
-        }
+    onFocusChanged: {
+        if (root.focus)
+            root.inputField?.forceActiveFocus();
     }
 
     Timer {
@@ -77,61 +146,60 @@ Item {
         onTriggered: () => {
             if (root.inputField.text.trim().length === 0) {
                 root.translatedText = "";
+                root.detectedSource = "";
                 return;
             }
-            if (root.useDeepL) {
-                deeplTranslateProc.running = false;
-                deeplTranslateProc.buffer = "";
-                deeplTranslateProc.running = true;
-            } else {
-                translateProc.running = false;
-                translateProc.buffer = "";
-                translateProc.running = true;
-            }
+            if (root.useDeepL)
+                deeplTranslateProc.start();
+            else
+                translateProc.start();
         }
     }
 
     Process {
         id: translateProc
-        command: ["bash", "-c", `trans -brief -no-bidi`
+        command: ["bash", "-c", `trans -brief -no-bidi -no-ansi`
+            + ` -engine '${StringUtils.shellSingleQuoteEscape(Config.options.language.translator.engine)}'`
             + ` -source '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}'`
             + ` -target '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}'`
             + ` '${StringUtils.shellSingleQuoteEscape(root.inputField.text.trim())}'`]
         property string buffer: ""
+        property string errorBuffer: ""
+
+        function start() {
+            translateProc.running = false;
+            translateProc.buffer = "";
+            translateProc.errorBuffer = "";
+            translateProc.running = true;
+        }
+
         stdout: SplitParser {
             onRead: data => {
                 translateProc.buffer += data + "\n";
             }
         }
-        onExited: (exitCode, exitStatus) => {
-            // With -brief mode, we get output with no metadata
-            root.translatedText = translateProc.buffer.trim();
-        }
-    }
-
-    Process {
-        id: getLanguagesProc
-        command: ["trans", "-list-languages", "-no-bidi"]
-        property list<string> bufferList: ["auto"]
-        stdout: SplitParser {
+        stderr: SplitParser {
             onRead: data => {
-                getLanguagesProc.bufferList.push(data.trim());
+                translateProc.errorBuffer += data + "\n";
             }
         }
         onExited: (exitCode, exitStatus) => {
-            let langs = getLanguagesProc.bufferList
-                .filter(lang => lang.trim().length > 0 && lang !== "auto")
-                .sort((a, b) => a.localeCompare(b));
-            langs.unshift("auto");
-            root.languages = langs;
-            getLanguagesProc.bufferList = [];
+            const translated = translateProc.buffer.trim();
+            root.translatedText = translated.length > 0 ? translated : translateProc.errorBuffer.trim();
+            root.detectedSource = "";
         }
     }
 
-    // DeepL Free API translation
     Process {
         id: deeplTranslateProc
         property string buffer: ""
+
+        function start() {
+            deeplTranslateProc.running = false;
+            deeplTranslateProc.buffer = "";
+            deeplTranslateProc.running = true;
+        }
+
         command: {
             const text = JSON.stringify(root.inputField.text.trim());
             const targetLang = root.targetLanguage === "auto" ? "EN" : root.targetLanguage.toUpperCase();
@@ -153,34 +221,62 @@ Item {
             try {
                 const resp = JSON.parse(deeplTranslateProc.buffer);
                 root.translatedText = resp.translations.map(t => t.text).join("\n");
+                root.detectedSource = resp.translations[0].detected_source_language ?? "";
             } catch (e) {
                 root.translatedText = deeplTranslateProc.buffer.trim();
             }
         }
     }
 
-    // DeepL supported languages list
-    Process {
-        id: getDeeplLanguagesProc
+    component DeeplLanguageFetch: Process {
+        id: fetcher
+        property string listType
+        property string apiKey
+        property var fallbackEntry
+        property var entries: []
         property string buffer: ""
-        command: ["curl", "-s", "https://api-free.deepl.com/v2/languages",
-            "-H", `Authorization: DeepL-Auth-Key ${root.deeplApiKey}`]
+        command: ["curl", "-sg", `https://api-free.deepl.com/v2/languages?type=${fetcher.listType}`,
+            "-H", `Authorization: DeepL-Auth-Key ${fetcher.apiKey}`]
+
+        function start(key: string) {
+            fetcher.apiKey = key;
+            fetcher.buffer = "";
+            fetcher.running = true;
+        }
+
         stdout: SplitParser {
             onRead: data => {
-                getDeeplLanguagesProc.buffer += data + "\n";
+                fetcher.buffer += data;
             }
         }
         onExited: (exitCode, exitStatus) => {
             try {
-                const resp = JSON.parse(getDeeplLanguagesProc.buffer);
-                let langs = resp.map(l => l.language).sort((a, b) => a.localeCompare(b));
-                langs.unshift("auto");
-                root.languages = langs;
+                const languages = JSON.parse(fetcher.buffer).map(language => {
+                    const code = LanguageCatalog.codeFor(language.language.toLowerCase());
+                    const name = LanguageCatalog.nameFor(code);
+                    return {
+                        code: code,
+                        label: name === code ? language.name : name
+                    };
+                }).sort((a, b) => a.label.localeCompare(b.label));
+                fetcher.entries = [fetcher.fallbackEntry].concat(languages);
             } catch (e) {
-                root.languages = ["auto"];
+                fetcher.entries = [fetcher.fallbackEntry];
             }
-            getDeeplLanguagesProc.buffer = "";
+            fetcher.buffer = "";
         }
+    }
+
+    DeeplLanguageFetch {
+        id: deeplSourceLanguages
+        listType: "source"
+        fallbackEntry: root.autoEntry
+    }
+
+    DeeplLanguageFetch {
+        id: deeplTargetLanguages
+        listType: "target"
+        fallbackEntry: root.autoEntry
     }
 
     ColumnLayout {
@@ -192,11 +288,12 @@ Item {
         StyledFlickable {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            contentWidth: width
             contentHeight: contentColumn.implicitHeight
 
             ColumnLayout {
                 id: contentColumn
-                anchors.fill: parent
+                width: parent.width
 
                 StyledText {
                     Layout.fillWidth: true
@@ -210,15 +307,47 @@ Item {
                     bottomPadding: 4
                 }
 
-                LanguageSelectorButton { // Target language button
-                    id: targetLanguageButton
-                    displayText: root.targetLanguage
-                    onClicked: {
-                        root.showLanguageSelectorDialog(true);
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    DropdownButton {
+                        id: targetLanguageButton
+                        displayText: root.labelFor(root.targetEntries, root.targetLanguage)
+                        onClicked: {
+                            root.selectorMode = "target";
+                        }
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    GroupButton {
+                        id: swapButton
+                        baseWidth: height
+                        buttonRadius: Appearance.rounding.small
+                        contentItem: MaterialSymbol {
+                            anchors.centerIn: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            iconSize: Appearance.font.pixelSize.larger
+                            text: "swap_vert"
+                            color: Appearance.colors.colOnLayer1
+                        }
+                        onClicked: {
+                            root.swapLanguages();
+                        }
+                    }
+
+                    DropdownButton {
+                        id: providerButton
+                        iconName: "translate"
+                        displayText: root.labelFor(root.providers, root.provider)
+                        onClicked: {
+                            root.selectorMode = "provider";
+                        }
                     }
                 }
 
-                TextCanvas { // Content translation
+                TextCanvas {
                     id: outputCanvas
                     isInput: false
                     placeholderText: Translation.tr("Translation goes here...")
@@ -262,18 +391,18 @@ Item {
                     }
                 }
 
-            }    
-        }
-
-        LanguageSelectorButton { // Source language button
-            id: sourceLanguageButton
-            displayText: root.sourceLanguage
-            onClicked: {
-                root.showLanguageSelectorDialog(false);
             }
         }
 
-        TextCanvas { // Content input
+        DropdownButton {
+            id: sourceLanguageButton
+            displayText: root.labelFor(root.sourceEntries, root.sourceLanguage)
+            onClicked: {
+                root.selectorMode = "source";
+            }
+        }
+
+        TextCanvas {
             id: inputCanvas
             isInput: true
             placeholderText: Translation.tr("Enter text to translate...")
@@ -316,30 +445,24 @@ Item {
 
     Loader {
         anchors.fill: parent
-        active: root.showLanguageSelector
-        visible: root.showLanguageSelector
+        active: root.selectorMode.length > 0
+        visible: root.selectorMode.length > 0
         z: 9999
         sourceComponent: SelectionDialog {
-            id: languageSelectorDialog
-            titleText: Translation.tr("Select Language")
-            items: root.languages
-            defaultChoice: root.languageSelectorTarget ? root.targetLanguage : root.sourceLanguage
+            id: selectorDialog
+            titleText: root.selectorIsProvider ? Translation.tr("Select Provider") : Translation.tr("Select Language")
+            searchable: !root.selectorIsProvider
+            searchPlaceholder: Translation.tr("Search languages")
+            items: root.selectorEntries.map(entry => entry.code)
+            labelFor: code => root.labelFor(root.selectorEntries, code)
+            defaultChoice: root.selectorCurrent
             onCanceled: () => {
-                root.showLanguageSelector = false;
+                root.selectorMode = "";
             }
             onSelected: (result) => {
-                root.showLanguageSelector = false;
-                if (!result || result.length === 0) return; // No selection made
-
-                if (root.languageSelectorTarget) {
-                    root.targetLanguage = result;
-                    Config.options.language.translator.targetLanguage = result; // Save to config
-                } else {
-                    root.sourceLanguage = result;
-                    Config.options.language.translator.sourceLanguage = result; // Save to config
-                }
-
-                translateTimer.restart(); // Restart translation after language change
+                if (result && result.length > 0)
+                    root.applySelection(result);
+                root.selectorMode = "";
             }
         }
     }

@@ -3,19 +3,40 @@ import qs.modules.common.widgets
 import qs.services
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 
 Item {
     id: root
     property real dialogPadding: 15
     property real dialogMargin: 30
     property string titleText: "Selection Dialog"
-    property alias items: choiceModel.values
-    property int selectedId: choiceListView.currentIndex
+    property var items: []
+    property var labelFor: item => String(item)
+    property bool searchable: false
+    property string searchPlaceholder: Translation.tr("Search")
     property var defaultChoice
+    property var selectedValue: defaultChoice
+
+    readonly property var filteredItems: {
+        const query = searchField.text.trim().toLowerCase();
+        if (query.length === 0)
+            return root.items;
+        return root.items.filter(item => root.labelFor(item).toLowerCase().includes(query));
+    }
 
     signal canceled();
     signal selected(var result);
+
+    function accept() {
+        root.selected(root.selectedValue ?? null);
+    }
+
+    function moveSelection(offset: int) {
+        const items = root.filteredItems;
+        if (items.length === 0)
+            return;
+        const index = items.indexOf(root.selectedValue) + offset;
+        root.selectedValue = items[Math.max(0, Math.min(items.length - 1, index))];
+    }
 
     Rectangle { // Scrim
         id: scrimOverlay
@@ -37,7 +58,7 @@ Item {
         anchors.fill: parent
         anchors.margins: dialogMargin
         implicitHeight: dialogColumnLayout.implicitHeight
-        
+
         ColumnLayout {
             id: dialogColumnLayout
             anchors.fill: parent
@@ -54,6 +75,19 @@ Item {
                 text: root.titleText
             }
 
+            MaterialTextField {
+                id: searchField
+                visible: root.searchable
+                Layout.fillWidth: true
+                Layout.leftMargin: root.dialogPadding
+                Layout.rightMargin: root.dialogPadding
+                placeholderText: root.searchPlaceholder
+                Keys.onDownPressed: root.moveSelection(1)
+                Keys.onUpPressed: root.moveSelection(-1)
+                onAccepted: root.accept()
+                Component.onCompleted: if (root.searchable) forceActiveFocus()
+            }
+
             Rectangle {
                 color: Appearance.m3colors.m3outline
                 implicitHeight: 1
@@ -67,32 +101,26 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
-                currentIndex: root.defaultChoice !== undefined ? root.items.indexOf(root.defaultChoice) : -1
                 spacing: 6
+                animateAppearance: false
+                currentIndex: root.filteredItems.indexOf(root.selectedValue)
 
-                model: ScriptModel {
-                    id: choiceModel
-                }
+                model: root.filteredItems
+
+                onCurrentIndexChanged: if (currentIndex >= 0) positionViewAtIndex(currentIndex, ListView.Contain)
 
                 delegate: StyledRadioButton {
                     id: radioButton
                     required property var modelData
-                    required property int index
-                    anchors {
-                        left: parent?.left
-                        right: parent?.right
-                        leftMargin: root.dialogPadding
-                        rightMargin: root.dialogPadding
-                    }
+                    checkable: false
+                    width: choiceListView.width
+                    leftPadding: root.dialogPadding
+                    rightPadding: root.dialogPadding
 
-                    description: modelData.toString()
-                    checked: index === choiceListView.currentIndex
+                    description: root.labelFor(modelData)
+                    checked: modelData === root.selectedValue
 
-                    onCheckedChanged: {
-                        if (checked) {
-                            choiceListView.currentIndex = index;
-                        }
-                    }
+                    onClicked: root.selectedValue = modelData
                 }
             }
 
@@ -117,10 +145,7 @@ Item {
                 }
                 DialogButton {
                     buttonText: Translation.tr("OK")
-                    onClicked: root.selected(
-                        root.selectedId === -1 ? null :
-                        root.items[root.selectedId]
-                    )
+                    onClicked: root.accept()
                 }
             }
         }

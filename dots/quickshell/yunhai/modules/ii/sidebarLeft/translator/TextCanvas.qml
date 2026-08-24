@@ -8,7 +8,7 @@ import QtQuick.Layouts
 
 Rectangle {
     id: root
-    property bool isInput: true // true for input, false for output
+    property bool isInput: true
     property string placeholderText
     property string text: ""
     property real minHeight: 150
@@ -23,7 +23,17 @@ Rectangle {
     color: Appearance.colors.colLayer2
     radius: Appearance.rounding.normal
 
-    signal inputTextChanged(); // Signal emitted when text changes
+    signal inputTextChanged();
+
+    TapHandler {
+        enabled: root.isInput
+        onTapped: {
+            if (!root.inputTextArea)
+                return;
+            root.inputTextArea.forceActiveFocus();
+            root.inputTextArea.cursorPosition = root.inputTextArea.length;
+        }
+    }
 
     ColumnLayout {
         id: inputColumn
@@ -35,10 +45,12 @@ Rectangle {
             active: root.isInput
             visible: root.isInput
             Layout.fillWidth: true
-            sourceComponent: StyledFlickable { // Input area
+            sourceComponent: StyledFlickable {
                 id: inputFlickable
                 property alias textArea: inputTextArea
-                implicitHeight: Math.min(root.maxTextHeight, contentHeight)
+                implicitHeight: Math.min(root.maxTextHeight, inputTextArea.implicitHeight)
+                contentWidth: width
+                contentHeight: inputTextArea.implicitHeight
                 clip: true
 
                 TextArea.flickable: StyledTextArea {
@@ -60,7 +72,7 @@ Rectangle {
             active: !root.isInput
             visible: !root.isInput
             Layout.fillWidth: true
-            sourceComponent: StyledFlickable { // Output area
+            sourceComponent: StyledFlickable {
                 id: outputFlickable
                 implicitHeight: Math.min(root.maxTextHeight, contentHeight)
                 contentWidth: width
@@ -81,7 +93,7 @@ Rectangle {
 
         Item { Layout.fillHeight: true }
 
-        RowLayout { // Status row
+        RowLayout {
             Layout.fillWidth: true
             Layout.margins: 10
             spacing: 10
