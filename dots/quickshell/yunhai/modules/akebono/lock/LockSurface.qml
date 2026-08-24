@@ -197,6 +197,10 @@ MouseArea {
                     }
                 }
 
+                TextEditContextMenuArea {
+                    editor: passwordBox
+                }
+
                 layer.enabled: true
                 layer.effect: OpacityMask {
                     maskSource: Rectangle {

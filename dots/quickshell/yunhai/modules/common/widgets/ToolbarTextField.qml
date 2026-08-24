@@ -33,18 +33,7 @@ TextField {
         radius: Appearance.rounding.full
     }
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: (mouse) => {
-            contextMenu.x = mouse.x;
-            contextMenu.y = mouse.y;
-            contextMenu.open();
-        }
-    }
-
-    TextFieldContextMenu {
-        id: contextMenu
-        textField: filterField
+    TextEditContextMenuArea {
+        editor: filterField
     }
 }

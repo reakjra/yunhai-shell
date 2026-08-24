@@ -6,11 +6,7 @@ import QtQuick.Controls
 
 import qs
 
-/**
- * Material 3 styled TextField (filled style)
- * https://m3.material.io/components/text-fields/overview
- * Note: We don't use NativeRendering because it makes the small placeholder text look weird
- */
+// no NativeRendering here, it makes the small placeholder text look weird
 TextField {
     id: root
     Material.theme: Material.System
@@ -34,19 +30,8 @@ TextField {
     }
     wrapMode: TextEdit.Wrap
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: (mouse) => {
-            contextMenu.x = mouse.x;
-            contextMenu.y = mouse.y;
-            contextMenu.open();
-        }
-    }
-
-    TextFieldContextMenu {
-        id: contextMenu
-        textField: root
+    TextEditContextMenuArea {
+        editor: root
     }
 
     MouseArea {

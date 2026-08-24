@@ -6,11 +6,7 @@ import QtQuick.Controls
 
 import qs
 
-/**
- * Material 3 styled TextArea (filled style)
- * https://m3.material.io/components/text-fields/overview
- * Note: We don't use NativeRendering because it makes the small placeholder text look weird
- */
+// no NativeRendering here, it makes the small placeholder text look weird
 TextArea {
     id: root
     Material.theme: Material.System
@@ -25,19 +21,8 @@ TextArea {
     selectionColor: Appearance.colors.colSecondaryContainer
     placeholderTextColor: Appearance.m3colors.m3outline
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onClicked: (mouse) => {
-            contextMenu.x = mouse.x;
-            contextMenu.y = mouse.y;
-            contextMenu.open();
-        }
-    }
-
-    TextAreaContextMenu {
-        id: contextMenu
-        textArea: root
+    TextEditContextMenuArea {
+        editor: root
     }
 
     background: Rectangle {

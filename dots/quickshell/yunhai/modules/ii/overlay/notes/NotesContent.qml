@@ -462,20 +462,6 @@ OverlayBackground {
                 background: null
                 padding: 12
 
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.RightButton
-                    onClicked: (mouse) => {
-                        contextMenu.x = mouse.x;
-                        contextMenu.y = mouse.y;
-                        contextMenu.open();
-                    }
-                }
-
-                TextAreaContextMenu {
-                    id: contextMenu
-                    textArea: textInput
-                }
 
                 Keys.onPressed: event => {
                     event.accepted = root.handleKeyPress(event);

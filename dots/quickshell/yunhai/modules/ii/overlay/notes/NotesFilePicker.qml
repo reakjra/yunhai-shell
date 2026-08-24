@@ -249,19 +249,8 @@ MouseArea {
                         selectedTextColor: Appearance.colors.colOnSecondaryContainer
                         selectionColor: Appearance.colors.colSecondaryContainer
 
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.RightButton
-                            onClicked: (mouse) => {
-                                contextMenu.x = mouse.x;
-                                contextMenu.y = mouse.y;
-                                contextMenu.open();
-                            }
-                        }
-
-                        TextFieldContextMenu {
-                            id: contextMenu
-                            textField: fileNameField
+                        TextEditContextMenuArea {
+                            editor: fileNameField
                         }
 
                         background: Rectangle {

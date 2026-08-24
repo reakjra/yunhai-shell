@@ -181,19 +181,8 @@ Item {
                     focus: root.showAddDialog
                     onAccepted: dialog.addTask()
 
-                    MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.RightButton
-                        onClicked: (mouse) => {
-                            contextMenu.x = mouse.x;
-                            contextMenu.y = mouse.y;
-                            contextMenu.open();
-                        }
-                    }
-
-                    TextFieldContextMenu {
-                        id: contextMenu
-                        textField: todoInput
+                    TextEditContextMenuArea {
+                        editor: todoInput
                     }
 
                     background: Rectangle {

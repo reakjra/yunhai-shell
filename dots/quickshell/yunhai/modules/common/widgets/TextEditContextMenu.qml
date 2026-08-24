@@ -3,13 +3,14 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.services
 
 import qs
 
 Popup {
     id: root
 
-    required property TextArea textArea
+    required property Item editor
 
     padding: 0
     margins: 0
@@ -51,51 +52,51 @@ Popup {
 
             ContextMenuItem {
                 iconName: "undo"
-                label: "Undo"
-                onClicked: { root.textArea.undo(); root.close(); }
+                label: Translation.tr("Undo")
+                onClicked: { root.editor.undo(); root.close(); }
             }
 
             ContextMenuItem {
                 iconName: "redo"
-                label: "Redo"
-                onClicked: { root.textArea.redo(); root.close(); }
+                label: Translation.tr("Redo")
+                onClicked: { root.editor.redo(); root.close(); }
             }
 
             MenuSeparator {}
 
             ContextMenuItem {
                 iconName: "cut"
-                label: "Cut"
-                enabled: root.textArea.selectedText.length > 0
-                onClicked: { root.textArea.cut(); root.close(); }
+                label: Translation.tr("Cut")
+                enabled: root.editor.selectedText.length > 0
+                onClicked: { root.editor.cut(); root.close(); }
             }
 
             ContextMenuItem {
                 iconName: "content_copy"
-                label: "Copy"
-                enabled: root.textArea.selectedText.length > 0
-                onClicked: { root.textArea.copy(); root.close(); }
+                label: Translation.tr("Copy")
+                enabled: root.editor.selectedText.length > 0
+                onClicked: { root.editor.copy(); root.close(); }
             }
 
             ContextMenuItem {
                 iconName: "content_paste"
-                label: "Paste"
-                onClicked: { root.textArea.paste(); root.close(); }
+                label: Translation.tr("Paste")
+                onClicked: { root.editor.paste(); root.close(); }
             }
 
             ContextMenuItem {
                 iconName: "delete"
-                label: "Delete"
-                enabled: root.textArea.selectedText.length > 0
-                onClicked: { root.textArea.remove(root.textArea.selectionStart, root.textArea.selectionEnd); root.close(); }
+                label: Translation.tr("Delete")
+                enabled: root.editor.selectedText.length > 0
+                onClicked: { root.editor.remove(root.editor.selectionStart, root.editor.selectionEnd); root.close(); }
             }
 
             MenuSeparator {}
 
             ContextMenuItem {
                 iconName: "select_all"
-                label: "Select All"
-                onClicked: { root.textArea.selectAll(); root.close(); }
+                label: Translation.tr("Select All")
+                onClicked: { root.editor.selectAll(); root.close(); }
             }
         }
     }

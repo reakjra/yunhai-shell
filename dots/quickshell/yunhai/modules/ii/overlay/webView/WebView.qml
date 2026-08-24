@@ -150,19 +150,8 @@ StyledOverlayWidget {
                         rightPadding: 12
                         verticalAlignment: TextInput.AlignVCenter
 
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.RightButton
-                            onClicked: (mouse) => {
-                                contextMenu.x = mouse.x;
-                                contextMenu.y = mouse.y;
-                                contextMenu.open();
-                            }
-                        }
-
-                        TextFieldContextMenu {
-                            id: contextMenu
-                            textField: urlField
+                        TextEditContextMenuArea {
+                            editor: urlField
                         }
 
                         background: Rectangle {
@@ -433,19 +422,8 @@ StyledOverlayWidget {
                                         rightPadding: 8
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            acceptedButtons: Qt.RightButton
-                                            onClicked: (mouse) => {
-                                                editContextMenu.x = mouse.x;
-                                                editContextMenu.y = mouse.y;
-                                                editContextMenu.open();
-                                            }
-                                        }
-
-                                        TextFieldContextMenu {
-                                            id: editContextMenu
-                                            textField: editField
+                                        TextEditContextMenuArea {
+                                            editor: editField
                                         }
                                         background: Rectangle {
                                             color: Appearance.colors.colLayer2
