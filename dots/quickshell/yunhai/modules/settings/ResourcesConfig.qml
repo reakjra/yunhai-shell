@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -9,31 +8,6 @@ import qs.modules.common.functions
 ContentPage {
     id: page
     forceWidth: true
-
-    // Load cached GPU info for vendor-aware display
-    property var gpuInfo: ({})
-    property var dgpuSensors: gpuInfo?.dgpu?.sensors ?? {}
-    property string dgpuVendor: gpuInfo?.dgpu?.vendor ?? ""
-    property string igpuVendor: gpuInfo?.igpu?.vendor ?? ""
-    property bool dgpuDetected: gpuInfo?.dgpu?.available ?? false
-    property bool igpuDetected: gpuInfo?.igpu?.available ?? false
-
-    FileView {
-        id: gpuInfoFile
-        path: Qt.resolvedUrl(FileUtils.trimFileProtocol(`${Directories.state}/user/gpu-info.json`))
-
-        JsonAdapter {
-            id: gpuInfoAdapter
-        }
-
-        onLoaded: {
-            try {
-                page.gpuInfo = JSON.parse(gpuInfoFile.text())
-            } catch (e) {
-                console.warn("Could not load gpu-info.json:", e)
-            }
-        }
-    }
 
     ContentSection {
         icon: "tune"
@@ -118,18 +92,18 @@ ContentPage {
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 2
-            visible: page.dgpuDetected || page.igpuDetected
+            visible: GpuUsage.dGpuAvailable || GpuUsage.iGpuAvailable
 
             StyledText {
-                visible: page.dgpuDetected
-                text: Translation.tr("Detected dGPU: %1 (%2)").arg(page.gpuInfo?.dgpu?.name ?? "").arg(page.dgpuVendor)
+                visible: GpuUsage.dGpuAvailable
+                text: Translation.tr("Detected dGPU: %1 (%2)").arg(GpuUsage.dGpuName).arg(GpuUsage.dGpuVendor)
                 color: Appearance.colors.colSubtext
                 font.pixelSize: Appearance.font.pixelSize.smallie
                 Layout.leftMargin: 8
             }
             StyledText {
-                visible: page.igpuDetected
-                text: Translation.tr("Detected iGPU: %1 (%2)").arg(page.gpuInfo?.igpu?.name ?? "").arg(page.igpuVendor)
+                visible: GpuUsage.iGpuAvailable
+                text: Translation.tr("Detected iGPU: %1 (%2)").arg(GpuUsage.iGpuName).arg(GpuUsage.iGpuVendor)
                 color: Appearance.colors.colSubtext
                 font.pixelSize: Appearance.font.pixelSize.smallie
                 Layout.leftMargin: 8
