@@ -44,7 +44,8 @@ StyledOverlayWidget {
     }
 
     onVisibleChanged: {
-        if (!root.visible) root.expandedPid = ""
+        if (!root.visible)
+            root.expandedPid = ""
     }
 
     onSearchTextChanged: {
@@ -97,7 +98,7 @@ StyledOverlayWidget {
 
                         StyledText {
                             anchors.centerIn: parent
-                            text: ProcessMonitor.processes.length
+                            text: ProcessMonitor.visibleCount
                             color: Appearance.colors.colOnSecondaryContainer
                             font.pixelSize: Appearance.font.pixelSize.small
                         }
@@ -107,7 +108,7 @@ StyledOverlayWidget {
                             hoverEnabled: true
 
                             StyledToolTip {
-                                text: Translation.tr("%1 processes found").arg(ProcessMonitor.processes.length)
+                                text: Translation.tr("%1 processes found").arg(ProcessMonitor.visibleCount)
                             }
                         }
                     }
@@ -296,7 +297,7 @@ StyledOverlayWidget {
                 // Empty state message
                 ColumnLayout {
                     anchors.centerIn: parent
-                    visible: !ProcessMonitor.warmingUp && ProcessMonitor.processes.length === 0
+                    visible: !ProcessMonitor.warmingUp && ProcessMonitor.visibleCount === 0
                     spacing: 12
 
                     MaterialSymbol {
@@ -324,7 +325,7 @@ StyledOverlayWidget {
                 // Process list
                 ScrollView {
                     anchors.fill: parent
-                    visible: ProcessMonitor.processes.length > 0
+                    visible: ProcessMonitor.visibleCount > 0
                     clip: true
 
                     ScrollBar.vertical: ScrollBar {
@@ -343,13 +344,19 @@ StyledOverlayWidget {
                         animateMovement: true
                         clip: true
 
-                        model: ScriptModel {
-                            objectProp: "pid"
-                            values: ProcessMonitor.processes
-                        }
+                        model: ProcessMonitor.model
 
                         delegate: Item {
-                            required property var modelData
+                            id: processDelegate
+
+                            required property string pid
+                            required property string name
+                            required property string fullCommand
+                            required property string user
+                            required property double cpuPercent
+                            required property double memPercent
+                            required property string memoryFormatted
+
                             width: listView.width
                             height: delegateColumn.implicitHeight + 8
                             clip: true
@@ -363,7 +370,7 @@ StyledOverlayWidget {
                                 }
                             }
 
-                            property bool isExpanded: root.expandedPid === modelData.pid
+                            property bool isExpanded: root.expandedPid === processDelegate.pid
 
                             Rectangle {
                                 anchors.fill: parent
@@ -385,7 +392,7 @@ StyledOverlayWidget {
                                     if (isExpanded) {
                                         root.expandedPid = ""
                                     } else {
-                                        root.expandedPid = modelData.pid
+                                        root.expandedPid = processDelegate.pid
                                     }
                                 }
                             }
@@ -410,7 +417,7 @@ StyledOverlayWidget {
                                         StyledText {
                                             Layout.fillWidth: true
                                             Layout.minimumWidth: 50
-                                            text: modelData.name
+                                            text: processDelegate.name
                                             elide: Text.ElideRight
                                             color: Appearance.colors.colOnSurface
                                             font.pixelSize: Appearance.font.pixelSize.small
@@ -421,10 +428,10 @@ StyledOverlayWidget {
                                             Layout.minimumWidth: 70
                                             Layout.maximumWidth: 70
                                             horizontalAlignment: Text.AlignRight
-                                            text: (modelData.cpuPercent || 0.0).toFixed(1) + "%"
-                                            color: modelData.cpuPercent > 50 ?
+                                            text: processDelegate.cpuPercent.toFixed(1) + "%"
+                                            color: processDelegate.cpuPercent > 50 ?
                                             Appearance.colors.colError :
-                                            modelData.cpuPercent > 25 ?
+                                            processDelegate.cpuPercent > 25 ?
                                             '#d8ffc374' :
                                             Appearance.colors.colOnSurfaceVariant
                                             font {
@@ -439,7 +446,7 @@ StyledOverlayWidget {
                                             Layout.minimumWidth: 90
                                             Layout.maximumWidth: 90
                                             horizontalAlignment: Text.AlignRight
-                                            text: modelData.memoryFormatted
+                                            text: processDelegate.memoryFormatted
                                             color: Appearance.colors.colOnSurfaceVariant
                                             font {
                                                 family: Appearance.font.family.numbers
@@ -474,7 +481,7 @@ StyledOverlayWidget {
                                                 }
 
                                                 onClicked: {
-                                                    const pid = modelData.pid
+                                                    const pid = processDelegate.pid
                                                     // If this process is expanded, close it first
                                                     if (root.expandedPid === pid) {
                                                         root.expandedPid = ""
@@ -484,7 +491,7 @@ StyledOverlayWidget {
                                                 }
 
                                                 StyledToolTip {
-                                                    text: Translation.tr("Kill (PID: %1)").arg(modelData.pid)
+                                                    text: Translation.tr("Kill (PID: %1)").arg(processDelegate.pid)
                                                 }
                                             }
                                         }
@@ -526,7 +533,7 @@ StyledOverlayWidget {
                                             StyledText {
                                                 Layout.fillWidth: true
                                                 horizontalAlignment: Text.AlignRight
-                                                text: modelData.pid
+                                                text: processDelegate.pid
                                                 color: Appearance.colors.colOnSurface
                                                 font.pixelSize: Appearance.font.pixelSize.smallie
                                             }
@@ -547,7 +554,7 @@ StyledOverlayWidget {
                                             StyledText {
                                                 Layout.fillWidth: true
                                                 horizontalAlignment: Text.AlignRight
-                                                text: modelData.user
+                                                text: processDelegate.user
                                                 color: Appearance.colors.colOnSurface
                                                 font.pixelSize: Appearance.font.pixelSize.smallie
                                             }
@@ -568,7 +575,7 @@ StyledOverlayWidget {
                                             StyledText {
                                                 Layout.fillWidth: true
                                                 horizontalAlignment: Text.AlignRight
-                                                text: modelData.memPercent.toFixed(1) + "% (" + modelData.memoryFormatted + ")"
+                                                text: processDelegate.memPercent.toFixed(1) + "% (" + processDelegate.memoryFormatted + ")"
                                                 color: Appearance.colors.colOnSurface
                                                 font.pixelSize: Appearance.font.pixelSize.smallie
                                             }
@@ -591,7 +598,7 @@ StyledOverlayWidget {
                                             }
                                             StyledText {
                                                 Layout.fillWidth: true
-                                                text: modelData.fullCommand
+                                                text: processDelegate.fullCommand
                                                 wrapMode: Text.Wrap
                                                 color: Appearance.colors.colOnSurface
                                                 font.pixelSize: Appearance.font.pixelSize.smallie
@@ -628,7 +635,7 @@ StyledOverlayWidget {
 
                     StyledText {
                         text: root.searchText.trim() !== "" ?
-                        Translation.tr("Showing %1 of %2").arg(ProcessMonitor.processes.length).arg(ProcessMonitor.totalCount) :
+                        Translation.tr("Showing %1 of %2").arg(ProcessMonitor.visibleCount).arg(ProcessMonitor.totalCount) :
                         Translation.tr("Total: %1").arg(ProcessMonitor.totalCount)
                         color: Appearance.colors.colOnSecondaryContainer
                         font.pixelSize: Appearance.font.pixelSize.smallie

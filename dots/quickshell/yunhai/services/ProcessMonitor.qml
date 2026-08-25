@@ -7,29 +7,74 @@ import Yunhai.Sys
 Singleton {
     id: root
 
-    readonly property int sortByCpu: ProcessTable.Cpu
-    readonly property int sortByMemory: ProcessTable.Memory
-    readonly property int sortByName: ProcessTable.Name
+    readonly property int sortByCpu: 0
+    readonly property int sortByMemory: 1
+    readonly property int sortByName: 2
 
     property bool active: false
+    property int interval: 2000
     property string filter: ""
     property int sortKey: root.sortByCpu
     property bool sortDescending: true
 
-    readonly property var processes: ProcessTable.processes
+    readonly property var model: ProcessTable
+    readonly property int visibleCount: ProcessTable.count
     readonly property int totalCount: ProcessTable.totalCount
     readonly property bool warmingUp: ProcessTable.warmingUp
 
-    onActiveChanged: ProcessTable.active = root.active
-    onFilterChanged: ProcessTable.filter = root.filter
-    onSortKeyChanged: ProcessTable.sortKey = root.sortKey
-    onSortDescendingChanged: ProcessTable.sortDescending = root.sortDescending
-
     function killProcess(pid) {
-        ProcessTable.kill(Number(pid));
+        ProcessTable.killProcess(pid);
     }
 
     function forceKillProcess(pid) {
-        ProcessTable.forceKill(Number(pid));
+        ProcessTable.forceKillProcess(pid);
+    }
+
+    // deferred: a synchronous refresh here mutates the model while a freshly created
+    // ListView is still laying out, and it answers by driving contentY negative
+    onActiveChanged: {
+        if (root.active)
+            prime.restart();
+    }
+
+    Timer {
+        id: prime
+        interval: 0
+        onTriggered: {
+            ProcessTable.refresh();
+            if (ProcessTable.warmingUp)
+                warmup.restart();
+        }
+    }
+
+    Binding {
+        target: ProcessTable
+        property: "filter"
+        value: root.filter
+    }
+
+    Binding {
+        target: ProcessTable
+        property: "sortKey"
+        value: root.sortKey
+    }
+
+    Binding {
+        target: ProcessTable
+        property: "sortDescending"
+        value: root.sortDescending
+    }
+
+    Timer {
+        interval: root.interval
+        running: root.active
+        repeat: true
+        onTriggered: ProcessTable.refresh()
+    }
+
+    Timer {
+        id: warmup
+        interval: 300
+        onTriggered: ProcessTable.refresh()
     }
 }

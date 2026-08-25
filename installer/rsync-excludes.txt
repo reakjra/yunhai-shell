@@ -24,4 +24,5 @@ hyprland/*.conf
 functions/build-layer.fish
 functions/rin-patches.fish
 plugin/build/
+plugin/target/
 imports/

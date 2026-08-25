@@ -17,6 +17,8 @@ ListView {
     property bool animateMovement: false
     // Accumulated scroll destination so wheel deltas stack while animating
     property real scrollTargetY: 0
+    // Only wheel scrolls animate, or the view's own contentY fixups on insert/remove get animated too
+    property bool scrollAnimating: false
 
     property real touchpadScrollFactor: Config?.options.interactions.scrolling.touchpadScrollFactor ?? 100
     property real mouseScrollFactor: Config?.options.interactions.scrolling.mouseScrollFactor ?? 50
@@ -46,18 +48,21 @@ ListView {
             var targetY = Math.max(0, Math.min(base - delta * scrollFactor, maxY));
 
             root.scrollTargetY = targetY;
+            root.scrollAnimating = true;
             root.contentY = targetY;
             wheelEvent.accepted = true;
         }
     }
 
     Behavior on contentY {
+        enabled: root.scrollAnimating
         NumberAnimation {
             id: scrollAnim
             alwaysRunToEnd: true
             duration: Appearance.animation.scroll.duration
             easing.type: Appearance.animation.scroll.type
             easing.bezierCurve: Appearance.animation.scroll.bezierCurve
+            onFinished: root.scrollAnimating = false
         }
     }
 
