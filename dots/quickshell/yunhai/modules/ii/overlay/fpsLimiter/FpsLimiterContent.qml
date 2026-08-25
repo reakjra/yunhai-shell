@@ -36,9 +36,9 @@ OverlayBackground {
         }
 
         var cfgPaths = [
-          "~/.config/MangoHud/mangohud-full.conf.conf",
-          "~/.config/MangoHud/mangohud-minimal.conf"
-        ]; // MangoHud config files
+          "~/.config/MangoHud/MangoHud.conf",
+          "~/.config/vkMiru/vkMiru.conf" // personal one :P
+        ];
 
         var updateCommands = cfgPaths.map(path => {
             return "if grep -q '^fps_limit=' " + path + "; " +
