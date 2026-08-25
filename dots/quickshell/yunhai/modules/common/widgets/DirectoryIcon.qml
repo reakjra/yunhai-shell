@@ -16,6 +16,12 @@ Image {
     sourceSize.width: root.width * root.Screen.devicePixelRatio
     sourceSize.height: root.height * root.Screen.devicePixelRatio
 
+    readonly property string filePath: fileModelData.filePath
+    onFilePathChanged: {
+        root.probedMime = "";
+        root.desktopFileIcon = "";
+    }
+
     readonly property bool isPlainFile: !fileModelData.fileIsDir && !root.isDesktopFile
     readonly property string knownMime: root.isPlainFile ? MimeIcons.mimeFor(fileModelData.fileName) : ""
     readonly property string mimeProbeTarget: (root.isPlainFile && MimeIcons.globsLoaded && root.knownMime.length === 0) ? fileModelData.filePath : ""

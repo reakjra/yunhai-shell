@@ -106,20 +106,34 @@ Item {
         layoutTimer.restart();
     }
 
+    property var entryCache: ({})
+
     function rebuildEntries() {
         const arr = [];
+        const cache = view.entryCache;
+        const live = new Set();
         const hidden = view.cfg.hiddenIcons ?? [];
         for (let i = 0; i < folderModel.count; i++) {
             const n = folderModel.get(i, "fileName");
             if (hidden.indexOf(n) >= 0)
                 continue;
-            arr.push({
-                "fileName": n,
-                "filePath": folderModel.get(i, "filePath"),
-                "fileIsDir": folderModel.get(i, "fileIsDir"),
-                "fileUrl": "" + folderModel.get(i, "fileUrl")
-            });
+            const path = folderModel.get(i, "filePath");
+            let entry = cache[n];
+            if (!entry || entry.filePath !== path) {
+                entry = {
+                    "fileName": n,
+                    "filePath": path,
+                    "fileIsDir": folderModel.get(i, "fileIsDir"),
+                    "fileUrl": "" + folderModel.get(i, "fileUrl")
+                };
+                cache[n] = entry;
+            }
+            live.add(n);
+            arr.push(entry);
         }
+        for (const k of Object.keys(cache))
+            if (!live.has(k))
+                delete cache[k];
         view.fileEntries = arr;
     }
 
@@ -133,11 +147,15 @@ Item {
         const toSave = ({});
         const hidden = view.cfg.hiddenIcons ?? [];
         const names = [];
+        const listed = [];
         for (let i = 0; i < folderModel.count; i++) {
             const n = folderModel.get(i, "fileName");
+            listed.push(n);
             if (hidden.indexOf(n) < 0)
                 names.push(n);
         }
+        if (folderModel.status === FolderListModel.Ready)
+            DesktopLayout.prune(view.screenName, listed);
         for (const n of names) {
             const c = DesktopLayout.cellOf(view.screenName, n);
             if (c && c.col >= 0 && c.col < view.cols && c.row >= 0 && c.row < view.rows) {
@@ -418,8 +436,11 @@ Item {
     }
 
     function trash(paths) {
-        if (paths.length > 0)
-            Quickshell.execDetached(["gio", "trash"].concat(paths));
+        if (paths.length === 0)
+            return;
+        Quickshell.execDetached(["gio", "trash"].concat(paths));
+        for (const p of paths)
+            DesktopLayout.forget(view.screenName, FileUtils.fileNameForPath(p));
     }
     function pathToUri(p) {
         return "file://" + p.split("/").map(s => encodeURIComponent(s)).join("/");

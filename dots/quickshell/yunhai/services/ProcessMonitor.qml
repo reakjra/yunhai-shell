@@ -30,8 +30,6 @@ Singleton {
         ProcessTable.forceKillProcess(pid);
     }
 
-    // deferred: a synchronous refresh here mutates the model while a freshly created
-    // ListView is still laying out, and it answers by driving contentY negative
     onActiveChanged: {
         if (root.active)
             prime.restart();

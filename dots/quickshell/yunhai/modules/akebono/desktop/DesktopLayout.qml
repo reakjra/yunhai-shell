@@ -49,6 +49,25 @@ Singleton {
         }
     }
 
+    function prune(screenName, names) {
+        if (names.length === 0)
+            return;
+        const all = root._all();
+        const s = all[screenName];
+        if (!s)
+            return;
+        const live = new Set(names);
+        let changed = false;
+        for (const k of Object.keys(s)) {
+            if (live.has(k))
+                continue;
+            delete s[k];
+            changed = true;
+        }
+        if (changed)
+            layoutAdapter.data = JSON.stringify(all);
+    }
+
     function clearScreen(screenName) {
         const all = root._all();
         all[screenName] = ({});

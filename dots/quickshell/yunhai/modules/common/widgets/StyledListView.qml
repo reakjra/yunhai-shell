@@ -17,7 +17,6 @@ ListView {
     property bool animateMovement: false
     // Accumulated scroll destination so wheel deltas stack while animating
     property real scrollTargetY: 0
-    // Only wheel scrolls animate, or the view's own contentY fixups on insert/remove get animated too
     property bool scrollAnimating: false
 
     property real touchpadScrollFactor: Config?.options.interactions.scrolling.touchpadScrollFactor ?? 100
