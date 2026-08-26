@@ -718,30 +718,42 @@ ColumnLayout {
                 onValueChanged: Config.options.akebono.squircle.smoothing = value
             }
         }
-        ConfigSwitch {
-            buttonIcon: "web_asset"
-            text: Translation.tr("Window title bars (hyprbars)")
-            checked: Config.options.akebono.hyprbars.enable
-            onCheckedChanged: Config.options.akebono.hyprbars.enable = checked
-        }
-        ConfigSwitch {
-            visible: Config.options.akebono.hyprbars.enable
-            buttonIcon: "crop_square"
-            text: Translation.tr("Glyph buttons")
-            checked: Config.options.akebono.hyprbars.glyphs
-            onCheckedChanged: Config.options.akebono.hyprbars.glyphs = checked
-            StyledToolTip {
-                text: Translation.tr("Minimize/maximize/close icons instead of blank semaphore dots")
+        ContentSubsection {
+            title: Translation.tr("Window title bars")
+            tooltip: Translation.tr("Needs the hyprbars plugin")
+
+            ConfigSwitch {
+                buttonIcon: "web_asset"
+                text: Translation.tr("Enable")
+                checked: Config.options.akebono.hyprbars.enable
+                onCheckedChanged: Config.options.akebono.hyprbars.enable = checked
             }
-        }
-        ConfigSwitch {
-            visible: Config.options.akebono.hyprbars.enable
-            buttonIcon: "palette"
-            text: Translation.tr("macOS colors")
-            checked: Config.options.akebono.hyprbars.macColors
-            onCheckedChanged: Config.options.akebono.hyprbars.macColors = checked
-            StyledToolTip {
-                text: Translation.tr("Classic red / yellow / green instead of your theme accents")
+            ConfigSwitch {
+                visible: Config.options.akebono.hyprbars.enable
+                buttonIcon: "crop_square"
+                text: Translation.tr("Glyph buttons")
+                checked: Config.options.akebono.hyprbars.glyphs
+                onCheckedChanged: Config.options.akebono.hyprbars.glyphs = checked
+                StyledToolTip {
+                    text: Translation.tr("Minimize/maximize/close icons instead of blank semaphore dots")
+                }
+            }
+            ConfigSwitch {
+                visible: Config.options.akebono.hyprbars.enable
+                buttonIcon: "palette"
+                text: Translation.tr("macOS colors")
+                checked: Config.options.akebono.hyprbars.macColors
+                onCheckedChanged: Config.options.akebono.hyprbars.macColors = checked
+                StyledToolTip {
+                    text: Translation.tr("Classic red / yellow / green instead of your theme accents")
+                }
+            }
+            MaterialTextField {
+                Layout.fillWidth: true
+                visible: Config.options.akebono.hyprbars.enable
+                placeholderText: Translation.tr("Title font, empty follows the title font")
+                text: Config.options.akebono.hyprbars.font
+                onEditingFinished: Config.options.akebono.hyprbars.font = text
             }
         }
     }

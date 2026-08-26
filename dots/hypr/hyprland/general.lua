@@ -305,10 +305,17 @@ hl.config({
 
 -- ##### AKEBONO HYPRBARS #####
 if hl.plugin and hl.plugin.hyprbars then
+	local fontFile = io.open(os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars-font.txt")
+	local barFont = fontFile and fontFile:read("l") or nil
+	if fontFile then
+		fontFile:close()
+	end
+
 	hl.config({
 		plugin = {
 			hyprbars = {
 				bar_height = 34,
+				bar_text_font = barFont,
 				bar_text_size = 16,
 				bar_padding = 14,
 				bar_button_padding = 8,

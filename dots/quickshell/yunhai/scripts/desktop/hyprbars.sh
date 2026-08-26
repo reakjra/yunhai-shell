@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# usage: hyprbars.sh load|style|font|disable|unload [font]
+# usage: hyprbars.sh load|style|font|reload|disable|unload [font] [glyphs|semaphore] [mac|themed]
 
 set -uo pipefail
 
-COLORS="$HOME/.local/state/quickshell/yunhai/user/generated/colors.json"
+GENERATED="$HOME/.local/state/quickshell/yunhai/user/generated"
+COLORS="$GENERATED/colors.json"
+FONTFILE="$GENERATED/hyprbars-font.txt"
 DEFAULT_BAR_COLOR=2285056819
+TRANSPARENT='rgba(00000000)'
 FG=
 FONT="${2:-}"
 STYLE="${3:-semaphore}"
@@ -37,11 +40,10 @@ add_btn() {
 
 style() {
     loaded || return 0
-    local bar text font_opt=
+    local bar text
     bar="$(col surface 131313)"; FG="$bar"
     text="$(col on_surface e2e2e2)"
-    [ -n "$FONT" ] && font_opt=", bar_text_font = '$FONT'"
-    hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = true, bar_color = '$bar', col = { text = '$text' }$font_opt } } })" >/dev/null
+    hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = true, bar_color = '$bar', col = { text = '$text' } } } })" >/dev/null
 
     local ec tc pc
     if [ "$BTNCOL" = mac ]; then
@@ -51,9 +53,9 @@ style() {
     fi
     if [ "$STYLE" = glyphs ]; then
         SIZE=28
-        FG="$ec"; add_btn "$bar" '󰖭' "hl.dsp.window.close()"
-        FG="$pc"; add_btn "$bar" '󰖯' "hl.dsp.window.float({ action = 'toggle' })"
-        FG="$tc"; add_btn "$bar" '󰖰' "" "bash \"$MINSCRIPT\""
+        FG="$ec"; add_btn "$TRANSPARENT" '󰖭' "hl.dsp.window.close()"
+        FG="$pc"; add_btn "$TRANSPARENT" '󰖯' "hl.dsp.window.float({ action = 'toggle' })"
+        FG="$tc"; add_btn "$TRANSPARENT" '󰖰' "" "bash \"$MINSCRIPT\""
     else
         add_btn "$ec" '' "hl.dsp.window.close()"
         add_btn "$pc" '' "hl.dsp.window.float({ action = 'toggle' })"
@@ -66,27 +68,32 @@ restyle() {
     style
 }
 
-set_font() {
-    loaded && [ -n "$FONT" ] && hyprctl eval "hl.config({ plugin = { hyprbars = { bar_text_font = '$FONT' } } })" >/dev/null
+write_font() {
+    [ -n "$FONT" ] || return 1
+    [ "$(cat "$FONTFILE" 2>/dev/null)" = "$FONT" ] && return 1
+    mkdir -p "$GENERATED"
+    printf '%s\n' "$FONT" >"$FONTFILE"
 }
 
 case "${1:-}" in
     load)
-        if loaded; then
-            hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = true } } })" >/dev/null
-            restyle
-            set_font
-        else
+        if ! loaded; then
             so="$(so_path)"
             [ -z "$so" ] && { echo "hyprbars.so not found; run: sudo hyprpm add https://github.com/hyprwm/hyprland-plugins" >&2; exit 1; }
+            write_font
             hyprctl plugin load "$so" >/dev/null
             hyprctl reload >/dev/null
+        elif write_font; then
+            hyprctl reload >/dev/null
+        else
+            hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = true } } })" >/dev/null
+            restyle
         fi
         ;;
     style)
         restyle ;;
     font)
-        set_font ;;
+        loaded && write_font && hyprctl reload >/dev/null ;;
     disable)
         loaded && hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = false } } })" >/dev/null
         ;;

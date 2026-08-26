@@ -8,19 +8,25 @@ Scope {
     readonly property string script: Quickshell.shellPath("scripts/desktop/hyprbars.sh")
     readonly property var cfg: Config.options[Config.options.panelFamily]?.hyprbars ?? null
     readonly property bool desired: cfg?.enable ?? false
-    readonly property string titleFont: Appearance.font.family.title ?? ""
+    readonly property string barFont: (cfg?.font ?? "") || Appearance.font.family.title
     readonly property bool glyphs: cfg?.glyphs ?? false
     readonly property bool macColors: cfg?.macColors ?? false
 
     function run(action) {
-        Quickshell.execDetached(["bash", root.script, action, root.titleFont, root.glyphs ? "glyphs" : "semaphore", root.macColors ? "mac" : "themed"]);
+        Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", root.macColors ? "mac" : "themed"]);
     }
 
     onDesiredChanged: run(desired ? "load" : "disable")
-    onTitleFontChanged: if (desired) run("font")
+    onBarFontChanged: if (desired) fontApply.restart()
     onGlyphsChanged: if (desired) run("reload")
     onMacColorsChanged: if (desired) run("reload")
     Component.onCompleted: if (desired) run("load")
+
+    Timer {
+        id: fontApply
+        interval: 600
+        onTriggered: root.run("font")
+    }
 
     Connections {
         target: Hyprland

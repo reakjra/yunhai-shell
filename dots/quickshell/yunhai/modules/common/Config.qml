@@ -1070,6 +1070,7 @@ Singleton {
                     property bool enable: true
                     property bool glyphs: false
                     property bool macColors: false
+                    property string font: ""
                 }
                 property JsonObject runner: JsonObject {
                     property bool favourites: true
