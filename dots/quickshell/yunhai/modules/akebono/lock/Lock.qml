@@ -31,7 +31,7 @@ LockScreen {
             onShouldPushChanged: {
                 if (shouldPush) {
                     lastWorkspaceId = HyprlandData.monitors.find(m => m.name == targetMonitorName)?.activeWorkspace?.id ?? 1;
-                    Quickshell.execDetached(["bash", "-c", `hyprctl keyword animation 'workspaces,1,7,menu_decel,slidevert'; hyprctl dispatch 'hl.dsp.focus({workspace=${2147483647 - lastWorkspaceId}})'`]);
+                    Quickshell.execDetached(["bash", "-c", `hyprctl eval "hl.animation({ leaf = 'workspaces', enabled = true, speed = 7, bezier = 'menu_decel', style = 'slidevert' })"; hyprctl dispatch 'hl.dsp.focus({workspace=${2147483647 - lastWorkspaceId}})'`]);
                 } else {
                     Quickshell.execDetached(["bash", "-c", `hyprctl dispatch 'hl.dsp.focus({workspace=${lastWorkspaceId}})'; hyprctl reload`]);
                 }

@@ -99,7 +99,7 @@ LunaeCard {
     Component { id: compNetwork; NetworkToggle { baseWidth: 48; baseHeight: 48; bounce: false } }
     Component { id: compBluetooth; BluetoothToggle { baseWidth: 48; baseHeight: 48; bounce: false } }
     Component { id: compNightLight; NightLight { baseWidth: 48; baseHeight: 48; bounce: false } }
-    Component { id: compGameMode; GameMode { baseWidth: 48; baseHeight: 48; bounce: false } }
+    Component { id: compGameMode; GameModeToggle { baseWidth: 48; baseHeight: 48; bounce: false } }
     Component { id: compIdleInhibitor; IdleInhibitor { baseWidth: 48; baseHeight: 48; bounce: false } }
     Component { id: compEasyEffects; EasyEffectsToggle { baseWidth: 48; baseHeight: 48; bounce: false } }
     Component { id: compCloudflareWarp; CloudflareWarp { baseWidth: 48; baseHeight: 48; bounce: false } }

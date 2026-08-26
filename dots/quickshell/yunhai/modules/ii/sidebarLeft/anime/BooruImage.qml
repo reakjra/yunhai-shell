@@ -34,6 +34,18 @@ Button {
     // Videos/gifs load directly (ffmpeg handles CDN fine); images go through curl for Cloudflare
     property string mediaSource: localSource || (needsCurlDownload ? "" : (imageData.sample_url ?? imageData.preview_url))
     property bool showActions: false
+
+    function setNoWarps(noWarps: bool) {
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ cursor = { no_warps = ${noWarps} } })`])
+    }
+
+    function openWithoutWarp(url: string) {
+        root.showActions = false
+        root.setNoWarps(true)
+        Qt.openUrlExternally(url)
+        root.setNoWarps(false)
+    }
+
     ImageDownloaderProcess {
         id: imageDownloader
         running: root.needsCurlDownload
@@ -235,12 +247,7 @@ Button {
                             id: openFileLinkButton
                             Layout.fillWidth: true
                             buttonText: Translation.tr("Open file link")
-                            onClicked: {
-                                root.showActions = false
-                                Quickshell.execDetached(["hyprctl", "keyword", "cursor:no_warps", "true"])
-                                Qt.openUrlExternally(root.imageData.file_url)
-                                Quickshell.execDetached(["hyprctl", "keyword", "cursor:no_warps", "false"])
-                            }
+                            onClicked: root.openWithoutWarp(root.imageData.file_url)
                         }
                         MenuButton {
                             id: sourceButton
@@ -248,12 +255,7 @@ Button {
                             Layout.fillWidth: true
                             buttonText: Translation.tr("Go to source (%1)").arg(StringUtils.getDomain(root.imageData.source))
                             enabled: root.imageData.source && root.imageData.source.length > 0
-                            onClicked: {
-                                root.showActions = false
-                                Quickshell.execDetached(["hyprctl", "keyword", "cursor:no_warps", "true"])
-                                Qt.openUrlExternally(root.imageData.source)
-                                Quickshell.execDetached(["hyprctl", "keyword", "cursor:no_warps", "false"])
-                            }
+                            onClicked: root.openWithoutWarp(root.imageData.source)
                         }
                         MenuButton {
                             id: downloadButton

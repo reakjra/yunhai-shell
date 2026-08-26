@@ -19,36 +19,34 @@ Singleton {
     readonly property string configuratorScriptPath: Quickshell.shellPath("scripts/hyprland/hyprconfigurator.py")
     readonly property string shellOverridesPath: FileUtils.trimFileProtocol(`${Directories.config}/hypr/hyprland/shellOverrides/main.lua`)
 
-    function set(key: string, value: var) {
+    function apply(args: string) {
         Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --set "${key}" "${value}"` //
+            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args} && hyprctl reload` //
         ])
     }
-    
+
+    function set(key: string, value: var) {
+        root.setMany({ [key]: value })
+    }
+
     function setMany(entries: var) {
         let args = ""
         for (let key in entries) {
             args += `--set "${key}" "${entries[key]}" `
         }
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}` //
-        ])
+        root.apply(args)
     }
-    
+
     function reset(key: string) {
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --reset "${key}"` //
-        ])
+        root.resetMany([key])
     }
-    
+
     function resetMany(keys: list<string>) {
         let args = ""
         for (let i = 0; i < keys.length; i++) {
             args += `--reset "${keys[i]}" `
         }
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}` //
-        ])
+        root.apply(args)
     }
 
     Connections {

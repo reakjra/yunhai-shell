@@ -4,23 +4,27 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
-/**
- * A nice wrapper for date and time strings.
- */
 Singleton {
     id: root
 
     property alias inhibit: idleInhibitor.enabled
     inhibit: false
 
+    function load() {
+        if (!Persistent.ready) {
+            return;
+        }
+        if (Persistent.isNewHyprlandInstance) {
+            Persistent.states.idle.inhibit = root.inhibit;
+        } else {
+            root.inhibit = Persistent.states.idle.inhibit;
+        }
+    }
+
     Connections {
         target: Persistent
         function onReadyChanged() {
-            if (!Persistent.isNewHyprlandInstance) {
-                root.inhibit = Persistent.states.idle.inhibit;
-            } else {
-                Persistent.states.idle.inhibit = root.inhibit;
-            }
+            root.load();
         }
     }
 
