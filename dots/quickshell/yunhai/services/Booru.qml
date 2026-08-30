@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import qs.modules.common
+import qs.modules.common.functions
 import qs.services
 import Quickshell;
 import Quickshell.Io;
@@ -56,6 +57,7 @@ Singleton {
         "system": { "name": Translation.tr("System") },
         "yandere": {
             "name": "yande.re",
+            "configKey": "yandere",
             "url": "https://yande.re",
             "api": "https://yande.re/post.json",
             "description": Translation.tr("All-rounder | Good quality, decent quantity"),
@@ -90,6 +92,7 @@ Singleton {
         },
         "konachan": {
             "name": "Konachan",
+            "configKey": "konachan",
             "url": "https://konachan.net",
             "api": "https://konachan.net/post.json",
             "description": Translation.tr("For desktop wallpapers | Good quality"),
@@ -124,6 +127,7 @@ Singleton {
         },
         "zerochan": {
             "name": "Zerochan",
+            "configKey": "zerochan",
             "url": "https://www.zerochan.net",
             "api": "https://www.zerochan.net/?json",
             "description": Translation.tr("Clean stuff | Excellent quality, no NSFW"),
@@ -151,6 +155,7 @@ Singleton {
         },
         "danbooru": {
             "name": "Danbooru",
+            "configKey": "danbooru",
             "url": "https://danbooru.donmai.us",
             "api": "https://danbooru.donmai.us/posts.json",
             "requires_key": true,
@@ -188,6 +193,7 @@ Singleton {
         },
         "gelbooru": {
             "name": "Gelbooru",
+            "configKey": "gelbooru",
             "url": "https://gelbooru.com",
             "api": "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1",
             "requires_key": true,
@@ -225,6 +231,7 @@ Singleton {
         },
         "waifu.im": {
             "name": "waifu.im",
+            "configKey": "waifuIm",
             "url": "https://waifu.im",
             "api": "https://api.waifu.im/search",
             "description": Translation.tr("Waifus only | Excellent quality, limited quantity"),
@@ -256,6 +263,7 @@ Singleton {
         },
         "t.alcy.cc": {
             "name": "Alcy",
+            "configKey": "tAlcyCc",
             "url": "https://t.alcy.cc",
             "api": "https://t.alcy.cc/",
             "description": Translation.tr("Large images | God tier quality, no NSFW."),
@@ -318,12 +326,24 @@ Singleton {
         return url;
     }
     
+    function downloadPathFor(providerKey: string): string {
+        const configKey = root.providers[providerKey]?.configKey
+        const override = configKey ? Config.options.booru[configKey].downloadPath : ""
+        return FileUtils.expandHome(override || Config.options.booru.downloadPath)
+    }
+
+    function saveFolderFor(providerKey: string, nsfw: bool): string {
+        const base = root.downloadPathFor(providerKey)
+        const nsfwFolder = Config.options.booru.nsfwFolder
+        return (nsfw && nsfwFolder.length > 0) ? `${base}/${nsfwFolder}` : base
+    }
+
     function setProvider(provider) {
         provider = provider.toLowerCase()
         if (providerList.indexOf(provider) !== -1) {
             Persistent.states.booru.provider = provider
             root.addSystemMessage(Translation.tr("Provider set to ") + providers[provider].name
-                + (provider == "zerochan" ? Translation.tr(". Notes for Zerochan:\n- You must enter a color\n- Set your zerochan username in `sidebar.booru.zerochan.username` config option. You [might be banned for not doing so](https://www.zerochan.net/api#:~:text=The%20request%20may%20still%20be%20completed%20successfully%20without%20this%20custom%20header%2C%20but%20your%20project%20may%20be%20banned%20for%20being%20anonymous.)!") : ""))
+                + (provider == "zerochan" ? Translation.tr(". Notes for Zerochan:\n- You must enter a color\n- Set your zerochan username in `booru.zerochan.username` config option. You [might be banned for not doing so](https://www.zerochan.net/api#:~:text=The%20request%20may%20still%20be%20completed%20successfully%20without%20this%20custom%20header%2C%20but%20your%20project%20may%20be%20banned%20for%20being%20anonymous.)!") : ""))
         } else {
             root.addSystemMessage(Translation.tr("Invalid API provider. Supported: \n- ") + providerList.join("\n- "))
         }
@@ -477,7 +497,7 @@ Singleton {
 
         try {
             if (currentProvider == "zerochan") {
-                const userAgent = Config.options?.sidebar?.booru?.zerochan?.username ? `Desktop sidebar booru viewer - username: ${Config.options.sidebar.booru.zerochan.username}` : defaultUserAgent
+                const userAgent = Config.options.booru.zerochan.username ? `Desktop sidebar booru viewer - username: ${Config.options.booru.zerochan.username}` : defaultUserAgent
                 xhr.setRequestHeader("User-Agent", userAgent)
             }
         } catch (error) {

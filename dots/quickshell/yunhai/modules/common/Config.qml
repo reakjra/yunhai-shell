@@ -379,15 +379,6 @@ Singleton {
         property JsonObject ai: JsonObject {
             property bool textFadeIn: false
         }
-        property JsonObject booru: JsonObject {
-            property bool allowNsfw: false
-            property string downloadPath: "~/Pictures/homework"
-            property string defaultProvider: "yandere"
-            property int limit: 20
-            property JsonObject zerochan: JsonObject {
-                property string username: "[unset]"
-            }
-        }
         property JsonObject cornerOpen: JsonObject {
             property bool enable: true
             property bool bottom: false
@@ -609,6 +600,36 @@ Singleton {
                 property int full: 101
                 property bool automaticSuspend: true
                 property int suspend: 3
+            }
+
+            property JsonObject booru: JsonObject {
+                property bool allowNsfw: false
+                property string downloadPath: "~/Pictures/homework"
+                property string nsfwFolder: "🌶️"
+                property string defaultProvider: "yandere"
+                property int limit: 20
+                property JsonObject yandere: JsonObject {
+                    property string downloadPath: ""
+                }
+                property JsonObject konachan: JsonObject {
+                    property string downloadPath: ""
+                }
+                property JsonObject zerochan: JsonObject {
+                    property string username: "[unset]"
+                    property string downloadPath: ""
+                }
+                property JsonObject danbooru: JsonObject {
+                    property string downloadPath: ""
+                }
+                property JsonObject gelbooru: JsonObject {
+                    property string downloadPath: ""
+                }
+                property JsonObject waifuIm: JsonObject {
+                    property string downloadPath: ""
+                }
+                property JsonObject tAlcyCc: JsonObject {
+                    property string downloadPath: ""
+                }
             }
 
             property JsonObject calendar: JsonObject {
@@ -1208,6 +1229,7 @@ Singleton {
         property alias apps: globalAdapter.apps
         property alias background: globalAdapter.background
         property alias battery: globalAdapter.battery
+        property alias booru: globalAdapter.booru
         property alias calendar: globalAdapter.calendar
         property alias cheatsheet: globalAdapter.cheatsheet
         property alias conflictKiller: globalAdapter.conflictKiller

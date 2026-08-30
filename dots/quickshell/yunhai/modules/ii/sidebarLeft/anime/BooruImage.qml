@@ -19,8 +19,7 @@ Button {
     property var rowHeight
     property bool manualDownload: false
     property string previewDownloadPath
-    property string downloadPath
-    property string nsfwPath
+    property string provider
     property string fileName: decodeURIComponent((imageData.file_url).substring((imageData.file_url).lastIndexOf('/') + 1))
     property string filePath: `${root.previewDownloadPath}/${root.fileName}`
     property int maxTagStringLineLength: 50
@@ -264,12 +263,16 @@ Button {
                             buttonText: Translation.tr("Download")
                             onClicked: {
                                 root.showActions = false;
-                                const targetPath = root.imageData.is_nsfw ? root.nsfwPath : root.downloadPath;
+                                const targetDir = Booru.saveFolderFor(root.provider, root.imageData.is_nsfw)
+                                const targetPath = StringUtils.shellSingleQuoteEscape(`${targetDir}/${root.fileName}`)
+                                const dir = StringUtils.shellSingleQuoteEscape(targetDir)
                                 const hdr = `-A 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'`
-                                const out = `'${targetPath}/${root.fileName}'`
-                                const fallback = root.imageData.sample_url ? ` || curl -fsSL --compressed ${hdr} '${root.imageData.sample_url}' -o ${out}` : ""
+                                const out = `'${targetPath}'`
+                                const fileUrl = StringUtils.shellSingleQuoteEscape(root.imageData.file_url)
+                                const sampleUrl = StringUtils.shellSingleQuoteEscape(root.imageData.sample_url ?? "")
+                                const fallback = root.imageData.sample_url ? ` || curl -fsSL --compressed ${hdr} '${sampleUrl}' -o ${out}` : ""
                                 Quickshell.execDetached(["bash", "-c",
-                                    `mkdir -p '${targetPath}' && (curl -fsSL --compressed ${hdr} '${root.imageData.file_url}' -o ${out}${fallback}) && notify-send '${Translation.tr("Download complete")}' '${root.downloadPath}/${root.fileName}' -a 'Shell'`
+                                    `mkdir -p '${dir}' && (curl -fsSL --compressed ${hdr} '${fileUrl}' -o ${out}${fallback}) && notify-send '${Translation.tr("Download complete")}' '${targetPath}' -a 'Shell'`
                                 ])
                             }
                         }

@@ -17,8 +17,6 @@ Rectangle {
     property var tagInputField
 
     property string previewDownloadPath
-    property string downloadPath
-    property string nsfwPath
 
     property real availableWidth: parent.width
     property real rowTooShortThreshold: 190
@@ -232,8 +230,7 @@ Rectangle {
                         // Download manually to reduce redundant requests or make sure downloading works
                         manualDownload: ["danbooru", "waifu.im", "t.alcy.cc"].includes(root.responseData.provider)
                         previewDownloadPath: root.previewDownloadPath
-                        downloadPath: root.downloadPath
-                        nsfwPath: root.nsfwPath
+                        provider: root.responseData.provider
                     }
                 }
             }

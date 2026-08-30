@@ -17,7 +17,7 @@ MouseArea {
     property bool useDarkMode: Appearance.m3colors.darkmode
     property bool wallhavenMode: false
     readonly property string wallpaperDir: FileUtils.expandHome(Config.options.wallpaperSelector.downloadPath)
-    readonly property string booruDir: FileUtils.expandHome(Config.options.sidebar.booru.downloadPath)
+    readonly property string booruDir: FileUtils.expandHome(Config.options.booru.downloadPath)
 
     function updateThumbnails() {
         const totalImageMargin = (Appearance.sizes.wallpaperSelectorItemMargins + Appearance.sizes.wallpaperSelectorItemPadding) * 2

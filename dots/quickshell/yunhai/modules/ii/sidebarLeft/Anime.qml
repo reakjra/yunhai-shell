@@ -17,8 +17,6 @@ Item {
     property var inputField: tagInputField
     readonly property var responses: Booru.responses
     property string previewDownloadPath: Directories.booruPreviews
-    property string downloadPath: FileUtils.expandHome(Config.options.sidebar.booru.downloadPath)
-    property string nsfwPath: `${root.downloadPath}/🌶️`
     property string commandPrefix: "/"
     property real scrollOnNewResponse: 100
     property int tagSuggestionDelay: 210
@@ -127,7 +125,7 @@ Item {
                     break;
                 }
             }
-            Booru.makeRequest(tagList, Persistent.states.booru.allowNsfw, Config.options.sidebar.booru.limit, pageIndex);
+            Booru.makeRequest(tagList, Persistent.states.booru.allowNsfw, Config.options.booru.limit, pageIndex);
         }
     }
 
@@ -212,8 +210,6 @@ Item {
                     responseData: modelData
                     tagInputField: root.inputField
                     previewDownloadPath: root.previewDownloadPath
-                    downloadPath: root.downloadPath
-                    nsfwPath: root.nsfwPath
                 }
 
                 onDragEnded: { // Pull to load more

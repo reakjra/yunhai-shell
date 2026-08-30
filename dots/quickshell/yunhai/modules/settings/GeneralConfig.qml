@@ -351,13 +351,40 @@ ContentPage {
                 text: Translation.tr("Booru download folder")
             }
 
-            MaterialTextArea {
+            MaterialTextField {
                 Layout.fillWidth: true
                 placeholderText: Translation.tr("Where booru images are saved, and the Homework shortcut in the wallpaper selector")
-                text: Config.options.sidebar.booru.downloadPath
-                wrapMode: TextEdit.Wrap
-                onTextChanged: {
-                    Config.options.sidebar.booru.downloadPath = text;
+                text: Config.options.booru.downloadPath
+                onEditingFinished: Config.options.booru.downloadPath = text
+            }
+
+            MaterialTextField {
+                Layout.fillWidth: true
+                placeholderText: Translation.tr("Subfolder for NSFW images. Empty to save them with the rest")
+                text: Config.options.booru.nsfwFolder
+                onEditingFinished: Config.options.booru.nsfwFolder = text
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            visible: Config.options.policies.weeb === 1
+
+            ContentSubsectionLabel {
+                text: Translation.tr("Per provider folders")
+            }
+
+            Repeater {
+                model: Booru.providerList
+
+                delegate: MaterialTextField {
+                    required property string modelData
+                    readonly property string configKey: Booru.providers[modelData].configKey
+
+                    Layout.fillWidth: true
+                    placeholderText: Translation.tr("%1 (default folder)").arg(Booru.providers[modelData].name)
+                    text: Config.options.booru[configKey].downloadPath
+                    onEditingFinished: Config.options.booru[configKey].downloadPath = text
                 }
             }
         }
