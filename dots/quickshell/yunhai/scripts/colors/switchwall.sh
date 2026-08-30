@@ -213,19 +213,12 @@ try:
     }
     with open(json_path) as f:
         colors = json.load(f)
-    # Use Material's designed-on colors for proper contrast
-    # Since kdeSelectionBg uses primary, text should use on_primary
-    bg = colors.get('background', '#ffffff').lstrip('#')
-    is_dark = (0.299*int(bg[0:2],16) + 0.587*int(bg[2:4],16) + 0.114*int(bg[4:6],16)) / 255 < 0.5
-    if is_dark:
-        kde_colors['kdeSelectionText'] = colors.get('on_primary', '#ffffff')
-    else:
-        kde_colors['kdeSelectionText'] = colors.get('on_primary', '#000000')
     # kde-material-you-colors doesn't write AccentColor to kdeglobals,
     # and any manually-set accent persists there as a stale value.
     # Always derive these from Material colors for consistency with wallpaper.
     kde_colors['kdeAccent'] = colors.get('primary', '')
-    kde_colors['kdeSelectionBg'] = colors.get('primary', '')
+    kde_colors['kdeSelectionBg'] = colors.get('secondary_container', '')
+    kde_colors['kdeSelectionText'] = colors.get('on_secondary_container', '')
     kde_colors['kdeButtonAltBg'] = colors.get('surface_container_highest', '')
     kde_colors['kdeLinkText'] = colors.get('primary', '')
     colors.update({k: v for k, v in kde_colors.items() if v})
