@@ -21,6 +21,13 @@ Singleton {
     property var altThemeColors: ({})
     property bool _wallpaperChanging: false
     property bool _gtkDirty: false
+    property bool _internalOverrideWrite: false
+
+    function setOverrides(value) {
+        root._internalOverrideWrite = true
+        ColorOverrideStore.data.colorOverrides = value
+        root._internalOverrideWrite = false
+    }
 
     function reapplyTheme() {
         themeFileView.reload()
@@ -56,9 +63,9 @@ Singleton {
 
         const overrides = ColorOverrideStore.data?.colorOverrides ?? "{}"
         if (overrides !== "{}") {
-            ColorOverrideStore.data.colorOverrides = "{}"
+            root.setOverrides("{}")
         } else {
-            root.refreshColors()
+            root.refreshColors(true)
         }
 
         Appearance.m3colors.darkmode = dark
@@ -111,10 +118,10 @@ Singleton {
 
         root.themeColors = originals
         root._gtkDirty = true
-        applyColorOverrides()
+        applyColorOverrides(true)
     }
 
-    function applyColorOverrides() {
+    function applyColorOverrides(respectThemingToggles) {
         const raw = ColorOverrideStore.data?.colorOverrides
         let hasKdeOverride = false
         let hasGtkOverride = false
@@ -132,25 +139,26 @@ Singleton {
         }
         Appearance.m3colors.darkmode = (Appearance.m3colors.m3background.hslLightness < 0.5)
 
-        if (Config.options?.appearance?.wallpaperTheming?.enableTerminal ?? true)
+        const theming = Config.options.appearance.wallpaperTheming
+        if (!respectThemingToggles || theming.enableTerminal)
             terminalApplyTimer.restart()
-        if (Config.options?.appearance?.wallpaperTheming?.enableQtApps ?? true)
+        if (!respectThemingToggles || theming.enableQtApps)
             kdeApplyTimer.restart()
-        if (Config.options?.appearance?.wallpaperTheming?.enableAppsAndShell ?? true)
+        if (!respectThemingToggles || theming.enableAppsAndShell)
             gtkApplyTimer.restart()
     }
 
-    function refreshColors() {
+    function refreshColors(respectThemingToggles) {
         for (const key in root.themeColors) {
             Appearance.m3colors[key] = root.themeColors[key]
         }
-        applyColorOverrides()
+        applyColorOverrides(respectThemingToggles)
     }
 
     function resetOverridesUnlessPreserved() {
         if (ColorOverrideStore.data?.preserveOnWallpaperChange) return
         if ((ColorOverrideStore.data?.colorOverrides ?? "{}") !== "{}")
-            ColorOverrideStore.data.colorOverrides = "{}"
+            root.setOverrides("{}")
         if ((ColorOverrideStore.data?.activePresetIndex ?? -1) !== -1)
             ColorOverrideStore.data.activePresetIndex = -1
     }
@@ -167,7 +175,7 @@ Singleton {
         const targetKey = dark ? "dark" : "light"
         const targetColors = preset[targetKey]
         if (!targetColors || Object.keys(targetColors).length === 0) return false
-        ColorOverrideStore.data.colorOverrides = JSON.stringify(targetColors)
+        root.setOverrides(JSON.stringify(targetColors))
         return true
     }
 
@@ -553,7 +561,7 @@ update_css(os.path.expanduser('~/.config/gtk-4.0/gtk.css'))
     Connections {
         target: ColorOverrideStore.data ?? null
         function onColorOverridesChanged() {
-            root.refreshColors()
+            root.refreshColors(root._internalOverrideWrite)
         }
     }
 
