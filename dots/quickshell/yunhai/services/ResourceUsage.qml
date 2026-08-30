@@ -9,13 +9,13 @@ import Yunhai.Sys
 Singleton {
     id: root
 
-    readonly property real memoryTotal: SysMon.memoryTotal / 1024
-    readonly property real memoryFree: SysMon.memoryFree / 1024
-    readonly property real memoryUsed: SysMon.memoryUsed / 1024
+    readonly property real memoryTotal: SysMon.memoryTotal
+    readonly property real memoryFree: SysMon.memoryFree
+    readonly property real memoryUsed: SysMon.memoryUsed
     readonly property real memoryUsedPercentage: SysMon.memoryUsage
-    readonly property real swapTotal: SysMon.swapTotal / 1024
-    readonly property real swapFree: SysMon.swapFree / 1024
-    readonly property real swapUsed: SysMon.swapUsed / 1024
+    readonly property real swapTotal: SysMon.swapTotal
+    readonly property real swapFree: SysMon.swapFree
+    readonly property real swapUsed: SysMon.swapUsed
     readonly property real swapUsedPercentage: SysMon.swapUsage
 
     readonly property real cpuUsage: SysMon.cpuUsage

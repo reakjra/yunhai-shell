@@ -12,8 +12,6 @@ Row {
     id: root
     spacing: 12
 
-    function formatKB(kb) { return (kb / (1024 * 1024)).toFixed(1) + " GB" }
-
     function getIGpuMetricData(metricId) {
         switch (metricId) {
         case "usage": return { icon: "bolt", label: Translation.tr("Load:"), value: `${Math.round(GpuUsage.iGpuUsage * 100)}%` }
@@ -40,18 +38,18 @@ Row {
         visible: Config.options?.resources?.enableRam !== false
         spacing: 4
         StyledPopupHeaderRow { icon: "memory"; label: "RAM" }
-        StyledPopupValueRow { icon: "clock_loader_60"; label: Translation.tr("Used:"); value: root.formatKB(ResourceUsage.memoryUsed) }
-        StyledPopupValueRow { icon: "check_circle"; label: Translation.tr("Free:"); value: root.formatKB(ResourceUsage.memoryFree) }
-        StyledPopupValueRow { icon: "empty_dashboard"; label: Translation.tr("Total:"); value: root.formatKB(ResourceUsage.memoryTotal) }
+        StyledPopupValueRow { icon: "clock_loader_60"; label: Translation.tr("Used:"); value: ResourceUsage.kbToGbString(ResourceUsage.memoryUsed) }
+        StyledPopupValueRow { icon: "check_circle"; label: Translation.tr("Free:"); value: ResourceUsage.kbToGbString(ResourceUsage.memoryFree) }
+        StyledPopupValueRow { icon: "empty_dashboard"; label: Translation.tr("Total:"); value: ResourceUsage.kbToGbString(ResourceUsage.memoryTotal) }
     }
 
     Column {
         visible: (Config.options?.resources?.enableSwap !== false) && (ResourceUsage.swapTotal > 0)
         spacing: 4
         StyledPopupHeaderRow { icon: "swap_horiz"; label: "Swap" }
-        StyledPopupValueRow { icon: "clock_loader_60"; label: Translation.tr("Used:"); value: root.formatKB(ResourceUsage.swapUsed) }
-        StyledPopupValueRow { icon: "check_circle"; label: Translation.tr("Free:"); value: root.formatKB(ResourceUsage.swapFree) }
-        StyledPopupValueRow { icon: "empty_dashboard"; label: Translation.tr("Total:"); value: root.formatKB(ResourceUsage.swapTotal) }
+        StyledPopupValueRow { icon: "clock_loader_60"; label: Translation.tr("Used:"); value: ResourceUsage.kbToGbString(ResourceUsage.swapUsed) }
+        StyledPopupValueRow { icon: "check_circle"; label: Translation.tr("Free:"); value: ResourceUsage.kbToGbString(ResourceUsage.swapFree) }
+        StyledPopupValueRow { icon: "empty_dashboard"; label: Translation.tr("Total:"); value: ResourceUsage.kbToGbString(ResourceUsage.swapTotal) }
     }
 
     Column {

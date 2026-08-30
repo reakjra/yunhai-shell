@@ -7,10 +7,6 @@ import qs.services
 StyledPopup {
     id: root
 
-    function formatKB(kb) {
-        return (kb / (1024 * 1024)).toFixed(1) + " GB";
-    }
-
     function getIGpuMetricData(metricId) {
         switch (metricId) {
             case "usage": return {
@@ -94,19 +90,19 @@ StyledPopup {
                 StyledPopupValueRow {
                     icon: "clock_loader_60"
                     label: Translation.tr("Used:")
-                    value: root.formatKB(ResourceUsage.memoryUsed)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.memoryUsed)
                 }
 
                 StyledPopupValueRow {
                     icon: "check_circle"
                     label: Translation.tr("Free:")
-                    value: root.formatKB(ResourceUsage.memoryFree)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.memoryFree)
                 }
 
                 StyledPopupValueRow {
                     icon: "empty_dashboard"
                     label: Translation.tr("Total:")
-                    value: root.formatKB(ResourceUsage.memoryTotal)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.memoryTotal)
                 }
 
             }
@@ -129,19 +125,19 @@ StyledPopup {
                 StyledPopupValueRow {
                     icon: "clock_loader_60"
                     label: Translation.tr("Used:")
-                    value: root.formatKB(ResourceUsage.swapUsed)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.swapUsed)
                 }
 
                 StyledPopupValueRow {
                     icon: "check_circle"
                     label: Translation.tr("Free:")
-                    value: root.formatKB(ResourceUsage.swapFree)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.swapFree)
                 }
 
                 StyledPopupValueRow {
                     icon: "empty_dashboard"
                     label: Translation.tr("Total:")
-                    value: root.formatKB(ResourceUsage.swapTotal)
+                    value: ResourceUsage.kbToGbString(ResourceUsage.swapTotal)
                 }
 
             }

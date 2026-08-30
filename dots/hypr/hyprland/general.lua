@@ -314,6 +314,7 @@ if hl.plugin and hl.plugin.hyprbars then
 	hl.config({
 		plugin = {
 			hyprbars = {
+				bar_blur = false,
 				bar_height = 34,
 				bar_text_font = barFont,
 				bar_text_size = 16,

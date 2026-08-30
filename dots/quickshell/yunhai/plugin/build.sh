@@ -22,4 +22,6 @@ cp "target/$PROFILE/libYunhai_Sys.so" "$MODULE/"
 cp target/cxxqt/qml_modules/Yunhai/Sys/plugin.qmltypes "$MODULE/"
 sed '/^prefer /d; s/^optional plugin/plugin/' target/cxxqt/qml_modules/Yunhai/Sys/qmldir > "$MODULE/qmldir"
 
+cargo clean
+
 echo "built qml plugin into $(cd "$MODULE" && pwd)"
