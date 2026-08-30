@@ -7,6 +7,7 @@ RowLayout {
     id: root
     property string text: ""
     property string icon
+    property color labelColor: Appearance.colors.colOnLayer3
     property alias value: spinBoxWidget.value
     property alias stepSize: spinBoxWidget.stepSize
     property alias from: spinBoxWidget.from
@@ -20,13 +21,13 @@ RowLayout {
         MaterialSymbol {
             text: root.icon
             opacity: root.enabled ? 1 : 0.4
-            color: Appearance.colors.colOnLayer3
+            color: root.labelColor
         }
         StyledText {
             id: labelWidget
             Layout.fillWidth: true
             text: root.text
-            color: Appearance.colors.colOnLayer3
+            color: root.labelColor
             opacity: root.enabled ? 1 : 0.4
         }
     }

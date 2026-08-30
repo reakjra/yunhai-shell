@@ -2,7 +2,6 @@ import QtQuick
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.lunae.widgets.dialogs
 
 StyledFlickable {
     id: root
@@ -15,7 +14,7 @@ StyledFlickable {
         spacing: 0
         topPadding: 4
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "animation"
             text: Translation.tr("Disable animations")
@@ -23,7 +22,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.disableAnimations = checked
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "shadow"
             text: Translation.tr("Disable shadows")
@@ -31,7 +30,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.disableShadows = checked
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "blur_off"
             text: Translation.tr("Disable blur")
@@ -39,7 +38,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.disableBlur = checked
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "fullscreen"
             text: Translation.tr("Remove gaps")
@@ -47,7 +46,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.removeGaps = checked
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "border_style"
             text: Translation.tr("Set border size")
@@ -55,7 +54,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.setBorderSize = checked
         }
 
-        LDialogConfigSpinBox {
+        DialogConfigSpinBox {
             anchors { left: parent.left; right: parent.right; leftMargin: 11; rightMargin: 9 }
             icon: "border_outer"
             text: Translation.tr("Border size (px)")
@@ -66,7 +65,7 @@ StyledFlickable {
             enabled: Config.options.gameMode.setBorderSize
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "rounded_corner"
             text: Translation.tr("Disable rounding")
@@ -74,7 +73,7 @@ StyledFlickable {
             onCheckedChanged: Config.options.gameMode.disableRounding = checked
         }
 
-        LDialogConfigSwitch {
+        DialogConfigSwitch {
             anchors { left: parent.left; right: parent.right }
             buttonIcon: "speed"
             text: Translation.tr("Enable tearing")

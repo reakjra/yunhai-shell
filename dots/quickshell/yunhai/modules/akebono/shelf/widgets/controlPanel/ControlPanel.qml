@@ -16,13 +16,14 @@ Item {
     property string activeDialog: ""
     property bool editMode: false
 
-    readonly property var allToggleTypes: ["network", "bluetooth", "nightLight", "gameMode", "idleInhibitor", "easyEffects", "cloudflareWarp", "darkMode", "audio", "mic", "screenSnip", "record", "onScreenKeyboard", "musicRecognition"]
-    readonly property var enabledToggles: Config.options.akebono?.shelf.quickSettings.toggles ?? []
-    readonly property bool flickMode: Config.options.akebono?.shelf.quickSettings.flickable ?? false
+    readonly property EntryRegistry registry: EntryRegistry {}
+    readonly property var allToggleTypes: root.registry.toggleIds
+    readonly property var enabledToggles: Config.options.akebono.shelf.quickSettings.toggles
+    readonly property bool flickMode: Config.options.akebono.shelf.quickSettings.flickable
     readonly property var brightnessMonitor: Brightness.getMonitorForScreen(QsWindow.window?.screen)
 
     function hasDialog(type) {
-        return ["network", "bluetooth", "nightLight", "audio", "mic", "record", "gameMode"].includes(type);
+        return root.registry.hasDetail(type);
     }
 
     onActiveDialogChanged: {

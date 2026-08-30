@@ -5,32 +5,11 @@ import QtQuick.Layouts
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.akebono
-import qs.modules.akebono.shelf.widgets.controlPanel.toggles
 
 Column {
     id: section
     required property var panel
     spacing: 0
-
-    function componentForType(type) {
-        switch (type) {
-        case "network": return compNetwork;
-        case "bluetooth": return compBluetooth;
-        case "nightLight": return compNightLight;
-        case "gameMode": return compGameMode;
-        case "idleInhibitor": return compIdleInhibitor;
-        case "easyEffects": return compEasyEffects;
-        case "cloudflareWarp": return compCloudflareWarp;
-        case "darkMode": return compDarkMode;
-        case "audio": return compAudio;
-        case "mic": return compMic;
-        case "screenSnip": return compScreenSnip;
-        case "record": return compRecord;
-        case "onScreenKeyboard": return compOnScreenKeyboard;
-        case "musicRecognition": return compMusicRecognition;
-        default: return null;
-        }
-    }
 
     function removeToggle(type) {
         let list = [...section.panel.enabledToggles];
@@ -54,21 +33,6 @@ Column {
         list[target] = tmp;
         Config.options.akebono.shelf.quickSettings.toggles = list;
     }
-
-    Component { id: compNetwork; NetworkToggle {} }
-    Component { id: compBluetooth; BluetoothToggle {} }
-    Component { id: compNightLight; NightLightToggle {} }
-    Component { id: compGameMode; GameModeToggle {} }
-    Component { id: compIdleInhibitor; IdleInhibitorToggle {} }
-    Component { id: compEasyEffects; EasyEffectsToggle {} }
-    Component { id: compCloudflareWarp; CloudflareWarpToggle {} }
-    Component { id: compDarkMode; DarkModeToggle {} }
-    Component { id: compAudio; AudioToggle {} }
-    Component { id: compMic; MicToggle {} }
-    Component { id: compScreenSnip; ScreenSnipToggle {} }
-    Component { id: compRecord; RecordToggle {} }
-    Component { id: compOnScreenKeyboard; OnScreenKeyboardToggle {} }
-    Component { id: compMusicRecognition; MusicRecognitionToggle {} }
 
     Item {
         id: editPanelWrapper
@@ -111,7 +75,7 @@ Column {
                         Loader {
                             id: addLoader
                             anchors.fill: parent
-                            sourceComponent: section.componentForType(addSlot.modelData)
+                            sourceComponent: section.panel.registry.toggleFor(addSlot.modelData)
                         }
                         MouseArea {
                             anchors.fill: parent
@@ -195,7 +159,7 @@ Column {
                         Loader {
                             id: toggleLoader
                             anchors.fill: parent
-                            sourceComponent: section.componentForType(toggleSlot.modelData)
+                            sourceComponent: section.panel.registry.toggleFor(toggleSlot.modelData)
                             onLoaded: if (item) item.panel = section.panel
                         }
                         MouseArea {

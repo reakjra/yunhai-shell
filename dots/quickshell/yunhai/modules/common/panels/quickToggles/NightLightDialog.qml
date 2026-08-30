@@ -2,14 +2,13 @@ import QtQuick
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.lunae.widgets.dialogs
 
 Column {
     width: parent?.width ?? 0
     spacing: 0
     topPadding: 4
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "check"
         text: Translation.tr("Enable now")
@@ -17,7 +16,7 @@ Column {
         onCheckedChanged: Hyprsunset.toggleTemperature(checked)
     }
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "night_sight_auto"
         text: Translation.tr("Automatic")
@@ -36,7 +35,7 @@ Column {
         tooltipContent: `${Math.round(value)}K`
     }
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "filter"
         text: Translation.tr("Content adjustment")
@@ -44,7 +43,7 @@ Column {
         onCheckedChanged: Config.options.light.antiFlashbang.enable = checked
     }
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "light_mode"
         text: Translation.tr("Brightness adjustment")

@@ -1,6 +1,6 @@
+import qs.modules.common.widgets
 import qs.modules.common
 import qs.modules.common.functions
-import qs.modules.common.widgets
 import qs.services
 import QtQuick
 import QtQuick.Layouts
@@ -8,6 +8,7 @@ import QtQuick.Layouts
 DialogListItem {
     id: root
     required property var device
+    property color labelColor: Appearance.colors.colOnSurfaceVariant
     property bool expanded: false
     pointingHandCursor: !expanded
 
@@ -44,7 +45,7 @@ DialogListItem {
                 Layout.fillWidth: true
                 StyledText {
                     Layout.fillWidth: true
-                    color: Appearance.colors.colOnLayer3
+                    color: root.labelColor
                     elide: Text.ElideRight
                     text: root.device?.name || Translation.tr("Unknown device")
                     textFormat: Text.PlainText

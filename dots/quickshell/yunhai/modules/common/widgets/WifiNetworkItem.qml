@@ -1,6 +1,6 @@
+import qs.modules.common.widgets
 import qs
 import qs.modules.common
-import qs.modules.common.widgets
 import qs.services
 import qs.services.network
 import QtQuick
@@ -9,6 +9,7 @@ import QtQuick.Layouts
 DialogListItem {
     id: root
     required property WifiAccessPoint wifiNetwork
+    property color labelColor: Appearance.colors.colOnSurfaceVariant
     enabled: !(Network.wifiConnectTarget === root.wifiNetwork && !wifiNetwork?.active)
 
     active: (wifiNetwork?.askingPassword || wifiNetwork?.active) ?? false
@@ -36,7 +37,7 @@ DialogListItem {
             }
             StyledText {
                 Layout.fillWidth: true
-                color: Appearance.colors.colOnLayer3
+                color: root.labelColor
                 elide: Text.ElideRight
                 text: root.wifiNetwork?.ssid ?? Translation.tr("Unknown")
                 textFormat: Text.PlainText

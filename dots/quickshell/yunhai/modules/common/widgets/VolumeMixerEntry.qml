@@ -1,5 +1,5 @@
-import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common
 import qs.services
 import QtQuick
 import QtQuick.Layouts
@@ -10,6 +10,7 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: root
     required property PwNode node
+    property color labelColor: Appearance.colors.colSubtext
     PwObjectTracker {
         objects: [root.node]
     }
@@ -87,7 +88,7 @@ Item {
             StyledText {
                 Layout.fillWidth: true
                 font.pixelSize: Appearance.font.pixelSize.small
-                color: Appearance.colors.colOnLayer3
+                color: root.labelColor
                 elide: Text.ElideRight
                 text: {
                     const app = Audio.appNodeDisplayName(root.node);

@@ -2,12 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.lunae.widgets
 import qs.modules.lunae.sidebarRight.quickToggles.classicStyle
-import qs.modules.lunae.sidebarRight.quickToggles.dialogs
+import qs.modules.common.panels.quickToggles
 
 LunaeCard {
     id: root
@@ -298,8 +299,16 @@ LunaeCard {
                 }
 
                 Loader {
+                    id: dialogLoader
                     width: parent.width
                     sourceComponent: root.dialogComponentForType(dialogPanelWrapper.displayDialog)
+                }
+
+                Binding {
+                    target: GlobalStates
+                    property: "sidebarRightPinned"
+                    value: true
+                    when: dialogLoader.item?.popupOpen ?? false
                 }
             }
         }

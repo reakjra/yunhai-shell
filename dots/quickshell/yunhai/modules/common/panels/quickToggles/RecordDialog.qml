@@ -1,14 +1,14 @@
 import QtQuick
 import qs.services
 import qs.modules.common
-import qs.modules.lunae.widgets.dialogs
+import qs.modules.common.widgets
 
 Column {
     width: parent?.width ?? 0
     spacing: 0
     topPadding: 4
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "memory"
         text: Translation.tr("Hardware encoding")
@@ -16,7 +16,7 @@ Column {
         onCheckedChanged: Config.options.screenRecord.hardwareEncoding = checked
     }
 
-    LDialogConfigSwitch {
+    DialogConfigSwitch {
         anchors { left: parent.left; right: parent.right }
         buttonIcon: "mic"
         text: Translation.tr("Record audio")
@@ -24,7 +24,7 @@ Column {
         onCheckedChanged: Config.options.screenRecord.recordAudio = checked
     }
 
-    LDialogConfigSpinBox {
+    DialogConfigSpinBox {
         anchors { left: parent.left; right: parent.right; leftMargin: 11; rightMargin: 9 }
         icon: "high_quality"
         text: Translation.tr("Quality (QP)")
@@ -34,7 +34,7 @@ Column {
         onValueChanged: Config.options.screenRecord.qualityQp = value
     }
 
-    LDialogConfigSpinBox {
+    DialogConfigSpinBox {
         anchors { left: parent.left; right: parent.right; leftMargin: 11; rightMargin: 9 }
         icon: "speed"
         text: Translation.tr("Max FPS")

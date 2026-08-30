@@ -4,7 +4,6 @@ import Quickshell.Bluetooth
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.lunae.sidebarRight.bluetoothDevices
 
 Column {
     property real maxListHeight: 250
@@ -28,6 +27,7 @@ Column {
             device: modelData
             width: ListView.view?.width ?? 0
             buttonRadius: Appearance.rounding.small
+            labelColor: Appearance.colors.colOnLayer3
         }
     }
 }
