@@ -7,6 +7,7 @@ import qs.modules.common.widgets
 ColumnLayout {
     id: root
     property string title
+    property string sectionId: ""
     property string icon: ""
     default property alias data: sectionContent.data
 

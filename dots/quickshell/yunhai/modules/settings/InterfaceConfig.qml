@@ -261,7 +261,21 @@ ContentPage {
 
     ContentSection {
         icon: "notifications"
+        sectionId: "notifications"
         title: Translation.tr("Notifications")
+
+        ContentSubsection {
+            title: Translation.tr("Popup style")
+            visible: Config.options.panelFamily === "akebono"
+            ConfigSelectionArray {
+                currentValue: Config.options.akebono.notifications.style
+                onSelected: newValue => Config.options.akebono.notifications.style = newValue
+                options: [
+                    { value: "normal", displayName: Translation.tr("Normal"), icon: "notifications" },
+                    { value: "kde", displayName: Translation.tr("KDE"), icon: "desktop_windows" }
+                ]
+            }
+        }
 
         ConfigSpinBox {
             icon: "av_timer"

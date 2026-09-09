@@ -10,6 +10,7 @@ for d in "${CONFIG_DIRS[@]}"; do
     rsync -a --delete --exclude-from="$EXCLUDES" "$HOME/.config/$d/" "dots/config/$d/"
 done
 for f in "${CONFIG_FILES[@]}"; do
+    [[ -f "$HOME/.config/$f" ]] || continue
     cp -f "$HOME/.config/$f" "dots/config/$f"
 done
 

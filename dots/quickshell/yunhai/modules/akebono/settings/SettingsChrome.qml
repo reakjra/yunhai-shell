@@ -13,6 +13,7 @@ Item {
 
     property var pages: []
     property int currentPage: 0
+    property string initialSection: ""
 
     property var history: [0]
     property int historyPos: 0
@@ -330,6 +331,13 @@ Item {
                 Layout.fillHeight: true
                 active: Config.ready
                 source: root.pages[root.currentPage] ? Quickshell.shellPath(root.pages[root.currentPage].component) : ""
+
+                onLoaded: {
+                    if (root.initialSection === "" || !item.scrollToSection)
+                        return;
+                    item.scrollToSection(root.initialSection);
+                    root.initialSection = "";
+                }
 
                 Connections {
                     target: root

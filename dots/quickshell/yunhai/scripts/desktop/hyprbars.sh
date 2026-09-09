@@ -41,7 +41,7 @@ add_btn() {
 style() {
     loaded || return 0
     local bar text
-    bar="$(col surface 131313)"; FG="$bar"
+    bar="$(col term0 131313)"; FG="$bar"
     text="$(col on_surface e2e2e2)"
     hyprctl eval "hl.config({ plugin = { hyprbars = { enabled = true, bar_color = '$bar', col = { text = '$text' } } } })" >/dev/null
 

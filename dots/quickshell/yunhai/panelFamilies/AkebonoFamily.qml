@@ -1,7 +1,9 @@
 import Quickshell
 
+import qs.modules.common
 import qs.modules.akebono
 import qs.modules.akebono.dock
+import qs.modules.akebono.notificationPopup
 import qs.modules.akebono.overview
 import qs.modules.ii.background
 import qs.modules.ii.cheatsheet
@@ -30,7 +32,14 @@ Scope {
     PanelLoader { component: Shelf {} }
     PanelLoader { component: Lock {} }
     PanelLoader { component: MediaControls {} }
-    PanelLoader { component: NotificationPopup {} }
+    PanelLoader {
+        component: NotificationPopup {}
+        extraCondition: Config.options.akebono.notifications.style === "normal"
+    }
+    PanelLoader {
+        component: KdeNotificationPopup {}
+        extraCondition: Config.options.akebono.notifications.style === "kde"
+    }
     PanelLoader { component: OnScreenDisplay {} }
     PanelLoader { component: OnScreenKeyboard {} }
     PanelLoader { component: Overlay {} }

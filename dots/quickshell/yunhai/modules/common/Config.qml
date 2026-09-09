@@ -1104,6 +1104,9 @@ Singleton {
                     property int sheetWidth: 720
                     property int sheetHeight: 560
                 }
+                property JsonObject notifications: JsonObject {
+                    property string style: "normal" // "normal" | "kde"
+                }
                 property JsonObject shelf: JsonObject {
                     property string position: "bottom" // "bottom" | "top"
                     property string shape: "inverseHug" // "float" | "inverseHug" | "hug" | "rect"

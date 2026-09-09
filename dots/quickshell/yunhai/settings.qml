@@ -88,7 +88,15 @@ ApplicationWindow {
         return out;
     }
     property var pages: root.ownChrome ? root.familyPages : root.iiPages
-    property int currentPage: 0
+    readonly property int initialPage: {
+        const target = Quickshell.env("YUNHAI_SETTINGS_PAGE");
+        if (!target)
+            return 0;
+        const index = root.pages.findIndex(pg => pg.component === target);
+        return index === -1 ? 0 : index;
+    }
+    property int currentPage: root.initialPage
+    readonly property string initialSection: Quickshell.env("YUNHAI_SETTINGS_SECTION") || ""
     readonly property bool ownChrome: PanelFamilies.hasSettingsChrome(Config.options?.panelFamily)
 
     Binding {
@@ -101,7 +109,11 @@ ApplicationWindow {
         anchors.fill: parent
         active: root.ownChrome
         source: `${root.familyDir}/settings/SettingsChrome.qml`
-        onLoaded: item.pages = Qt.binding(() => root.pages)
+        onLoaded: {
+            item.pages = Qt.binding(() => root.pages);
+            item.initialSection = root.initialSection;
+            item.navigate(root.initialPage);
+        }
     }
 
     // Calculate nav rail width based on font metrics so it grows with the font

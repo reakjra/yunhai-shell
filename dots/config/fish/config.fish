@@ -17,12 +17,15 @@ if status is-interactive # Commands to run in interactive sessions can go here
         cat ~/.local/state/quickshell/yunhai/user/generated/terminal/sequences.txt
     end
 
+    # Abbreviations
+    abbr -a zd "zeditor ~/Documents/Personal/CodeProjects/"
+
     # Aliases
     alias pamcan pacman
     alias ls 'eza --icons'
     alias clear "printf '\033[2J\033[3J\033[1;1H'"
     alias q 'qs -c yunhai'
-    
+
 end
 
 functions --erase __fish_prompt_newline 2>/dev/null
