@@ -602,6 +602,12 @@ Singleton {
                 property int suspend: 3
             }
 
+            property JsonObject deviceBattery: JsonObject {
+                property bool notifyLow: true
+                property int defaultLow: 20
+                property list<var> thresholds: []
+            }
+
             property JsonObject booru: JsonObject {
                 property bool allowNsfw: false
                 property string downloadPath: "~/Pictures/homework"
@@ -1237,6 +1243,7 @@ Singleton {
         property alias cheatsheet: globalAdapter.cheatsheet
         property alias conflictKiller: globalAdapter.conflictKiller
         property alias crosshair: globalAdapter.crosshair
+        property alias deviceBattery: globalAdapter.deviceBattery
         property alias interactions: globalAdapter.interactions
         property alias language: globalAdapter.language
         property alias launcher: globalAdapter.launcher

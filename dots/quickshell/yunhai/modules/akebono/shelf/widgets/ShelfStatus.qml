@@ -27,7 +27,6 @@ Item {
     readonly property bool sinkMuted: Audio.sink?.audio?.muted ?? false
     readonly property bool micMuted: Audio.source?.audio?.muted ?? false
     readonly property real volume: Audio.sink?.audio?.volume ?? 0
-    readonly property int batteryLevel: Math.round(Battery.percentage * 6)
     readonly property bool batteryLow: Battery.isLow && !Battery.isCharging
     property bool capsLockOn: false
 
@@ -208,10 +207,7 @@ Item {
             MaterialSymbol {
                 Layout.alignment: Qt.AlignVCenter
                 visible: root.showBattery && Battery.available
-                text: (Battery.isCharging && Battery.percentage < 1) ? "battery_android_bolt"
-                    : root.batteryLow ? "battery_android_alert"
-                    : root.batteryLevel >= 6 ? "battery_android_full"
-                    : `battery_android_${root.batteryLevel}`
+                text: DeviceIcons.symbolForLevel(Battery.percentage, Battery.isCharging, root.batteryLow)
                 iconSize: root.iconSize
                 color: root.batteryLow ? Appearance.m3colors.m3error : Appearance.colors.colOnLayer1
             }

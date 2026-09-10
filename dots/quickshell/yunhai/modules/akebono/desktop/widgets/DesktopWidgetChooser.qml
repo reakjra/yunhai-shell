@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import Qt.labs.qmlmodels
 import qs.modules.akebono.desktop.widgets.calendar
+import qs.modules.akebono.desktop.widgets.deviceBattery
 import qs.modules.akebono.desktop.widgets.image
 import qs.modules.akebono.desktop.widgets.media
 import qs.modules.akebono.desktop.widgets.notes
@@ -27,6 +28,14 @@ DelegateChooser {
     DelegateChoice {
         roleValue: "weather"
         WeatherWidget {
+            required property var modelData
+            widgetData: modelData
+        }
+    }
+
+    DelegateChoice {
+        roleValue: "deviceBattery"
+        DeviceBatteryWidget {
             required property var modelData
             widgetData: modelData
         }

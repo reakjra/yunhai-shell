@@ -110,9 +110,8 @@ MouseArea {
 
                 StyledText {
                     Layout.fillWidth: true
-                    font.pixelSize: Appearance.font.pixelSize.small
-                    font.weight: Font.DemiBold
-                    color: Appearance.colors.colOnLayer2
+                    font.pixelSize: Appearance.font.pixelSize.smaller
+                    color: Appearance.colors.colSubtext
                     elide: Text.ElideRight
                     text: root.notification.appName
                 }
@@ -139,7 +138,7 @@ MouseArea {
 
                     StyledText {
                         Layout.fillWidth: true
-                        font.pixelSize: Appearance.font.pixelSize.small
+                        font.pixelSize: Appearance.font.pixelSize.normal
                         font.weight: Font.DemiBold
                         color: Appearance.colors.colOnLayer2
                         wrapMode: Text.Wrap
@@ -149,7 +148,7 @@ MouseArea {
                     StyledText {
                         Layout.fillWidth: true
                         visible: text.length > 0
-                        font.pixelSize: Appearance.font.pixelSize.smaller
+                        font.pixelSize: Appearance.font.pixelSize.small
                         color: Appearance.colors.colSubtext
                         wrapMode: Text.Wrap
                         textFormat: Text.RichText

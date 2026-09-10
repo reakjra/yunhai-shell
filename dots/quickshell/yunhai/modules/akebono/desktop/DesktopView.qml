@@ -646,6 +646,7 @@ Item {
                 { "icon": "calendar_month", "label": "Add calendar widget", "action": () => DesktopWidgets.add(view.screenName, "calendar", mx, my) },
                 { "icon": "partly_cloudy_day", "label": "Add weather widget", "action": () => DesktopWidgets.add(view.screenName, "weather", mx, my) },
                 { "icon": "music_note", "label": "Add media widget", "action": () => DesktopWidgets.add(view.screenName, "media", mx, my) },
+                { "icon": "battery_android_full", "label": "Add device battery widget", "action": () => DesktopWidgets.add(view.screenName, "deviceBattery", mx, my) },
                 { "separator": true },
                 { "icon": "check", "label": "Done editing", "action": () => DesktopWidgets.editMode = false }
             ];

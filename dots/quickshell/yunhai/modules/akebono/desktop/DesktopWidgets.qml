@@ -56,7 +56,8 @@ Singleton {
     readonly property var defaultSizes: ({
             "calendar": { "w": 260, "h": 280 },
             "media": { "w": 240, "h": 240 },
-            "weather": { "w": 230, "h": 230 }
+            "weather": { "w": 230, "h": 230 },
+            "deviceBattery": { "w": 190, "h": 200 }
         })
 
     function add(screen, type, x, y) {

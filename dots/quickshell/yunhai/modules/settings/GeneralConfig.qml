@@ -127,6 +127,61 @@ ContentPage {
                 }
             }
         }
+
+        ContentSubsection {
+            title: Translation.tr("Connected devices")
+            tooltip: Translation.tr("Low battery warnings for peripherals such as mice, keyboards and earbuds.")
+
+            ConfigSwitch {
+                buttonIcon: "notifications_active"
+                text: Translation.tr("Notify when low")
+                checked: Config.options.deviceBattery.notifyLow
+                onCheckedChanged: {
+                    Config.options.deviceBattery.notifyLow = checked;
+                }
+            }
+
+            ConfigRow {
+                uniform: true
+                ConfigSpinBox {
+                    text: Translation.tr("Default")
+                    value: Config.options.deviceBattery.defaultLow
+                    from: 0
+                    to: 100
+                    stepSize: 5
+                    onValueChanged: {
+                        Config.options.deviceBattery.defaultLow = value;
+                    }
+                }
+            }
+
+            Repeater {
+                model: Battery.devices
+                ConfigRow {
+                    id: deviceRow
+                    required property var modelData
+                    uniform: true
+                    ConfigSpinBox {
+                        text: Battery.labelFor(deviceRow.modelData)
+                        value: Battery.thresholdFor(Battery.keyFor(deviceRow.modelData))
+                        from: 0
+                        to: 100
+                        stepSize: 5
+                        onValueChanged: {
+                            if (value !== Battery.thresholdFor(Battery.keyFor(deviceRow.modelData)))
+                                Battery.setThresholdFor(deviceRow.modelData, value);
+                        }
+                    }
+                }
+            }
+
+            StyledText {
+                visible: Battery.devices.length === 0
+                text: Translation.tr("No devices with a battery are connected.")
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                color: Appearance.colors.colSubtext
+            }
+        }
     }
 
     ColumnLayout {
