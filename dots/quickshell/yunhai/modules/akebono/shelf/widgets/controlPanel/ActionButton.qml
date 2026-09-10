@@ -25,6 +25,7 @@ Squircle {
     }
     RippleArea {
         shapeRadius: bt.radius
+        squircle: true
         rippleColor: bt.danger ? Appearance.colors.colError : Appearance.colors.colOnLayer2
         onClicked: bt.clicked()
     }

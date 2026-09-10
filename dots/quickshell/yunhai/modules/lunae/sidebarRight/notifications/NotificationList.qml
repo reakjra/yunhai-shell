@@ -13,6 +13,7 @@ Item {
     property bool showStatusRow: true
     property real placeholderIconSize: 56
     readonly property real listContentHeight: listview.contentHeight
+    readonly property real implicitContentHeight: root.listContentHeight + (root.showStatusRow ? statusRow.implicitHeight + 5 : 0)
     readonly property bool expanding: listview.expanding
 
     LunaeNotificationSidebarListView {

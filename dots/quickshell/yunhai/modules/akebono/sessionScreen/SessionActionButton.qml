@@ -75,7 +75,7 @@ Item {
     RippleArea {
         id: ripple
         shapeRadius: bg.radius
-        squircleMask: true
+        squircle: true
         rippleColor: button.highlighted ? Appearance.m3colors.m3onPrimary : Appearance.colors.colOnLayer1
         onClicked: button.clicked()
     }

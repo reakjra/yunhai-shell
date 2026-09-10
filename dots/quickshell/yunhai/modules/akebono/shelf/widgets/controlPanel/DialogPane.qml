@@ -3,80 +3,39 @@ import QtQuick.Layouts
 import qs.modules.common
 import qs.modules.common.widgets
 
-Item {
+ColumnLayout {
     id: pane
     required property var panel
+    spacing: 10
 
-    visible: panel.width > panel.mainW + 40
-    opacity: Math.max(0, Math.min(1, (panel.width - panel.mainW) / panel.dialogW))
-
-    property string displayDialog: ""
-    onVisibleChanged: if (!visible) displayDialog = ""
-
-    Connections {
-        target: pane.panel
-        function onActiveDialogChanged() {
-            if (pane.panel.activeDialog === "")
-                return;
-            if (pane.displayDialog !== "" && pane.displayDialog !== pane.panel.activeDialog)
-                dialogSwapAnim.restart();
-            else
-                pane.displayDialog = pane.panel.activeDialog;
-        }
-    }
-    SequentialAnimation {
-        id: dialogSwapAnim
-        NumberAnimation { target: dialogContent; property: "opacity"; to: 0; duration: 150; easing.type: Easing.InCubic }
-        ScriptAction { script: pane.displayDialog = pane.panel.activeDialog }
-        NumberAnimation { target: dialogContent; property: "opacity"; to: 1; duration: 150; easing.type: Easing.OutCubic }
-    }
-
-    ColumnLayout {
-        id: dialogContent
-        anchors.top: parent.top
-        anchors.topMargin: 18
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 18
-        anchors.left: pane.panel.dialogOnLeft ? undefined : parent.left
-        anchors.right: pane.panel.dialogOnLeft ? parent.right : undefined
-        width: pane.panel.dialogW - 14
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: 4
         spacing: 8
 
-        RowLayout {
+        StyledText {
             Layout.fillWidth: true
-            spacing: 8
-
-            StyledText {
-                Layout.fillWidth: true
-                text: pane.panel.registry.titleFor(pane.displayDialog)
-                font.pixelSize: Appearance.font.pixelSize.larger
-                font.weight: Font.DemiBold
-                color: Appearance.colors.colOnLayer0
-                elide: Text.ElideRight
-            }
-            ActionButton {
-                size: 30
-                iconSize: 19
-                flat: true
-                icon: "check"
-                onClicked: pane.panel.activeDialog = ""
-            }
-        }
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 1
+            text: pane.panel.registry.titleFor(pane.panel.displayDialog)
+            font.pixelSize: Appearance.font.pixelSize.huge
+            font.weight: Font.DemiBold
             color: Appearance.colors.colOnLayer0
-            opacity: 0.14
+            elide: Text.ElideRight
         }
+        ActionButton {
+            size: 30
+            iconSize: 19
+            flat: true
+            icon: "check"
+            onClicked: pane.panel.activeDialog = ""
+        }
+    }
+    Card {
+        Layout.fillWidth: true
+        contentMargin: 6
+
         Loader {
-            id: dialogLoader
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            sourceComponent: pane.panel.registry.detailFor(pane.displayDialog)
-            onLoaded: {
-                if (item && item.maxListHeight !== undefined)
-                    item.maxListHeight = Qt.binding(() => Math.max(120, dialogLoader.height - 16));
-            }
+            sourceComponent: pane.panel.registry.detailFor(pane.panel.displayDialog)
         }
     }
 }

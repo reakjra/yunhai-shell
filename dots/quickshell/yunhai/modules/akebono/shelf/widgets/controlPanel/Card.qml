@@ -6,6 +6,7 @@ import qs.modules.akebono
 Squircle {
     id: card
     default property alias content: cardCol.data
+    property real contentMargin: 15
     radius: 22
     smoothing: AkebonoAppearance.squircleSmoothing
     color: Appearance.colors.colLayer2
@@ -16,8 +17,8 @@ Squircle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: 15
-        anchors.rightMargin: 15
+        anchors.leftMargin: card.contentMargin
+        anchors.rightMargin: card.contentMargin
         spacing: 12
     }
 }

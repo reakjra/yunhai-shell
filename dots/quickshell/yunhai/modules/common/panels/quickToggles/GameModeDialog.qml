@@ -5,7 +5,9 @@ import qs.modules.common.widgets
 
 StyledFlickable {
     id: root
+    property real maxListHeight: 250
     contentHeight: content.implicitHeight
+    implicitHeight: Math.min(root.contentHeight, root.maxListHeight)
     clip: true
 
     Column {

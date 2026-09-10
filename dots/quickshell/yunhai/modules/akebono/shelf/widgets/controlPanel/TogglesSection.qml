@@ -38,17 +38,17 @@ Column {
         id: editPanelWrapper
         width: parent.width
         clip: true
-        height: section.panel.shelf?.qsEditH ?? 0
+        height: section.panel.editMode ? editCol.implicitHeight : 0
         opacity: section.panel.editMode ? 1 : 0
 
-        Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-        Binding {
-            target: section.panel.shelf
-            property: "qsEditH"
-            value: section.panel.editMode ? editCol.implicitHeight : 0
-            when: section.panel.shelf !== null
+        Behavior on height {
+            NumberAnimation {
+                duration: Appearance.animation.elementMove.duration
+                easing.type: Appearance.animation.elementMove.type
+                easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
+            }
         }
+        Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
         Column {
             id: editCol
@@ -202,6 +202,7 @@ Column {
             }
             RippleArea {
                 shapeRadius: 16
+                squircle: true
                 rippleColor: Appearance.colors.colOnLayer2
                 onClicked: section.panel.editMode = !section.panel.editMode
             }

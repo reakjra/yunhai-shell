@@ -35,6 +35,7 @@ Item {
     RippleArea {
         id: ripple
         shapeRadius: 16
+        squircle: true
         rippleColor: root.on ? Appearance.colors.colOnSecondaryContainer : Appearance.colors.colOnLayer2
         onClicked: root.clicked()
     }

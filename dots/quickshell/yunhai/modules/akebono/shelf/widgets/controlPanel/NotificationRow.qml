@@ -80,7 +80,7 @@ Squircle {
     }
     RippleArea {
         shapeRadius: 18
-        squircleMask: true
+        squircle: true
         rippleColor: notifRow.on ? Appearance.colors.colOnSecondaryContainer : Appearance.colors.colOnLayer2
         onClicked: notifRow.panel.activeDialog = notifRow.on ? "" : "notifications"
     }

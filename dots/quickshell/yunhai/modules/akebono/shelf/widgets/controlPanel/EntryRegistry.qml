@@ -71,5 +71,11 @@ QtObject {
     readonly property Component audioDetail: Component { AudioOutputDialog {} }
     readonly property Component micDetail: Component { AudioInputDialog {} }
     readonly property Component recordDetail: Component { RecordDialog {} }
-    readonly property Component notificationsDetail: Component { NotificationList { placeholderIconSize: 40 } }
+    readonly property Component notificationsDetail: Component {
+        NotificationList {
+            id: notifList
+            placeholderIconSize: 40
+            implicitHeight: Math.min(Math.max(notifList.implicitContentHeight, 260), 420)
+        }
+    }
 }

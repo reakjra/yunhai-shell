@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import qs.modules.common
 import QtQuick
 import QtQuick.Shapes
-import Qt5Compat.GraphicalEffects as GE
 
 MouseArea {
     id: root
@@ -12,18 +11,7 @@ MouseArea {
     property real hoverOpacity: 0.08
     property real pressOpacity: 0.12
     property real shapeRadius: root.parent?.radius ?? 0
-    property bool squircleMask: false
-
-    layer.enabled: squircleMask
-    layer.effect: GE.OpacityMask {
-        maskSource: Squircle {
-            width: root.width
-            height: root.height
-            radius: root.shapeRadius
-            smoothing: AkebonoAppearance.squircleSmoothing
-            color: "white"
-        }
-    }
+    property bool squircle: false
 
     property real stateOpacity: pressed ? pressOpacity : containsMouse ? hoverOpacity : 0
     property real pressX: width / 2
@@ -79,9 +67,10 @@ MouseArea {
         duration: 320
     }
 
-    Rectangle {
+    Squircle {
         anchors.fill: parent
         radius: root.shapeRadius
+        smoothing: root.squircle ? AkebonoAppearance.squircleSmoothing : 2.0
         color: root.rippleColor
         opacity: root.stateOpacity
         Behavior on opacity { NumberAnimation { duration: 130; easing.type: Easing.OutCubic } }

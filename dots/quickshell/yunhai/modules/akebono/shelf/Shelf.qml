@@ -126,6 +126,7 @@ Scope {
 
                     readonly property bool popupsDetached: Config.options.akebono?.shelf.popupsDetached ?? false
                     readonly property real popupGap: 18
+                    readonly property real popupEdgeMargin: 8
                     property real detachEnable: popupsDetached ? 1 : 0
                     readonly property real activePopupProgress: Math.max(launcherProgress, trayProgress, qsProgress, mediaProgress, calProgress, weatherProgress, resourcesProgress, bumpProgress)
                     readonly property real popupDetach: detachEnable * Math.max(0, Math.min(1, (activePopupProgress - 0.55) / 0.45))
@@ -166,34 +167,11 @@ Scope {
                     property bool qsOpen: false
                     property real statusRawX: 0
                     property var statusAnchor: null
-                    readonly property int qsBaseW: 406
-                    readonly property int qsDialogW: 300
-                    property bool qsDialogOpen: false
-                    property real qsW: qsBaseW + (qsDialogOpen ? qsDialogW : 0)
-                    property real qsEditH: 0
-                    property real qsContentH: 320
-                    readonly property real qsFullH: qsContentH
                     property real qsProgress: 0
 
-                    Behavior on qsEditH {
-                        NumberAnimation {
-                            duration: Appearance.animation.elementMove.duration
-                            easing.type: Appearance.animation.elementMove.type
-                            easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
-                        }
-                    }
                     readonly property bool qsActive: qsOpen || qsProgress > 0.001
-                    readonly property bool qsGrowLeft: barSurface.qsGrowLeft
-                    readonly property real qsWClamped: Math.max(qsBaseW, qsW)
                     property real qsWave: 1
 
-                    Behavior on qsW {
-                        NumberAnimation {
-                            duration: Appearance.animation.elementMove.duration
-                            easing.type: Appearance.animation.elementMove.type
-                            easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
-                        }
-                    }
                     NumberAnimation {
                         id: qsWaveAnim
                         target: shelfRoot
@@ -201,10 +179,6 @@ Scope {
                         from: 0
                         to: 1
                         duration: Appearance.animation.elementMove.duration + 250
-                    }
-                    onQsDialogOpenChanged: {
-                        if (!shelfRoot.qsDialogOpen && shelfRoot.qsOpen)
-                            qsWaveAnim.restart();
                     }
 
                     property bool calOpen: false
@@ -565,7 +539,7 @@ Scope {
                     onQsOpenChanged: {
                         shelfRoot.qsProgress = shelfRoot.qsOpen ? 1 : 0;
                         shelfRoot.publishStatus();
-                        shelfRoot.announcePopup(shelfRoot.qsOpen, barSurface.qsX, shelfRoot.qsW, shelfRoot.qsFullH);
+                        shelfRoot.announcePopup(shelfRoot.qsOpen, barSurface.qsX, qsPanel.implicitWidth, qsPanel.implicitHeight);
                     }
                     onMediaOpenChanged: {
                         shelfRoot.mediaProgress = shelfRoot.mediaOpen ? 1 : 0;
@@ -684,40 +658,43 @@ Scope {
                         property real bumpHeight: shelfRoot.bumpProgress * (shelfRoot.thumbH + shelfRoot.previewInset * 2)
                         property real bumpX: Math.max(bumpWidth / 2, Math.min(shelfRoot.bumpX, width - bumpWidth / 2))
                         property real sminK: 26
+
+                        function popupX(rawX: real, w: real): real {
+                            const half = w / 2 + shelfRoot.popupEdgeMargin;
+                            return Math.max(half, Math.min(rawX, barSurface.width - half));
+                        }
+
                         property real waveX: shelfRoot.waveX
                         property real waveProgress: shelfRoot.waveProgress
                         property real waveAmp: shelfRoot.waveAmp
                         property real waveHalfW: shelfRoot.waveHalfW
-                        property real launcherX: Math.max(shelfRoot.launcherW / 2, Math.min(shelfRoot.launcherRawX, width - shelfRoot.launcherW / 2))
+                        property real launcherX: barSurface.popupX(shelfRoot.launcherRawX, shelfRoot.launcherW)
                         property real launcherW: shelfRoot.launcherW * shelfRoot.suckW(shelfRoot.runnerOpen, shelfRoot.launcherProgress)
                         property real launcherH: shelfRoot.launcherProgress * shelfRoot.launcherFullH
                         property real launcherR: 30
                         property real trayW: (trayOverflowItem.implicitWidth + 8) * shelfRoot.suckW(shelfRoot.trayOverflowOpen, shelfRoot.trayProgress)
-                        property real trayX: Math.max(trayW / 2, Math.min(shelfRoot.trayRawX, width - trayW / 2))
+                        property real trayX: barSurface.popupX(shelfRoot.trayRawX, trayW)
                         property real trayH: shelfRoot.trayProgress * (trayOverflowItem.implicitHeight + 8)
                         property real trayR: 24
-                        readonly property real qsBaseX: Math.max(shelfRoot.qsBaseW / 2, Math.min(shelfRoot.statusRawX, width - shelfRoot.qsBaseW / 2))
-                        readonly property bool qsGrowLeft: qsBaseX - shelfRoot.qsBaseW / 2 >= shelfRoot.qsDialogW
-                        readonly property real qsExtra: Math.max(0, shelfRoot.qsW - shelfRoot.qsBaseW)
-                        property real qsX: qsBaseX + (qsGrowLeft ? -qsExtra / 2 : qsExtra / 2)
-                        property real qsW: shelfRoot.qsWClamped * shelfRoot.suckW(shelfRoot.qsOpen, shelfRoot.qsProgress)
+                        property real qsX: barSurface.popupX(shelfRoot.statusRawX, qsPanel.implicitWidth)
+                        property real qsW: qsPanel.implicitWidth * shelfRoot.suckW(shelfRoot.qsOpen, shelfRoot.qsProgress)
                         property real qsWave: shelfRoot.qsWave
-                        property real qsWaveX: qsGrowLeft ? qsX - qsW / 2 : qsX + qsW / 2
-                        property real qsH: shelfRoot.qsProgress * shelfRoot.qsFullH
+                        property real qsWaveX: qsX
+                        property real qsH: shelfRoot.qsProgress * qsPanel.implicitHeight
                         property real qsR: 32
-                        property real mediaX: Math.max(shelfRoot.mediaW / 2, Math.min(shelfRoot.mediaRawX, width - shelfRoot.mediaW / 2))
+                        property real mediaX: barSurface.popupX(shelfRoot.mediaRawX, shelfRoot.mediaW)
                         property real mediaW: shelfRoot.mediaW * shelfRoot.suckW(shelfRoot.mediaOpen, shelfRoot.mediaProgress)
                         property real mediaH: shelfRoot.mediaProgress * shelfRoot.mediaFullH
                         property real mediaR: 32
-                        property real calX: Math.max(calPanel.implicitWidth / 2, Math.min(shelfRoot.clockRawX, width - calPanel.implicitWidth / 2))
+                        property real calX: barSurface.popupX(shelfRoot.clockRawX, calPanel.implicitWidth)
                         property real calW: calPanel.implicitWidth * shelfRoot.suckW(shelfRoot.calOpen, shelfRoot.calProgress)
                         property real calH: shelfRoot.calProgress * calPanel.implicitHeight
                         property real calR: 32
-                        property real weatherX: Math.max(weatherPanel.implicitWidth / 2, Math.min(shelfRoot.weatherRawX, width - weatherPanel.implicitWidth / 2))
+                        property real weatherX: barSurface.popupX(shelfRoot.weatherRawX, weatherPanel.implicitWidth)
                         property real weatherW: weatherPanel.implicitWidth * shelfRoot.suckW(shelfRoot.weatherOpen, shelfRoot.weatherProgress)
                         property real weatherH: shelfRoot.weatherProgress * weatherPanel.implicitHeight
                         property real weatherR: 32
-                        property real resX: Math.max(resourcesPanel.implicitWidth / 2, Math.min(shelfRoot.resourcesRawX, width - resourcesPanel.implicitWidth / 2))
+                        property real resX: barSurface.popupX(shelfRoot.resourcesRawX, resourcesPanel.implicitWidth)
                         property real resW: resourcesPanel.implicitWidth * shelfRoot.suckW(shelfRoot.resourcesOpen, shelfRoot.resourcesProgress)
                         property real resH: shelfRoot.resourcesProgress * resourcesPanel.implicitHeight
                         property real resR: 32
@@ -877,14 +854,15 @@ Scope {
                         open: shelfRoot.qsOpen
                         progress: shelfRoot.qsProgress
                         anchorX: barSurface.qsX
-                        panelW: shelfRoot.qsWClamped
-                        panelH: shelfRoot.qsFullH
+                        panelW: qsPanel.implicitWidth
+                        panelH: qsPanel.implicitHeight
 
                         ControlPanel {
                             id: qsPanel
                             anchors.fill: parent
                             shelf: shelfRoot
                             onCloseRequested: shelfRoot.qsOpen = false
+                            onReshaped: qsWaveAnim.restart()
                         }
                     }
 
