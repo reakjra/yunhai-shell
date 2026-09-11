@@ -130,8 +130,11 @@ Scope {
         }
     }
 
+    property bool startupHandled: false
+
     function initIfReady() {
-        if (!Config.ready || !Persistent.ready) return;
+        if (root.startupHandled || !Config.ready || !Persistent.ready) return;
+        root.startupHandled = true;
         if (Config.options.lock.launchOnStartup && Persistent.isNewHyprlandInstance) {
             root.lock();
         } else {
@@ -150,4 +153,5 @@ Scope {
             root.initIfReady();
         }
     }
+    Component.onCompleted: root.initIfReady()
 }

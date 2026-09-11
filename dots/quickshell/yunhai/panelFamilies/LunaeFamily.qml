@@ -2,7 +2,7 @@ import Quickshell
 
 import qs.modules.common
 
-import qs.modules.lunae.background
+import qs.modules.ii.background
 import qs.modules.ii.lock
 import qs.modules.lunae.onScreenDisplay
 import qs.modules.ii.overlay

@@ -584,6 +584,10 @@ Singleton {
                 property string wallpaperPath: ""
                 property string thumbnailPath: ""
                 property bool hideWhenFullscreen: true
+                property JsonObject transition: JsonObject {
+                    property string style: "circle" // Options: "none", "fade", "circle", "wipe", "dissolve"
+                    property int duration: 850
+                }
                 property JsonObject parallax: JsonObject {
                     property bool vertical: false
                     property bool autoVertical: false

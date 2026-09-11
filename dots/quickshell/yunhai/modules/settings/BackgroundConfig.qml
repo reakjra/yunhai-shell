@@ -8,6 +8,62 @@ ContentPage {
     forceWidth: true
 
     ContentSection {
+        icon: "animation"
+        title: Translation.tr("Transition")
+
+        ContentSubsection {
+            title: Translation.tr("Style")
+            Layout.fillWidth: true
+            ConfigSelectionArray {
+                currentValue: Config.options.background.transition.style
+                onSelected: newValue => {
+                    Config.options.background.transition.style = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("None"),
+                        icon: "block",
+                        value: "none"
+                    },
+                    {
+                        displayName: Translation.tr("Fade"),
+                        icon: "transition_fade",
+                        value: "fade"
+                    },
+                    {
+                        displayName: Translation.tr("Circle"),
+                        icon: "blur_circular",
+                        value: "circle"
+                    },
+                    {
+                        displayName: Translation.tr("Wipe"),
+                        icon: "transition_push",
+                        value: "wipe"
+                    },
+                    {
+                        displayName: Translation.tr("Dissolve"),
+                        icon: "transition_dissolve",
+                        value: "dissolve"
+                    }
+                ]
+            }
+        }
+
+        ConfigSpinBox {
+            visible: Config.options.background.transition.style !== "none"
+            icon: "timer"
+            text: Translation.tr("Duration (ms)")
+            value: Config.options.background.transition.duration
+            from: 100
+            to: 3000
+            stepSize: 50
+            onValueChanged: {
+                Config.options.background.transition.duration = value;
+            }
+        }
+    }
+
+    ContentSection {
         icon: "sync_alt"
         title: Translation.tr("Parallax")
 

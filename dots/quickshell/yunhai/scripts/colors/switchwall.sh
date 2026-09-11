@@ -53,6 +53,10 @@ post_process() {
     local screen_height="$2"
     local wallpaper_path="$3"
 
+    mkdir -p "$CACHE_DIR"
+    exec 9>"$CACHE_DIR/kdeglobals.lock"
+    flock 9
+
     # Save non-color sections from kdeglobals before kde-material-you-colors
     # rewrites the file (it replaces the entire file, losing fonts/styles/etc.)
     local kdeglobals_preserve=""
@@ -105,7 +109,7 @@ print(''.join(preserved), end='')
     # Restore preserved non-color settings that kde-material-you-colors wiped
     if [ -n "$kdeglobals_preserve" ] && [ -f "$HOME/.config/kdeglobals" ]; then
         python3 -c "
-import re, sys
+import os, re, sys, tempfile
 # Parse the new kdeglobals (color data from kde-material-you-colors)
 with open('$HOME/.config/kdeglobals') as f:
     new_content = f.read()
@@ -153,8 +157,11 @@ for sec in new_order:
     if out and not out[-1].endswith('\n'):
         out.append('\n')
     out.append('\n')
-with open('$HOME/.config/kdeglobals', 'w') as f:
+path = '$HOME/.config/kdeglobals'
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path))
+with os.fdopen(fd, 'w') as f:
     f.writelines(out)
+os.replace(tmp, path)
 " <<< "$kdeglobals_preserve" 2>/dev/null
     fi
     python3 -c "
@@ -368,6 +375,22 @@ categorize_wallpaper() {
     echo "$img_cat" > "$STATE_DIR/user/generated/wallpaper/category.txt"
 }
 
+resolve_auto_type() {
+    [[ "$type_flag" != "auto" ]] && return
+    wait "$detect_type_pid" 2>/dev/null
+    local detected_type
+    detected_type="$(cat "$detect_type_file" 2>/dev/null)"
+    rm -f "$detect_type_file"
+    for t in "${allowed_types[@]}"; do
+        if [[ "$detected_type" == "$t" && "$detected_type" != "auto" ]]; then
+            type_flag="$detected_type"
+            return
+        fi
+    done
+    echo "[switchwall] Warning: Could not auto-detect a valid scheme, defaulting to 'scheme-tonal-spot'" >&2
+    type_flag="scheme-tonal-spot"
+}
+
 switch() {
     imgpath="$1"
     mode_flag="$2"
@@ -459,8 +482,15 @@ switch() {
                 exit 1
             fi
         else
-            matugen_args+=(image "$imgpath")
-            generate_colors_material_args=(--path "$imgpath")
+            # colorgen quantises every pixel, a thumbnail gives the same palette
+            colorgen_source="$imgpath"
+            thumbnail="$CACHE_DIR/user/generated/colorgen-source.png"
+            mkdir -p "$(dirname "$thumbnail")"
+            if magick -define jpeg:size=512x512 "$imgpath" -resize 256x256 "$thumbnail" 2>/dev/null; then
+                colorgen_source="$thumbnail"
+            fi
+            matugen_args+=(image "$colorgen_source")
+            generate_colors_material_args=(--path "$colorgen_source")
             # Update wallpaper path in config (skip in --noswitch mode, path hasn't changed)
             [[ -z "$noswitch_flag" ]] && set_wallpaper_path "$imgpath"
             remove_restore
@@ -486,6 +516,7 @@ switch() {
             generate_colors_material_args+=(--mode "$mode_flag")
         fi
     fi
+    resolve_auto_type
     [[ -n "$type_flag" ]] && matugen_args+=(--type "$type_flag") && generate_colors_material_args+=(--scheme "$type_flag")
     generate_colors_material_args+=(--termscheme "$terminalscheme" --blend_bg_fg)
     generate_colors_material_args+=(--cache "$STATE_DIR/user/generated/color.txt")
@@ -685,23 +716,11 @@ main() {
         fi
     fi
 
-    # If type_flag is 'auto', detect scheme type from image (after imgpath is set)
     if [[ "$type_flag" == "auto" ]]; then
         if [[ -n "$imgpath" && -f "$imgpath" ]]; then
-            detected_type="$(detect_scheme_type_from_image "$imgpath")"
-            valid_detected=0
-            for t in "${allowed_types[@]}"; do
-                if [[ "$detected_type" == "$t" && "$detected_type" != "auto" ]]; then
-                    valid_detected=1
-                    break
-                fi
-            done
-            if [[ $valid_detected -eq 1 ]]; then
-                type_flag="$detected_type"
-            else
-                echo "[switchwall] Warning: Could not auto-detect a valid scheme, defaulting to 'scheme-tonal-spot'" >&2
-                type_flag="scheme-tonal-spot"
-            fi
+            detect_type_file="$(mktemp /tmp/ii-scheme.XXXXXX)"
+            detect_scheme_type_from_image "$imgpath" > "$detect_type_file" &
+            detect_type_pid=$!
         else
             echo "[switchwall] Warning: No image to auto-detect scheme from, defaulting to 'scheme-tonal-spot'" >&2
             type_flag="scheme-tonal-spot"

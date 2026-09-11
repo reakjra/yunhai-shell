@@ -5,7 +5,7 @@ import qs.modules.common
 import qs.services
 import QtQuick
 import Quickshell
-import Yunhai.Sys
+import Yunhai
 
 Singleton {
     id: root

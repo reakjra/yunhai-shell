@@ -4,10 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "Yunhai_Sys"
+name = "Yunhai"
 crate-type = ["cdylib"]
 
 [dependencies]
+imagesize = "0.13"
 sysinfo = { path = "../sysinfo" }
 cxx.workspace = true
 cxx-qt.workspace = true

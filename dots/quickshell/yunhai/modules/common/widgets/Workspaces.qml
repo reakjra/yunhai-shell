@@ -18,7 +18,6 @@ Item {
     property bool vertical: false
     property bool borderless: Config.options.bar.borderless
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.QsWindow.window?.screen)
-    readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
 
     readonly property bool useWorkspaceMap: Config.options.bar.workspaces.useWorkspaceMap
     readonly property list<int> workspaceMap: Config.options.bar.workspaces.workspaceMap
@@ -27,7 +26,6 @@ Item {
 
     readonly property int workspacesShown: Config.options.bar.workspaces.shown
     readonly property int workspaceGroup: Math.floor((monitor?.activeWorkspace?.id - root.workspaceOffset - 1) / root.workspacesShown)
-    property list<bool> workspaceOccupied: []
     property int workspaceIndexInGroup: dynamicWorkspaces
         ? visibleWorkspaceIds.indexOf(monitor?.activeWorkspace?.id ?? -1)
         : (monitor?.activeWorkspace?.id - root.workspaceOffset - 1) % root.workspacesShown
@@ -128,12 +126,6 @@ Item {
         visibleWorkspaceIds = [...ids].sort((a, b) => a - b)
     }
 
-    function updateWorkspaceOccupied() {
-        workspaceOccupied = Array.from({ length: root.workspacesShown }, (_, i) => {
-            return Hyprland.workspaces.values.some(ws => ws.id === workspaceOffset + workspaceGroup * root.workspacesShown + i + 1);
-        })
-    }
-
     function workspaceDisplayText(workspaceId) {
         return Config.options?.bar.workspaces.numberMap[workspaceId - 1] || workspaceId.toString()
     }
@@ -161,32 +153,23 @@ Item {
     }
 
     Component.onCompleted: {
-        updateWorkspaceOccupied()
         updateMonitorWindows()
         updateVisibleWorkspaceIds()
     }
     Connections {
         target: Hyprland.workspaces
         function onValuesChanged() {
-            updateWorkspaceOccupied();
             updateVisibleWorkspaceIds();
         }
     }
     Connections {
         target: Hyprland
         function onFocusedWorkspaceChanged() {
-            updateWorkspaceOccupied();
             updateVisibleWorkspaceIds();
         }
     }
-    onWorkspaceGroupChanged: {
-        updateWorkspaceOccupied();
-        updateVisibleWorkspaceIds();
-    }
-    onDynamicWorkspacesChanged: {
-        updateWorkspaceOccupied();
-        updateVisibleWorkspaceIds();
-    }
+    onWorkspaceGroupChanged: updateVisibleWorkspaceIds()
+    onDynamicWorkspacesChanged: updateVisibleWorkspaceIds()
 
     WheelHandler {
         onWheel: (event) => {
@@ -303,15 +286,9 @@ Item {
                 Layout.alignment: Qt.AlignCenter
 
                 property int wsId: root.wsIdAt(index)
-                property bool isOccupied: root.dynamicWorkspaces
-                    ? root.hasWindowsInWorkspace(wsId)
-                    : (root.workspaceOccupied[index] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 1))
-                property bool prevOccupied: index > 0 && (root.dynamicWorkspaces
-                    ? root.hasWindowsInWorkspace(root.wsIdAt(index - 1))
-                    : (root.workspaceOccupied[index - 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index)))
-                property bool nextOccupied: index < root.classicCount - 1 && (root.dynamicWorkspaces
-                    ? root.hasWindowsInWorkspace(root.wsIdAt(index + 1))
-                    : (root.workspaceOccupied[index + 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 2)))
+                property bool isOccupied: root.hasWindowsInWorkspace(wsId)
+                property bool prevOccupied: index > 0 && root.hasWindowsInWorkspace(root.wsIdAt(index - 1))
+                property bool nextOccupied: index < root.classicCount - 1 && root.hasWindowsInWorkspace(root.wsIdAt(index + 1))
                 property var radiusPrev: prevOccupied ? 0 : (width / 2)
                 property var radiusNext: nextOccupied ? 0 : (width / 2)
 
@@ -552,7 +529,7 @@ Item {
         property bool showNumbers: Config.options.bar.workspaces.alwaysShowNumbers || root.showWorkspaceNumbers
         property int workspaceValue
         property bool activeWorkspace
-        property bool occupied: root.dynamicWorkspaces ? root.hasWindowsInWorkspace(workspaceValue) : root.workspaceOccupied[index]
+        property bool occupied: root.hasWindowsInWorkspace(workspaceValue)
         property color indColor: activeWorkspace ? Appearance.m3colors.m3onPrimary : (occupied ? Appearance.m3colors.m3onSecondaryContainer : Appearance.colors.colOnLayer1Inactive)
 
         anchors.centerIn: parent

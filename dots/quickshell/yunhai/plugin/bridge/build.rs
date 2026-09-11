@@ -21,10 +21,10 @@ fn main() {
     );
 
     CxxQtBuilder::new_qml_module(
-        QmlModule::new("Yunhai.Sys")
+        QmlModule::new("Yunhai")
             .version(1, 0)
             .plugin_type(PluginType::Dynamic),
     )
-    .files(["src/monitor.rs", "src/process.rs"])
+    .files(["src/monitor.rs", "src/process.rs", "src/image.rs"])
     .build();
 }

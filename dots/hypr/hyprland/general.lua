@@ -71,7 +71,7 @@ hl.config({
 	decoration = {
 		-- 2 = circle, higher = squircle, 4 = very obvious squircle
 		-- Fuck clearly visible squircles. 100% Apple brainrot.
-		rounding_power = 2.5,
+		rounding_power = 4.5,
 		rounding = 18,
 
 		blur = {
@@ -113,6 +113,33 @@ hl.config({
 		-- precise_mouse_move = true,
 	},
 })
+
+-- ##### AKEBONO HYPRBARS #####
+if hl.plugin and hl.plugin.hyprbars then
+	local fontFile = io.open(os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars-font.txt")
+	local barFont = fontFile and fontFile:read("l") or nil
+	if fontFile then
+		fontFile:close()
+	end
+
+	hl.config({
+		plugin = {
+			hyprbars = {
+				bar_blur = false,
+				bar_height = 34,
+				bar_text_font = barFont,
+				bar_text_size = 16,
+				bar_padding = 14,
+				bar_button_padding = 8,
+				bar_buttons_alignment = "right",
+				bar_text_align = "center",
+				bar_part_of_window = true,
+				bar_precedence_over_border = true,
+			},
+		},
+	})
+end
+
 -- Curves
 hl.curve("expressiveFastSpatial", {
 	type = "bezier",
@@ -302,32 +329,6 @@ hl.config({
 		force_zero_scaling = true,
 	},
 })
-
--- ##### AKEBONO HYPRBARS #####
-if hl.plugin and hl.plugin.hyprbars then
-	local fontFile = io.open(os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars-font.txt")
-	local barFont = fontFile and fontFile:read("l") or nil
-	if fontFile then
-		fontFile:close()
-	end
-
-	hl.config({
-		plugin = {
-			hyprbars = {
-				bar_blur = false,
-				bar_height = 34,
-				bar_text_font = barFont,
-				bar_text_size = 16,
-				bar_padding = 14,
-				bar_button_padding = 8,
-				bar_buttons_alignment = "right",
-				bar_text_align = "center",
-				bar_part_of_window = true,
-				bar_precedence_over_border = true,
-			},
-		},
-	})
-end
 
 -- ##### M3 EXPRESSIVE ANIMATION SET #####
 hl.curve("m3_decelerate", { type = "bezier", points = { { 0.05, 0.7 }, { 0.1, 1.0 } } })

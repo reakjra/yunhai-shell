@@ -10,7 +10,6 @@ import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 
@@ -62,8 +61,6 @@ Variants {
         property int wallpaperHeight: modelData.height // Some reasonable init value, to be updated
         property real scaledWallpaperWidth: wallpaperWidth * effectiveWallpaperScale
         property real scaledWallpaperHeight: wallpaperHeight * effectiveWallpaperScale
-        property real parallaxTotalPixelsX: Math.max(0, scaledWallpaperWidth - screen.width)
-        property real parallaxTotalPixelsY: Math.max(0, scaledWallpaperHeight - screen.height)
         readonly property bool verticalParallax: (Config.options.background.parallax.autoVertical && wallpaperHeight > wallpaperWidth) || Config.options.background.parallax.vertical
         // Colors
         property bool shouldBlur: (GlobalStates.screenLocked && Config.options.lock.blur.enable)
@@ -100,6 +97,8 @@ Variants {
             animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
         }
 
+        property string sizedWallpaperPath: ""
+        Component.onCompleted: bgRoot.updateZoomScale()
         onWallpaperPathChanged: {
             bgRoot.updateZoomScale();
             // Clock position gets updated after zoom scale is updated
@@ -107,42 +106,28 @@ Variants {
 
         // Wallpaper zoom scale
         function updateZoomScale() {
-            getWallpaperSizeProc.path = bgRoot.wallpaperPath;
-            getWallpaperSizeProc.running = true;
-        }
-        Process {
-            id: getWallpaperSizeProc
-            property string path: bgRoot.wallpaperPath
-            command: ["magick", "identify", "-format", "%w %h", path]
-            stdout: StdioCollector {
-                id: wallpaperSizeOutputCollector
-                onStreamFinished: {
-                    const output = wallpaperSizeOutputCollector.text;
-                    const [width, height] = output.split(" ").map(Number);
-                    const [screenWidth, screenHeight] = [bgRoot.screen.width, bgRoot.screen.height];
-                    bgRoot.wallpaperWidth = width;
-                    bgRoot.wallpaperHeight = height;
+            const size = ImageInfo.dimensions(bgRoot.wallpaperPath);
+            if (size.width > 0 && size.height > 0) {
+                bgRoot.wallpaperWidth = size.width;
+                bgRoot.wallpaperHeight = size.height;
 
-                    // Perfect image; scale = 1
-                    // Small picture; scale > 1; will zoom in the picture
-                    // Big picture; scale < 1; will zoom out the picture
-                    // Choose max number so every side will fit
-                    const minSuitableScale = Math.max(screenWidth / width, screenHeight / height);
-                    bgRoot.effectiveWallpaperScale = minSuitableScale * bgRoot.additionalScaleFactor * bgRoot.parallaxRation;
-                }
+                // Choose max number so every side will fit
+                const minSuitableScale = Math.max(bgRoot.screen.width / size.width, bgRoot.screen.height / size.height);
+                bgRoot.effectiveWallpaperScale = minSuitableScale * bgRoot.additionalScaleFactor * bgRoot.parallaxRation;
             }
+            bgRoot.sizedWallpaperPath = bgRoot.wallpaperPath;
         }
 
         Item {
             anchors.fill: parent
 
             // Wallpaper
-            StyledImage {
+            TransitionImage {
                 id: wallpaper
-                visible: opacity > 0 && !blurLoader.active
-                opacity: (status === Image.Ready && !bgRoot.wallpaperIsVideo) ? 1 : 0
-                cache: false
-                smooth: false
+                visible: !blurLoader.active && !bgRoot.wallpaperIsVideo
+                cursorMonitor: bgRoot.monitor
+                style: Config.options.background.transition.style
+                transitionDuration: Config.options.background.transition.duration
 
                 property int workspaceIndex: (bgRoot.monitor.activeWorkspace?.id ?? 1) - 1
                 property real middleFraction: 0.5
@@ -174,39 +159,12 @@ Variants {
                     return Math.max(0, Math.min(1, usedFraction));
                 }
 
-                x: {
-                    if (bgRoot.screen.width > bgRoot.scaledWallpaperWidth) {
-                        return (bgRoot.screen.width - bgRoot.scaledWallpaperWidth) / 2;
-                    }
-                    return - bgRoot.parallaxTotalPixelsX * usedFractionX;
-                }
-                y: {
-                    if (bgRoot.screen.height > bgRoot.scaledWallpaperHeight) {
-                        return (bgRoot.screen.height - bgRoot.scaledWallpaperHeight) / 2;
-                    }
-                    return - bgRoot.parallaxTotalPixelsY * usedFractionY;
-                }
-
-                source: bgRoot.wallpaperSafetyTriggered ? "" : bgRoot.wallpaperPath
-                fillMode: Image.PreserveAspectCrop
-                Behavior on x {
-                    NumberAnimation {
-                        duration: 600
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                Behavior on y {
-                    NumberAnimation {
-                        duration: 600
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                sourceSize {
-                    width: bgRoot.scaledWallpaperWidth
-                    height: bgRoot.scaledWallpaperHeight
-                }
-                width: bgRoot.scaledWallpaperWidth
-                height: bgRoot.scaledWallpaperHeight
+                anchors.fill: parent
+                source: bgRoot.wallpaperSafetyTriggered ? "" : bgRoot.sizedWallpaperPath
+                imageSourceSize: Qt.size(bgRoot.scaledWallpaperWidth, bgRoot.scaledWallpaperHeight)
+                zoom: bgRoot.additionalScaleFactor * bgRoot.parallaxRation
+                parallaxX: usedFractionX
+                parallaxY: usedFractionY
             }
 
             Loader {
@@ -260,13 +218,9 @@ Variants {
                     var f = Config.options.background.parallax.widgetsFactor;
                     return f / Config.options.background.parallax.workspaceZoom;
                 }
-                readonly property real baseWallpaperOffsetX: (bgRoot.screen.width - bgRoot.scaledWallpaperWidth) / 2
-                readonly property real baseWallpaperOffsetY: (bgRoot.screen.height - bgRoot.scaledWallpaperHeight) / 2
-                readonly property real wallpaperTotalOffsetX: wallpaper.x - baseWallpaperOffsetX
-                readonly property real wallpaperTotalOffsetY: wallpaper.y - baseWallpaperOffsetY
                 readonly property bool locked: GlobalStates.screenLocked
-                x: wallpaperTotalOffsetX * parallaxFactor * !locked
-                y: wallpaperTotalOffsetY * parallaxFactor * !locked
+                x: wallpaper.parallaxOffsetX * parallaxFactor * !locked
+                y: wallpaper.parallaxOffsetY * parallaxFactor * !locked
 
                 transitions: Transition {
                     PropertyAnimation {
