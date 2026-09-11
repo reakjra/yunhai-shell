@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 import qs.modules.lunae.widgets
 import qs.services
 
@@ -157,7 +158,7 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.margins: 4
         playing: MprisController.activePlayer?.isPlaying ?? false
-        source: Config.options.lunae.hub.dash.gifSource
+        source: FileUtils.toSourceUrl(Config.options.lunae.hub.dash.gifSource)
         asynchronous: true
         fillMode: AnimatedImage.PreserveAspectFit
     }

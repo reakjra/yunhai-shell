@@ -20,6 +20,7 @@ DesktopWidgetBase {
 
     Squircle {
         anchors.fill: parent
+        visible: root.showBackground
         radius: 28
         smoothing: AkebonoAppearance.squircleSmoothing
         color: Appearance.colors.colLayer1

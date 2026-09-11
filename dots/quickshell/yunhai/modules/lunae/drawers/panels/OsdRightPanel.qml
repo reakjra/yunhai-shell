@@ -6,6 +6,7 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 import qs.modules.lunae
 import qs.modules.lunae.widgets
 import Quickshell
@@ -18,7 +19,7 @@ Item {
     required property real sidebarWidth
 
     readonly property bool showBoth: Config.options.lunae?.osd?.showBoth ?? false
-    readonly property string gifSource: Config.options.lunae?.osd?.gifSource ?? ""
+    readonly property string gifSource: FileUtils.toSourceUrl(Config.options.lunae.osd.gifSource)
     readonly property bool hasGif: gifSource !== ""
     readonly property real gifNudgeUp: Config.options.lunae?.osd?.gifNudgeUp ?? 0
     readonly property real gifNudgeRight: Config.options.lunae?.osd?.gifNudgeRight ?? 0

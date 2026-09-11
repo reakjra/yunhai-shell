@@ -17,16 +17,6 @@ Scope {
     id: root
     property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)
 
-    function resolveGifSource(path) {
-        if (path === "")
-            return "";
-        if (path.startsWith("~"))
-            path = Quickshell.env("HOME") + path.slice(1);
-        if (path.startsWith("/"))
-            return "file://" + path;
-        return path;
-    }
-
     Loader {
         id: sessionLoader
         active: GlobalStates.sessionOpen
@@ -91,12 +81,12 @@ Scope {
                     id: gifLoader
                     Layout.alignment: Qt.AlignHCenter
                     Layout.bottomMargin: 6
-                    active: (Config.options.akebono?.session.gifPath ?? "") !== ""
+                    active: Config.options.akebono.session.gifPath !== ""
                     visible: active && (item?.height ?? 0) > 0
                     sourceComponent: AnimatedImage {
                         id: gif
                         readonly property real targetHeight: Config.options.akebono?.session.gifHeight ?? 220
-                        source: root.resolveGifSource(Config.options.akebono?.session.gifPath ?? "")
+                        source: FileUtils.toSourceUrl(Config.options.akebono.session.gifPath)
                         height: status === AnimatedImage.Ready ? targetHeight : 0
                         width: status === AnimatedImage.Ready ? Math.min(targetHeight * implicitWidth / Math.max(1, implicitHeight), 700) : 0
                         fillMode: Image.PreserveAspectCrop

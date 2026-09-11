@@ -16,6 +16,7 @@ Item {
     readonly property string wid: root.host.wid
     readonly property bool editMode: root.host.editMode
     readonly property bool manipulating: dragArea.pressed || resizeHandle.pressed
+    readonly property bool showBackground: root.widgetData.background ?? true
     property int minSize: 90
     property int maxSize: 600
     readonly property int gridSize: 24
@@ -37,7 +38,7 @@ Item {
 
     ShaderEffect {
         id: shadowFx
-        visible: Config.options.desktop.widgetShadow
+        visible: Config.options.desktop.widgetShadow && root.showBackground
         readonly property real spreadPx: 8 + root.shadowStr * 14
         readonly property real offY: 1 + root.shadowStr * 9
         readonly property real pad: Math.ceil(shadowFx.spreadPx + shadowFx.offY + 6)
@@ -87,26 +88,50 @@ Item {
         onReleased: DesktopWidgets.setPos(root.wid, root.host.x, root.host.y)
     }
 
-    Rectangle {
+    Column {
         visible: root.editMode
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.rightMargin: -6
         anchors.topMargin: -6
+        spacing: 4
+        z: 2
+
+        ChromeButton {
+            icon: "close"
+            color: Appearance.colors.colError
+            iconColor: Appearance.colors.colOnError
+            onTriggered: DesktopWidgets.remove(root.wid)
+        }
+        ChromeButton {
+            icon: root.showBackground ? "format_color_fill" : "format_color_reset"
+            onTriggered: DesktopWidgets.setProp(root.wid, "background", !root.showBackground)
+        }
+    }
+
+    component ChromeButton: Rectangle {
+        id: button
+        property string icon: ""
+        property color iconColor: Appearance.colors.colOnLayer1
+        signal triggered()
+
         width: 26
         height: 26
-        radius: 13
-        color: Appearance.colors.colError
+        radius: width / 2
+        color: buttonArea.containsMouse ? Appearance.colors.colLayer2Hover : Appearance.colors.colLayer2
+
         MaterialSymbol {
             anchors.centerIn: parent
-            text: "close"
+            text: button.icon
             iconSize: 16
-            color: Appearance.colors.colOnError
+            color: button.iconColor
         }
         MouseArea {
+            id: buttonArea
             anchors.fill: parent
+            hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: DesktopWidgets.remove(root.wid)
+            onClicked: button.triggered()
         }
     }
 

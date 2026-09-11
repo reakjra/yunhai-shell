@@ -25,6 +25,19 @@ Singleton {
     }
 
     /**
+     * Turns a user-entered path or URL into something an Image/AnimatedImage can load.
+     * Remote urls and qrc paths pass through untouched; local paths, including ~, become file:// urls.
+     * @param {string} str
+     * @returns {string}
+     */
+    function toSourceUrl(str) {
+        if (typeof str !== "string" || str === "") return "";
+        if (/^[a-z][a-z0-9+.-]*:/i.test(str)) return str;
+        const expanded = root.expandHome(str);
+        return expanded.startsWith("/") ? "file://" + expanded : expanded;
+    }
+
+    /**
      * Extracts the file name from a file path
      * @param {string} str
      * @returns {string}

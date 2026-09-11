@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 import qs.modules.lunae.widgets
 import qs.services
 
@@ -75,7 +76,7 @@ Item {
             Layout.fillHeight: true
             visible: source !== ""
             playing: root.playing
-            source: Config.options.lunae.hub.media.gifSource
+            source: FileUtils.toSourceUrl(Config.options.lunae.hub.media.gifSource)
             asynchronous: true
             fillMode: AnimatedImage.PreserveAspectFit
         }

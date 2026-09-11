@@ -2,6 +2,7 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 import qs.modules.akebono
 import qs.modules.lunae
 import qs.modules.lunae.widgets
@@ -177,7 +178,7 @@ Scope {
                     Layout.alignment: Qt.AlignHCenter
 
                     readonly property bool showBoth: Config.options.akebono?.osd.showBoth ?? false
-                    readonly property string gifSource: Config.options.akebono?.osd.gifSource ?? ""
+                    readonly property string gifSource: FileUtils.toSourceUrl(Config.options.akebono.osd.gifSource)
                     readonly property bool hasGif: gifSource !== ""
                     readonly property real gifNudgeUp: Config.options.akebono?.osd.gifNudgeUp ?? 0
                     readonly property real gifNudgeRight: Config.options.akebono?.osd.gifNudgeRight ?? 0

@@ -41,6 +41,7 @@ Item {
     readonly property int rows: Math.max(1, Math.floor((height - marginTop - marginBottom) / cellH))
     readonly property real pitchY: rows > 1 ? (height - marginTop - marginBottom - cellH) / (rows - 1) : cellH
     readonly property var gridGeometry: [cols, rows, marginLeft, marginTop, pitchX]
+    property bool reservedSettling: false
 
     property var cellAssignments: ({})
     property var fileEntries: []
@@ -135,7 +136,7 @@ Item {
     }
 
     function computeLayout() {
-        if (view.dragActive)
+        if (view.dragActive || view.reservedSettling)
             return;
         if (view.cols < 1 || view.rows < 1 || view.width < 300 || view.height < 300)
             return;
@@ -687,6 +688,46 @@ Item {
     Connections {
         target: DesktopLayout
         function onReloaded() {
+            view.scheduleLayout();
+        }
+    }
+
+    Connections {
+        target: Config.options
+        function onPanelFamilyChanged() {
+            view.reservedSettling = true;
+            reservedSettleTimer.restart();
+        }
+    }
+
+    Timer {
+        id: reservedSettleTimer
+        interval: 80
+        repeat: true
+        readonly property int stableTarget: 3
+        readonly property int maxTicks: 25
+        property string lastSeen: ""
+        property int stableTicks: 0
+        property int ticks: 0
+
+        onRunningChanged: if (running) {
+            reservedSettleTimer.lastSeen = "";
+            reservedSettleTimer.stableTicks = 0;
+            reservedSettleTimer.ticks = 0;
+        }
+        onTriggered: {
+            HyprlandData.updateMonitors();
+            const now = view.reserved.join(",");
+            if (now === reservedSettleTimer.lastSeen)
+                reservedSettleTimer.stableTicks++;
+            else {
+                reservedSettleTimer.lastSeen = now;
+                reservedSettleTimer.stableTicks = 0;
+            }
+            if (reservedSettleTimer.stableTicks < reservedSettleTimer.stableTarget && ++reservedSettleTimer.ticks < reservedSettleTimer.maxTicks)
+                return;
+            reservedSettleTimer.stop();
+            view.reservedSettling = false;
             view.scheduleLayout();
         }
     }

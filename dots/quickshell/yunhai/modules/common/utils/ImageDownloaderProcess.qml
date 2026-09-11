@@ -12,13 +12,22 @@ Process {
     required property string sourceUrl;
     property string fallbackUrl: ""
 
+    readonly property string resolvedSource: FileUtils.toSourceUrl(root.sourceUrl)
+    readonly property bool localSource: root.resolvedSource.startsWith("file://")
+
     function processFilePath() {
         return StringUtils.shellSingleQuoteEscape(FileUtils.trimFileProtocol(filePath));
     }
 
+    function processSourcePath() {
+        return StringUtils.shellSingleQuoteEscape(FileUtils.trimFileProtocol(root.resolvedSource));
+    }
+
     property string curlFlags: `-fsSL --compressed -H 'Accept: */*' -A 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'`
     running: true
-    command: ["bash", "-c",
+    command: root.localSource ? ["bash", "-c",
+        `[ -f '${processSourcePath()}' ] && file '${processSourcePath()}'`
+    ] : ["bash", "-c",
         `mkdir -p $(dirname '${processFilePath()}'); [ -f '${processFilePath()}' ] || curl ${curlFlags} '${sourceUrl}' -o '${processFilePath()}'${fallbackUrl ? ` || curl ${curlFlags} '${fallbackUrl}' -o '${processFilePath()}'` : ""}; [ -f '${processFilePath()}' ] && file '${processFilePath()}'`
     ]
     stdout: StdioCollector {
@@ -29,7 +38,7 @@ Process {
             const match = output.match(/(\d+)\s*x\s*(\d+)/);
             const width = match ? Number(match[1]) : 0;
             const height = match ? Number(match[2]) : 0;
-            root.done(root.filePath, width, height);
+            root.done(root.localSource ? root.resolvedSource : root.filePath, width, height);
         }
     }
 }
