@@ -324,6 +324,44 @@ Singleton {
         property list<string> ignoredAppRegexes: []
     }
 
+    component HyprbarsOptions: JsonObject {
+        property bool enable: false
+        property bool glyphs: false
+        property bool macColors: false
+        property string font: ""
+    }
+
+    component SquircleOptions: JsonObject {
+        property real smoothing: 2.0 // 2 = circular corners, higher = squircle
+    }
+
+    component DesktopOptions: JsonObject {
+        property bool enable: false
+        property bool showIcons: true
+        property bool showWidgets: true
+        property bool widgetWobble: true
+        property bool widgetShadow: true
+        property real widgetShadowStrength: 0.5
+        property int iconSize: 48 // 48 | 64 | 96
+        property string sortBy: "name" // name | date | size | type
+        property bool showHidden: false
+        property bool showExtensions: false
+        property int iconSpacingX: 56
+        property int iconSpacingY: 16
+        property int edgePadding: 16
+        property list<string> hiddenIcons: []
+        property JsonObject shortcuts: JsonObject {
+            property string trash: "Delete"
+            property string rename: "F2"
+            property string copy: "Ctrl+C"
+            property string cut: "Ctrl+X"
+            property string paste: "Ctrl+V"
+            property string selectAll: "Ctrl+A"
+            property string open: "Return"
+            property string deselect: "Escape"
+        }
+    }
+
     component ScreenOptions: JsonObject {
         property int fakeScreenRounding: 2 // 0: None | 1: Always | 2: When not fullscreen | 3: Wrapped
         property int wrappedFrameThickness: 10
@@ -983,6 +1021,9 @@ Singleton {
             property DockOptions dock: DockOptions {}
             property OverlayOptions overlay: OverlayOptions {}
             property ScreenOptions screen: ScreenOptions {}
+            property HyprbarsOptions hyprbars: HyprbarsOptions {}
+            property DesktopOptions desktop: DesktopOptions {}
+            property SquircleOptions squircle: SquircleOptions {}
         }
     }
 
@@ -996,6 +1037,9 @@ Singleton {
             property DockOptions dock: DockOptions {}
             property OverlayOptions overlay: OverlayOptions {}
             property ScreenOptions screen: ScreenOptions {}
+            property HyprbarsOptions hyprbars: HyprbarsOptions {}
+            property DesktopOptions desktop: DesktopOptions {}
+            property SquircleOptions squircle: SquircleOptions {}
 
             property JsonObject lunae: JsonObject {
                 property string monitor: "" // Output name to pin the shell to, empty = first screen
@@ -1055,6 +1099,9 @@ Singleton {
             property DockOptions dock: DockOptions {}
             property OverlayOptions overlay: OverlayOptions {}
             property ScreenOptions screen: ScreenOptions {}
+            property HyprbarsOptions hyprbars: HyprbarsOptions {}
+            property DesktopOptions desktop: DesktopOptions {}
+            property SquircleOptions squircle: SquircleOptions {}
 
             property JsonObject waffles: JsonObject {
                 // Some spots are kinda janky/awkward. Setting the following to
@@ -1089,19 +1136,13 @@ Singleton {
             property DockOptions dock: DockOptions { enable: true }
             property OverlayOptions overlay: OverlayOptions {}
             property ScreenOptions screen: ScreenOptions {}
+            property HyprbarsOptions hyprbars: HyprbarsOptions { enable: true }
+            property DesktopOptions desktop: DesktopOptions { enable: true }
+            property SquircleOptions squircle: SquircleOptions { smoothing: 4.0 }
 
             property JsonObject akebono: JsonObject {
-                property JsonObject squircle: JsonObject {
-                    property real smoothing: 4.0
-                }
                 property JsonObject preview: JsonObject {
                     property bool enable: true
-                }
-                property JsonObject hyprbars: JsonObject {
-                    property bool enable: true
-                    property bool glyphs: false
-                    property bool macColors: false
-                    property string font: ""
                 }
                 property JsonObject runner: JsonObject {
                     property bool favourites: true
@@ -1186,31 +1227,6 @@ Singleton {
                         ]
                     }
                 }
-                property JsonObject desktop: JsonObject {
-                    property bool enable: true
-                    property bool showIcons: true
-                    property bool showWidgets: true
-                    property bool widgetWobble: true
-                    property bool widgetShadow: true
-                    property real widgetShadowStrength: 0.5
-                    property int iconSize: 48 // 48 | 64 | 96
-                    property string sortBy: "name" // name | date | size | type
-                    property bool showHidden: false
-                    property bool showExtensions: false
-                    property int iconSpacingX: 56
-                    property int iconSpacingY: 16
-                    property list<string> hiddenIcons: []
-                    property JsonObject shortcuts: JsonObject {
-                        property string trash: "Delete"
-                        property string rename: "F2"
-                        property string copy: "Ctrl+C"
-                        property string cut: "Ctrl+X"
-                        property string paste: "Ctrl+V"
-                        property string selectAll: "Ctrl+A"
-                        property string open: "Return"
-                        property string deselect: "Escape"
-                    }
-                }
                 property JsonObject session: JsonObject {
                     property string gifPath: ""
                     property int gifHeight: 220
@@ -1279,8 +1295,11 @@ Singleton {
         readonly property var dock: root.activeFamilyAdapter.dock
         readonly property var overlay: root.activeFamilyAdapter.overlay
         readonly property var screen: root.activeFamilyAdapter.screen
+        readonly property var hyprbars: root.activeFamilyAdapter.hyprbars
+        readonly property var desktop: root.activeFamilyAdapter.desktop
+        readonly property var squircle: root.activeFamilyAdapter.squircle
 
-        readonly property string desktopFamily: PanelFamilies.desktopModule(globalAdapter.panelFamily)
+        readonly property bool hasDesktop: PanelFamilies.hasDesktop(globalAdapter.panelFamily)
         readonly property var family: root.activeFamilyAdapter[globalAdapter.panelFamily] ?? null
 
         readonly property var lunae: lunaeAdapter.lunae

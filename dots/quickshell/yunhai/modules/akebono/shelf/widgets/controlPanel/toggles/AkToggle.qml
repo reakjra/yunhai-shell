@@ -37,7 +37,20 @@ Item {
         shapeRadius: 16
         squircle: true
         rippleColor: root.on ? Appearance.colors.colOnSecondaryContainer : Appearance.colors.colOnLayer2
-        onClicked: root.clicked()
+
+        property bool held: false
+        onPressAndHold: {
+            if (!root.altAction) return;
+            ripple.held = true;
+            root.altAction();
+        }
+        onClicked: {
+            if (ripple.held) {
+                ripple.held = false;
+                return;
+            }
+            root.clicked();
+        }
     }
     MouseArea {
         anchors.fill: parent

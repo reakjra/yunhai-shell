@@ -26,12 +26,7 @@ Variants {
         id: bgRoot
 
         required property var modelData
-        readonly property string desktopModule: Config.options.desktopFamily
-        readonly property Component desktopComponent: ({
-                "akebono": akebonoDesktop
-            }[bgRoot.desktopModule] ?? null)
-        readonly property bool desktopFamily: bgRoot.desktopComponent !== null
-        readonly property bool desktopEnabled: bgRoot.desktopFamily && (Config.options[bgRoot.desktopModule]?.desktop?.enable ?? false) && !GlobalStates.screenLocked
+        readonly property bool desktopEnabled: Config.options.hasDesktop && Config.options.desktop.enable && !GlobalStates.screenLocked
 
         // Hide when fullscreen
         property list<HyprlandWorkspace> workspacesForMonitor: Hyprland.workspaces.values.filter(workspace => workspace.monitor && workspace.monitor.name == monitor.name)
@@ -194,7 +189,7 @@ Variants {
             }
 
             Component {
-                id: akebonoDesktop
+                id: desktopComponent
                 AkebonoDesktop.DesktopView {}
             }
 
@@ -202,7 +197,7 @@ Variants {
                 id: desktopLoader
                 anchors.fill: parent
                 active: bgRoot.desktopEnabled
-                sourceComponent: bgRoot.desktopComponent
+                sourceComponent: desktopComponent
                 onLoaded: {
                     item.screenName = Qt.binding(() => bgRoot.modelData.name);
                     item.screen = Qt.binding(() => bgRoot.modelData);

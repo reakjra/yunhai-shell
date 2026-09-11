@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.common.functions
@@ -19,9 +20,9 @@ Item {
 
     property string screenName: ""
     property var screen: null
-    readonly property var cfg: Config.options.akebono.desktop
+    readonly property var cfg: Config.options.desktop
     readonly property bool showIcons: ScreenOverrides.resolve(view.screenName, "showIcons", view.cfg.showIcons)
-    readonly property bool showWidgets: ScreenOverrides.resolve(view.screenName, "showWidgets", view.cfg.showWidgets ?? true)
+    readonly property bool showWidgets: ScreenOverrides.resolve(view.screenName, "showWidgets", view.cfg.showWidgets)
     readonly property var keymap: view.cfg.shortcuts
     readonly property string desktopDir: FileUtils.trimFileProtocol(Directories.desktop)
 
@@ -29,18 +30,14 @@ Item {
     readonly property int labelH: 34
     readonly property int cellW: view.iconSize + view.cfg.iconSpacingX
     readonly property int cellH: view.iconSize + view.labelH + view.cfg.iconSpacingY
-    readonly property bool shelfOnTop: Config.options.akebono.shelf.position === "top"
-    readonly property int shelfReserve: Config.options.akebono.shelf.height + 28
-    readonly property bool dockPinned: (Config.options.akebono?.standaloneDock ?? false) && (Config.options.dock.pinnedOnStartup ?? false)
-    readonly property int dockReserve: (Config.options.dock.height ?? 70) + 28
-    readonly property int edgePadX: 16
-    readonly property int marginLeft: edgePadX
-    readonly property int marginTop: shelfOnTop ? shelfReserve : 12
-    readonly property int marginBottom: shelfOnTop
-        ? (dockPinned ? dockReserve : 12)
-        : Math.max(shelfReserve, dockPinned ? dockReserve : 0)
-    readonly property int cols: Math.max(1, Math.floor((width - edgePadX * 2) / cellW))
-    readonly property real pitchX: cols > 1 ? (width - edgePadX * 2 - cellW) / (cols - 1) : cellW
+    readonly property var reserved: HyprlandData.monitors.find(m => m.name === view.screenName)?.reserved ?? [0, 0, 0, 0]
+    readonly property int edgePad: view.cfg.edgePadding
+    readonly property int marginLeft: view.reserved[0] + view.edgePad
+    readonly property int marginTop: view.reserved[1] + view.edgePad
+    readonly property int marginRight: view.reserved[2] + view.edgePad
+    readonly property int marginBottom: view.reserved[3] + view.edgePad
+    readonly property int cols: Math.max(1, Math.floor((width - marginLeft - marginRight) / cellW))
+    readonly property real pitchX: cols > 1 ? (width - marginLeft - marginRight - cellW) / (cols - 1) : cellW
     readonly property int rows: Math.max(1, Math.floor((height - marginTop - marginBottom) / cellH))
     readonly property real pitchY: rows > 1 ? (height - marginTop - marginBottom - cellH) / (rows - 1) : cellH
     readonly property var gridGeometry: [cols, rows, marginLeft, marginTop, pitchX]
@@ -112,7 +109,7 @@ Item {
         const arr = [];
         const cache = view.entryCache;
         const live = new Set();
-        const hidden = view.cfg.hiddenIcons ?? [];
+        const hidden = view.cfg.hiddenIcons;
         for (let i = 0; i < folderModel.count; i++) {
             const n = folderModel.get(i, "fileName");
             if (hidden.indexOf(n) >= 0)
@@ -145,7 +142,7 @@ Item {
         const result = ({});
         const occupied = ({});
         const toSave = ({});
-        const hidden = view.cfg.hiddenIcons ?? [];
+        const hidden = view.cfg.hiddenIcons;
         const names = [];
         const listed = [];
         for (let i = 0; i < folderModel.count; i++) {
@@ -554,26 +551,26 @@ Item {
     }
 
     function hideIcons(names) {
-        const h = (view.cfg.hiddenIcons ?? []).slice();
+        const h = view.cfg.hiddenIcons.slice();
         for (const n of names)
             if (h.indexOf(n) < 0)
                 h.push(n);
-        Config.options.akebono.desktop.hiddenIcons = h;
+        view.cfg.hiddenIcons = h;
     }
     function unhideAll() {
-        Config.options.akebono.desktop.hiddenIcons = [];
+        view.cfg.hiddenIcons = [];
     }
     function toggleShowIcons() {
         ScreenOverrides.setEffective(view.screenName, "showIcons", !view.showIcons, view.cfg.showIcons);
     }
     function toggleShowWidgets() {
-        ScreenOverrides.setEffective(view.screenName, "showWidgets", !view.showWidgets, view.cfg.showWidgets ?? true);
+        ScreenOverrides.setEffective(view.screenName, "showWidgets", !view.showWidgets, view.cfg.showWidgets);
     }
     function setIconSize(v) {
-        Config.options.akebono.desktop.iconSize = v;
+        view.cfg.iconSize = v;
     }
     function sortBy(v) {
-        Config.options.akebono.desktop.sortBy = v;
+        view.cfg.sortBy = v;
         view.tidy();
     }
     function tidy() {
@@ -665,7 +662,7 @@ Item {
             { "icon": "photo_size_select_large", "label": "Icon size", "submenu": sizes.map(s => ({ "label": s.label, "action": () => view.setIconSize(s.v) })) },
             { "icon": view.showIcons ? "visibility_off" : "visibility", "label": view.showIcons ? "Hide all icons" : "Show icons", "action": () => view.toggleShowIcons() }
         ];
-        if ((view.cfg.hiddenIcons ?? []).length > 0)
+        if ((view.cfg.hiddenIcons).length > 0)
             items.push({ "icon": "visibility", "label": "Show hidden icons (" + view.cfg.hiddenIcons.length + ")", "action": () => view.unhideAll() });
         items.push({ "separator": true });
         items.push({ "icon": view.showWidgets ? "visibility_off" : "visibility", "label": view.showWidgets ? "Hide widgets" : "Show widgets", "action": () => view.toggleShowWidgets() });
@@ -685,6 +682,13 @@ Item {
         id: layoutTimer
         interval: 16
         onTriggered: view.computeLayout()
+    }
+
+    Connections {
+        target: DesktopLayout
+        function onReloaded() {
+            view.scheduleLayout();
+        }
     }
 
     FileView {
@@ -707,42 +711,42 @@ Item {
     }
 
     Shortcut {
-        sequence: view.keymap?.trash ?? ""
+        sequence: view.keymap.trash
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length > 0)
         onActivated: view.trash(view.selectedPaths())
     }
     Shortcut {
-        sequence: view.keymap?.rename ?? ""
+        sequence: view.keymap.rename
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length === 1)
         onActivated: view.beginRename(view.selectedFiles[0])
     }
     Shortcut {
-        sequence: view.keymap?.copy ?? ""
+        sequence: view.keymap.copy
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length > 0)
         onActivated: view.clip(view.selectedPaths(), "copy")
     }
     Shortcut {
-        sequence: view.keymap?.cut ?? ""
+        sequence: view.keymap.cut
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length > 0)
         onActivated: view.clip(view.selectedPaths(), "cut")
     }
     Shortcut {
-        sequence: view.keymap?.paste ?? ""
+        sequence: view.keymap.paste
         enabled: view.shortcutEnabled(sequence, true)
         onActivated: view.paste()
     }
     Shortcut {
-        sequence: view.keymap?.selectAll ?? ""
+        sequence: view.keymap.selectAll
         enabled: view.shortcutEnabled(sequence, true)
         onActivated: view.selectAll()
     }
     Shortcut {
-        sequence: view.keymap?.open ?? ""
+        sequence: view.keymap.open
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length > 0)
         onActivated: view.openSelected()
     }
     Shortcut {
-        sequence: view.keymap?.deselect ?? ""
+        sequence: view.keymap.deselect
         enabled: view.shortcutEnabled(sequence, view.selectedFiles.length > 0)
         onActivated: view.selectFile("")
     }
@@ -870,7 +874,7 @@ Item {
 
         Repeater {
             model: widgetModel
-            delegate: DesktopWidgetChooser {}
+            delegate: DesktopWidgetHost {}
         }
     }
 

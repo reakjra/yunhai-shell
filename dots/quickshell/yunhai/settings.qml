@@ -22,7 +22,7 @@ ApplicationWindow {
     property string firstRunFileContent: "This file is just here to confirm you've been greeted :>"
     property real contentPadding: 8
     property bool showNextTime: false
-    readonly property var iiPages: [
+    readonly property var allPages: [
         {
             name: Translation.tr("Quick"),
             icon: "instant_mix",
@@ -50,6 +50,11 @@ ApplicationWindow {
             component: "modules/settings/InterfaceConfig.qml"
         },
         {
+            name: Translation.tr("Desktop"),
+            icon: "wallpaper",
+            component: "modules/settings/DesktopConfig.qml"
+        },
+        {
             name: Translation.tr("Resources"),
             icon: "monitor_heart",
             component: "modules/settings/ResourcesConfig.qml"
@@ -71,23 +76,11 @@ ApplicationWindow {
         }
     ]
     readonly property string familyDir: `modules/${Config.options?.panelFamily ?? "ii"}`
-    readonly property var familyPages: {
-        var out = [];
-        for (var i = 0; i < root.iiPages.length; i++) {
-            var pg = root.iiPages[i];
-            if (pg.component === "modules/settings/BarConfig.qml")
-                continue;
-            out.push(pg);
-            if (pg.component === "modules/settings/InterfaceConfig.qml")
-                out.push({
-                    name: Translation.tr("Desktop"),
-                    icon: "wallpaper",
-                    component: `${root.familyDir}/settings/pages/DesktopConfig.qml`
-                });
-        }
-        return out;
-    }
-    property var pages: root.ownChrome ? root.familyPages : root.iiPages
+    readonly property var pageAvailability: ({
+        "modules/settings/BarConfig.qml": !root.ownChrome,
+        "modules/settings/DesktopConfig.qml": Config.options.hasDesktop
+    })
+    readonly property var pages: root.allPages.filter(pg => root.pageAvailability[pg.component] ?? true)
     readonly property int initialPage: {
         const target = Quickshell.env("YUNHAI_SETTINGS_PAGE");
         if (!target)

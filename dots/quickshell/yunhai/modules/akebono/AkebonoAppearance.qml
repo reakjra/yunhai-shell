@@ -4,7 +4,7 @@ import Quickshell
 import qs.modules.common
 
 Singleton {
-    readonly property real squircleSmoothing: Config?.options.akebono.squircle.smoothing ?? 4.0
+    readonly property real squircleSmoothing: Config.options.squircle.smoothing
 
     readonly property bool shelfPills: Config?.options.akebono.shelf.pills ?? true
     readonly property color shelfPillColor: shelfPills ? Appearance.colors.colLayer1 : "transparent"

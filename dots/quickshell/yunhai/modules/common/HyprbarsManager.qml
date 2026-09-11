@@ -6,11 +6,11 @@ import qs.modules.common
 Scope {
     id: root
     readonly property string script: Quickshell.shellPath("scripts/desktop/hyprbars.sh")
-    readonly property var cfg: Config.options[Config.options.panelFamily]?.hyprbars ?? null
-    readonly property bool desired: cfg?.enable ?? false
-    readonly property string barFont: (cfg?.font ?? "") || Appearance.font.family.title
-    readonly property bool glyphs: cfg?.glyphs ?? false
-    readonly property bool macColors: cfg?.macColors ?? false
+    readonly property var cfg: Config.options.hyprbars
+    readonly property bool desired: cfg.enable
+    readonly property string barFont: cfg.font || Appearance.font.family.title
+    readonly property bool glyphs: cfg.glyphs
+    readonly property bool macColors: cfg.macColors
 
     function run(action) {
         Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", root.macColors ? "mac" : "themed"]);

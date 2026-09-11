@@ -18,7 +18,7 @@ Item {
     property var history: [0]
     property int historyPos: 0
 
-    readonly property real squircleSmoothing: Config.options?.akebono?.squircle?.smoothing ?? 4.0
+    readonly property real squircleSmoothing: Config.options.squircle.smoothing
 
     component LSquircle: ShaderEffect {
         property color color: "#000000"

@@ -108,6 +108,76 @@ ContentPage {
         }
     }
     ContentSection {
+        icon: "water_drop"
+        title: Translation.tr("Look")
+
+        ContentSubsection {
+            readonly property bool chromeWide: Config.options.panelFamily === "akebono"
+
+            title: Translation.tr("Squircle corner smoothing")
+            tooltip: chromeWide
+                ? Translation.tr("2 = circular, higher = squircle. On %1 this shapes every panel, popup and card.").arg(PanelFamilies.metaFor(Config.options.panelFamily).name)
+                : Translation.tr("2 = circular, higher = squircle. On %1 this only affects desktop widgets.").arg(PanelFamilies.metaFor(Config.options.panelFamily).name)
+
+            ConfigSpinBox {
+                icon: "rounded_corner"
+                text: Translation.tr("Smoothing")
+                value: Math.round(Config.options.squircle.smoothing)
+                from: 2
+                to: 8
+                stepSize: 1
+                onValueChanged: Config.options.squircle.smoothing = value
+            }
+        }
+    }
+
+    ContentSection {
+        id: hyprbarsSection
+        icon: "web_asset"
+        title: Translation.tr("Window title bars")
+
+        readonly property var cfg: Config.options.hyprbars
+        readonly property bool enabledHere: cfg.enable
+
+        ConfigSwitch {
+            buttonIcon: "web_asset"
+            text: Translation.tr("Enable for %1").arg(PanelFamilies.metaFor(Config.options.panelFamily).name)
+            checked: hyprbarsSection.enabledHere
+            onCheckedChanged: hyprbarsSection.cfg.enable = checked
+            StyledToolTip {
+                text: Translation.tr("Needs the hyprbars plugin")
+            }
+        }
+        ConfigSwitch {
+            visible: hyprbarsSection.enabledHere
+            buttonIcon: "crop_square"
+            text: Translation.tr("Glyph buttons")
+            checked: hyprbarsSection.cfg.glyphs
+            onCheckedChanged: hyprbarsSection.cfg.glyphs = checked
+            StyledToolTip {
+                text: Translation.tr("Minimize/maximize/close icons instead of blank semaphore dots")
+            }
+        }
+        ConfigSwitch {
+            visible: hyprbarsSection.enabledHere
+            buttonIcon: "palette"
+            text: Translation.tr("macOS colors")
+            checked: hyprbarsSection.cfg.macColors
+            onCheckedChanged: hyprbarsSection.cfg.macColors = checked
+            StyledToolTip {
+                text: Translation.tr("Classic red / yellow / green instead of your theme accents")
+            }
+        }
+        MaterialTextField {
+            Layout.fillWidth: true
+            visible: hyprbarsSection.enabledHere
+            placeholderText: Translation.tr("Title font, empty follows the title font")
+            text: hyprbarsSection.cfg.font
+            onEditingFinished: hyprbarsSection.cfg.font = text
+        }
+    }
+
+    ContentSection {
         visible: !SettingsStyle.grouped
         icon: "call_to_action"
         title: Translation.tr("Dock")

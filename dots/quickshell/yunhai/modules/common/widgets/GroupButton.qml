@@ -111,8 +111,8 @@ Button {
         }
 
         onPressAndHold: () => {
-            altAction(); 
-            root.down = false; 
+            if (root.altAction) root.altAction();
+            root.down = false;
             root.clicked = false;
         };
     }

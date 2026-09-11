@@ -363,9 +363,15 @@ except Exception: pass
         const kdeJson = JSON.stringify(kdeUpdates).replace(/'/g, "'\\''")
         const schemeJson = JSON.stringify(schemeUpdates).replace(/'/g, "'\\''")
         Quickshell.execDetached(["python3", "-c", `
-import re, json, sys, os, subprocess
+import re, json, sys, os, subprocess, tempfile, fcntl
 kde_updates = json.loads('${kdeJson}')
 scheme_updates = json.loads('${schemeJson}')
+
+# same lock switchwall.sh holds, kde-material-you-colors wipes the file between its read and write
+lock_dir = os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')) + '/quickshell'
+os.makedirs(lock_dir, exist_ok=True)
+lock = open(lock_dir + '/kdeglobals.lock', 'w')
+fcntl.flock(lock, fcntl.LOCK_EX)
 
 def update_ini(path, updates):
     try:
@@ -402,8 +408,10 @@ def update_ini(path, updates):
     if section in by_section:
         for key, val in by_section.pop(section).items():
             out.append(key + '=' + val + '\\n')
-    with open(path, 'w') as f:
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path))
+    with os.fdopen(fd, 'w') as f:
         f.writelines(out)
+    os.replace(tmp, path)
 
 scheme_name = ''
 try:

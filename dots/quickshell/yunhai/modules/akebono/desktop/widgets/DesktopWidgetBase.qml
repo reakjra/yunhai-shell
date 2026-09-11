@@ -9,30 +9,25 @@ import qs.modules.akebono.desktop
 
 Item {
     id: root
-    required property var widgetData
+    required property var host
     default property alias content: contentHost.data
 
-    readonly property string wid: widgetData.id
-    readonly property bool editMode: DesktopWidgets.editMode
+    readonly property var widgetData: root.host.modelData
+    readonly property string wid: root.host.wid
+    readonly property bool editMode: root.host.editMode
+    readonly property bool manipulating: dragArea.pressed || resizeHandle.pressed
     property int minSize: 90
     property int maxSize: 600
     readonly property int gridSize: 24
-    readonly property real shadowStr: Config.options.akebono?.desktop.widgetShadowStrength ?? 0.5
+    readonly property real shadowStr: Config.options.desktop.widgetShadowStrength
     property real shadowRadius: 24
 
     function snap(v) {
         return Math.round(v / root.gridSize) * root.gridSize;
     }
 
-    Component.onCompleted: {
-        root.x = widgetData.x ?? 60;
-        root.y = widgetData.y ?? 60;
-        root.width = widgetData.w ?? 190;
-        root.height = widgetData.h ?? 190;
-    }
-
     SequentialAnimation on rotation {
-        running: root.editMode && (Config.options.akebono?.desktop.widgetWobble ?? true)
+        running: root.editMode && (Config.options.desktop.widgetWobble)
         loops: Animation.Infinite
         onStopped: root.rotation = 0
         NumberAnimation { to: 1.1; duration: 110; easing.type: Easing.InOutSine }
@@ -42,7 +37,7 @@ Item {
 
     ShaderEffect {
         id: shadowFx
-        visible: Config.options.akebono?.desktop.widgetShadow ?? true
+        visible: Config.options.desktop.widgetShadow
         readonly property real spreadPx: 8 + root.shadowStr * 14
         readonly property real offY: 1 + root.shadowStr * 9
         readonly property real pad: Math.ceil(shadowFx.spreadPx + shadowFx.offY + 6)
@@ -79,17 +74,17 @@ Item {
         onPositionChanged: mouse => {
             if (!dragArea.pressed)
                 return;
-            const scene = dragArea.mapToItem(root.parent, mouse.x, mouse.y);
+            const scene = dragArea.mapToItem(root.host.parent, mouse.x, mouse.y);
             let nx = scene.x - dragArea.grabX;
             let ny = scene.y - dragArea.grabY;
             if (mouse.modifiers & Qt.ShiftModifier) {
                 nx = root.snap(nx);
                 ny = root.snap(ny);
             }
-            root.x = nx;
-            root.y = ny;
+            root.host.x = nx;
+            root.host.y = ny;
         }
-        onReleased: DesktopWidgets.setPos(root.wid, root.x, root.y)
+        onReleased: DesktopWidgets.setPos(root.wid, root.host.x, root.host.y)
     }
 
     Rectangle {
@@ -129,25 +124,22 @@ Item {
         onPressed: mouse => {
             resizeHandle.startW = root.width;
             resizeHandle.startH = root.height;
-            resizeHandle.startScene = resizeHandle.mapToItem(root.parent, mouse.x, mouse.y);
+            resizeHandle.startScene = resizeHandle.mapToItem(root.host.parent, mouse.x, mouse.y);
         }
         onPositionChanged: mouse => {
             if (!resizeHandle.pressed)
                 return;
-            const p = resizeHandle.mapToItem(root.parent, mouse.x, mouse.y);
+            const p = resizeHandle.mapToItem(root.host.parent, mouse.x, mouse.y);
             let nw = resizeHandle.startW + (p.x - resizeHandle.startScene.x);
             let nh = resizeHandle.startH + (p.y - resizeHandle.startScene.y);
             if (mouse.modifiers & Qt.ShiftModifier) {
                 nw = root.snap(nw);
                 nh = root.snap(nh);
             }
-            root.width = Math.max(root.minSize, Math.min(root.maxSize, nw));
-            root.height = Math.max(root.minSize, Math.min(root.maxSize, nh));
+            root.host.width = Math.max(root.minSize, Math.min(root.maxSize, nw));
+            root.host.height = Math.max(root.minSize, Math.min(root.maxSize, nh));
         }
-        onReleased: {
-            DesktopWidgets.setProp(root.wid, "w", Math.round(root.width));
-            DesktopWidgets.setProp(root.wid, "h", Math.round(root.height));
-        }
+        onReleased: DesktopWidgets.setSize(root.wid, root.host.width, root.host.height)
 
         Rectangle {
             anchors.centerIn: parent
