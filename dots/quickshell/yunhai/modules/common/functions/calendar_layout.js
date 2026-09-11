@@ -111,3 +111,4 @@ function getCalendarLayout(dateObject, highlight) {
     }
     return calendar;
 }
+

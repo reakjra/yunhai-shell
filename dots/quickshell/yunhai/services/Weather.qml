@@ -36,6 +36,7 @@ Singleton {
         sunset: 0,
         windDir: 0,
         wCode: 0,
+        desc: 0,
         city: 0,
         wind: 0,
         precip: 0,
@@ -54,6 +55,7 @@ Singleton {
         temp.sunset = data?.astronomy?.sunset || "0.0";
         temp.windDir = data?.current?.winddir16Point || "N";
         temp.wCode = data?.current?.weatherCode || "113";
+        temp.desc = (data?.current?.weatherDesc[0]?.value || "").trim();
         temp.city = data?.location?.areaName[0]?.value || "City";
         temp.temp = "";
         temp.tempFeelsLike = "";

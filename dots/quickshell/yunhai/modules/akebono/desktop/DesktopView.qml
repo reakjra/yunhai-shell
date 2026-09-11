@@ -8,6 +8,7 @@ import Quickshell.Wayland
 import qs
 import qs.services
 import qs.modules.common
+import qs.modules.common.desktop
 import qs.modules.common.widgets
 import qs.modules.common.functions
 import qs.modules.akebono
@@ -638,16 +639,14 @@ Item {
         view.createY = my;
         view.selectFile("");
         if (DesktopWidgets.editMode) {
-            const we = [
-                { "icon": "add_photo_alternate", "label": "Add image widget", "action": () => DesktopWidgets.add(view.screenName, "image", mx, my) },
-                { "icon": "sticky_note_2", "label": "Add notes widget", "action": () => DesktopWidgets.add(view.screenName, "notes", mx, my) },
-                { "icon": "calendar_month", "label": "Add calendar widget", "action": () => DesktopWidgets.add(view.screenName, "calendar", mx, my) },
-                { "icon": "partly_cloudy_day", "label": "Add weather widget", "action": () => DesktopWidgets.add(view.screenName, "weather", mx, my) },
-                { "icon": "music_note", "label": "Add media widget", "action": () => DesktopWidgets.add(view.screenName, "media", mx, my) },
-                { "icon": "battery_android_full", "label": "Add device battery widget", "action": () => DesktopWidgets.add(view.screenName, "deviceBattery", mx, my) },
+            const we = WidgetTypes.list.map(t => ({
+                "icon": t.icon,
+                "label": `Add ${t.displayName.toLowerCase()} widget`,
+                "action": () => DesktopWidgets.add(view.screenName, t.value, mx, my)
+            })).concat([
                 { "separator": true },
                 { "icon": "check", "label": "Done editing", "action": () => DesktopWidgets.editMode = false }
-            ];
+            ]);
             view.menuItems = we;
             menu.show(we, mx, my);
             return;

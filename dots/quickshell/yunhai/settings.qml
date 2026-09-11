@@ -13,6 +13,7 @@ import QtQuick.Window
 import Quickshell
 import qs.services
 import qs.modules.common
+import qs.modules.common.desktop
 import qs.modules.common.widgets
 import qs.modules.common.functions as CF
 

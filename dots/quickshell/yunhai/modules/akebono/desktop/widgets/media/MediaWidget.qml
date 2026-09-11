@@ -6,6 +6,7 @@ import Qt5Compat.GraphicalEffects
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 import qs.modules.akebono
 import qs.modules.akebono.desktop.widgets
 
@@ -18,10 +19,19 @@ WidgetCard {
     readonly property var track: MprisController.activeTrack
     readonly property string artUrl: root.track?.artUrl ?? ""
     readonly property bool hasArt: root.artUrl.length > 0 && cover.status === Image.Ready
-    readonly property color foreground: root.hasArt ? "white" : Appearance.colors.colOnLayer1
+    readonly property color foreground: (root.isCover && root.hasArt) ? "white" : Appearance.colors.colOnLayer1
     readonly property real progress: (root.player?.length ?? 0) > 0 ? (root.player.position / root.player.length) : 0
     readonly property int buttonSize: Math.max(28, Math.min(44, Math.round(root.width * 0.17)))
-    readonly property bool controlsShown: cardHover.hovered && !root.editMode
+    readonly property bool controlsShown: cardHover.hovered && !root.editMode && root.isCover
+    readonly property bool isCover: root.styleId === "cover"
+    readonly property bool isLyrics: root.styleId === "lyrics"
+    readonly property real artSize: Math.max(38, Math.min(56, Math.round(root.height * 0.18)))
+    readonly property real headerHeight: root.artSize + 24
+    readonly property real lyricSize: Math.max(Appearance.font.pixelSize.normal, Math.min(Appearance.font.pixelSize.hugeass, Math.round(root.height * 0.075)))
+
+    onIsLyricsChanged: LyricsService.setWant(root, root.isLyrics)
+    Component.onCompleted: LyricsService.setWant(root, root.isLyrics)
+    Component.onDestruction: LyricsService.setWant(root, false)
 
     HoverHandler {
         id: cardHover
@@ -42,38 +52,26 @@ WidgetCard {
 
     MaterialSymbol {
         anchors.centerIn: parent
-        visible: !root.hasArt
+        visible: root.isCover && !root.hasArt
         text: "music_note"
         iconSize: Math.round(Math.min(root.width, root.height) * 0.35)
         color: Appearance.colors.colSubtext
         opacity: 0.35
     }
 
-    Item {
-        id: artLayer
-        anchors.fill: parent
-        visible: root.hasArt
-        layer.enabled: artLayer.visible
-        layer.effect: OpacityMask {
-            maskSource: Squircle {
-                width: artLayer.width
-                height: artLayer.height
-                radius: root.cardRadius
-                smoothing: AkebonoAppearance.squircleSmoothing
-                color: "white"
-            }
-        }
-
+    backdropVisible: (root.isCover && root.hasArt) || root.isLyrics
+    backdrop: [
         Image {
             id: cover
+            visible: root.isCover
             anchors.fill: parent
             source: root.artUrl
             fillMode: Image.PreserveAspectCrop
             cache: false
             asynchronous: true
-        }
-
+        },
         Rectangle {
+            visible: root.isCover
             anchors.fill: parent
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.75) }
@@ -81,10 +79,19 @@ WidgetCard {
                 GradientStop { position: 0.6; color: "transparent" }
                 GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.8) }
             }
+        },
+        Rectangle {
+            visible: root.isLyrics
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: root.headerHeight
+            color: ColorUtils.transparentize(Appearance.colors.colLayer0Base, Appearance.backgroundTransparency * 0.6)
         }
-    }
+    ]
 
     ColumnLayout {
+        visible: root.isCover
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -112,6 +119,7 @@ WidgetCard {
     }
 
     ColumnLayout {
+        visible: root.isCover
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -191,6 +199,108 @@ WidgetCard {
                     if (seekArea.pressed)
                         root.seek(mouse.x / seekArea.width);
                 }
+            }
+        }
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        visible: root.isLyrics
+        spacing: 0
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.headerHeight
+            Layout.leftMargin: 12
+            Layout.rightMargin: 12
+            spacing: 10
+
+            Item {
+                implicitWidth: root.artSize
+                implicitHeight: root.artSize
+                visible: root.hasArt
+
+                Image {
+                    id: thumb
+                    anchors.fill: parent
+                    source: root.artUrl
+                    fillMode: Image.PreserveAspectCrop
+                    cache: false
+                    asynchronous: true
+                    layer.enabled: true
+                    layer.effect: OpacityMask {
+                        maskSource: Squircle {
+                            width: thumb.width
+                            height: thumb.height
+                            radius: Appearance.rounding.small
+                            smoothing: AkebonoAppearance.squircleSmoothing
+                            color: "white"
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: root.track?.title ?? Translation.tr("Nothing playing")
+                    font.pixelSize: Appearance.font.pixelSize.normal
+                    font.weight: Font.DemiBold
+                    color: Appearance.colors.colOnLayer1
+                    elide: Text.ElideRight
+                }
+                StyledText {
+                    Layout.fillWidth: true
+                    visible: text.length > 0
+                    text: root.track?.artist ?? ""
+                    font.pixelSize: Appearance.font.pixelSize.smaller
+                    color: Appearance.colors.colSubtext
+                    elide: Text.ElideRight
+                }
+            }
+
+            ShapeSurface {
+                baseSize: Math.round(root.artSize * 0.82)
+                shape: root.chipShape
+                color: Appearance.colors.colPrimaryContainer
+                opacity: MprisController.canTogglePlaying ? 1 : 0.4
+
+                MaterialSymbol {
+                    anchors.centerIn: parent
+                    text: (root.player?.isPlaying ?? false) ? "pause" : "play_arrow"
+                    fill: 1
+                    iconSize: Math.round(root.artSize * 0.45)
+                    color: Appearance.colors.colOnPrimaryContainer
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: MprisController.canTogglePlaying
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: MprisController.togglePlaying()
+                }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            LyricsView {
+                anchors.fill: parent
+                anchors.margins: 8
+                currentFontSize: root.lyricSize
+                otherFontSize: Math.round(root.lyricSize * 0.82)
+                dimOpacity: 0.4
+                linePadding: 8
+            }
+
+            LyricsPlaceholder {
+                anchors.centerIn: parent
+                width: parent.width - 24
             }
         }
     }

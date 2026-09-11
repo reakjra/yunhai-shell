@@ -222,57 +222,13 @@ Item {
             color: Appearance.colors.colLayer1
             clip: true
 
-            ListView {
-                id: lyrics
+            LyricsView {
                 anchors.fill: parent
                 anchors.margins: 8
-                clip: true
-                visible: LyricsService.hasLyrics
-                model: LyricsService.model
-                currentIndex: LyricsService.currentIndex
-                highlightFollowsCurrentItem: true
-                highlightMoveDuration: 400
-                highlightRangeMode: ListView.ApplyRange
-                preferredHighlightBegin: height / 2 - 30
-                preferredHighlightEnd: height / 2 + 30
-
-                delegate: Item {
-                    id: lrow
-                    required property int index
-                    required property string lyricLine
-                    readonly property bool current: index === lyrics.currentIndex
-                    width: lyrics.width
-                    implicitHeight: ltext.implicitHeight + 12
-
-                    StyledText {
-                        id: ltext
-                        anchors.centerIn: parent
-                        width: parent.width - 20
-                        horizontalAlignment: Text.AlignHCenter
-                        wrapMode: Text.WordWrap
-                        text: lrow.lyricLine
-                        font.pixelSize: lrow.current ? Appearance.font.pixelSize.hugeass : Appearance.font.pixelSize.larger
-                        font.weight: lrow.current ? Font.DemiBold : Font.Normal
-                        color: lrow.current ? Appearance.colors.colPrimary : Appearance.colors.colOnLayer1
-                        opacity: lrow.current ? 1 : 0.45
-                        Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
-                        Behavior on color { ColorAnimation { duration: 220 } }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: LyricsService.jumpTo(lrow.index)
-                    }
-                }
             }
 
-            StyledText {
+            LyricsPlaceholder {
                 anchors.centerIn: parent
-                visible: !LyricsService.hasLyrics
-                text: LyricsService.loading ? Translation.tr("Finding lyrics…")
-                    : (LyricsService.instrumental ? Translation.tr("♪ Instrumental") : Translation.tr("No lyrics found"))
-                font.pixelSize: Appearance.font.pixelSize.normal
-                color: Appearance.colors.colSubtext
             }
         }
     }

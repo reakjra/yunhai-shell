@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import qs
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.akebono
 import qs.modules.lunae.overview
 import QtQuick

@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.modules.common
-import qs.modules.lunae.widgets
+import qs.modules.common.widgets
 
 Item {
     id: root

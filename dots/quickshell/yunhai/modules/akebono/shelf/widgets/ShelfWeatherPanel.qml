@@ -2,11 +2,9 @@ pragma ComponentBehavior: Bound
 
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.akebono
 import qs.services
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Shapes
 
 Item {
     id: root
@@ -17,36 +15,6 @@ Item {
 
     implicitWidth: 350
     implicitHeight: col.implicitHeight + 36
-
-    function parseTime12(s) {
-        const m = /(\d+):(\d+)\s*(AM|PM)/i.exec(s ?? "");
-        if (!m)
-            return -1;
-        let h = parseInt(m[1]) % 12;
-        if (m[3].toUpperCase() === "PM")
-            h += 12;
-        return h * 60 + parseInt(m[2]);
-    }
-
-    readonly property real nowMinutes: {
-        DateTime.time;
-        const d = new Date();
-        return d.getHours() * 60 + d.getMinutes();
-    }
-    readonly property real riseMin: parseTime12(wd?.sunrise)
-    readonly property real setMin: parseTime12(wd?.sunset)
-    readonly property bool astroValid: riseMin >= 0 && setMin > riseMin
-    readonly property bool isDay: astroValid && nowMinutes >= riseMin && nowMinutes <= setMin
-    readonly property real arcFrac: {
-        if (!astroValid)
-            return 0;
-        if (isDay)
-            return Math.max(0, Math.min(1, (nowMinutes - riseMin) / (setMin - riseMin)));
-        const nightLen = 1440 - (setMin - riseMin);
-        const sinceSet = nowMinutes > setMin ? nowMinutes - setMin : nowMinutes + 1440 - setMin;
-        return Math.max(0, Math.min(1, sinceSet / nightLen));
-    }
-    readonly property color arcColor: isDay ? Appearance.colors.colPrimary : Appearance.colors.colSecondary
 
     component InfoChip: Squircle {
         id: chip
@@ -144,122 +112,11 @@ Item {
             radius: 20
             color: Appearance.colors.colLayer1
 
-            Item {
-                id: arcArea
+            SunArc {
                 anchors.fill: parent
                 anchors.margins: 12
-                readonly property real baseY: height - 24
-                readonly property real cx: width / 2
-                readonly property real rx: width / 2 - 26
-                readonly property real ry: baseY - 16
-                readonly property real sunX: cx - rx * Math.cos(root.arcFrac * Math.PI)
-                readonly property real sunY: baseY - ry * Math.sin(root.arcFrac * Math.PI)
-
-                Rectangle {
-                    x: 0
-                    y: arcArea.baseY - height / 2
-                    width: parent.width
-                    height: 1.5
-                    radius: 1
-                    color: Appearance.colors.colOutlineVariant
-                    opacity: 0.5
-                }
-
-                Shape {
-                    anchors.fill: parent
-                    preferredRendererType: Shape.CurveRenderer
-
-                    ShapePath {
-                        strokeColor: Appearance.colors.colOutlineVariant
-                        strokeWidth: 2
-                        fillColor: "transparent"
-                        strokeStyle: ShapePath.DashLine
-                        dashPattern: [0.5, 4]
-                        capStyle: ShapePath.RoundCap
-
-                        PathAngleArc {
-                            centerX: arcArea.cx
-                            centerY: arcArea.baseY
-                            radiusX: arcArea.rx
-                            radiusY: arcArea.ry
-                            startAngle: 180
-                            sweepAngle: 180
-                        }
-                    }
-                }
-
-                Shape {
-                    anchors.fill: parent
-                    preferredRendererType: Shape.CurveRenderer
-                    visible: root.arcFrac > 0.015
-
-                    ShapePath {
-                        strokeColor: root.arcColor
-                        strokeWidth: 3
-                        fillColor: "transparent"
-                        capStyle: ShapePath.RoundCap
-
-                        PathAngleArc {
-                            centerX: arcArea.cx
-                            centerY: arcArea.baseY
-                            radiusX: arcArea.rx
-                            radiusY: arcArea.ry
-                            startAngle: 180
-                            sweepAngle: 180 * root.arcFrac
-                        }
-                    }
-                }
-
-                Rectangle {
-                    x: arcArea.sunX - width / 2
-                    y: arcArea.sunY - height / 2
-                    width: 26
-                    height: 26
-                    radius: 13
-                    color: root.arcColor
-
-                    MaterialSymbol {
-                        anchors.centerIn: parent
-                        text: root.isDay ? "light_mode" : "dark_mode"
-                        fill: 1
-                        iconSize: 16
-                        color: root.isDay ? Appearance.m3colors.m3onPrimary : Appearance.m3colors.m3onSecondary
-                    }
-                }
-
-                RowLayout {
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    spacing: 4
-
-                    MaterialSymbol {
-                        text: "wb_twilight"
-                        iconSize: 15
-                        color: Appearance.colors.colSubtext
-                    }
-                    StyledText {
-                        text: (root.isDay ? root.wd?.sunrise : root.wd?.sunset) ?? "--"
-                        font.pixelSize: Appearance.font.pixelSize.smaller
-                        color: Appearance.colors.colSubtext
-                    }
-                }
-
-                RowLayout {
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    spacing: 4
-
-                    StyledText {
-                        text: (root.isDay ? root.wd?.sunset : root.wd?.sunrise) ?? "--"
-                        font.pixelSize: Appearance.font.pixelSize.smaller
-                        color: Appearance.colors.colSubtext
-                    }
-                    MaterialSymbol {
-                        text: "routine"
-                        iconSize: 15
-                        color: Appearance.colors.colSubtext
-                    }
-                }
+                sunrise: root.wd.sunrise
+                sunset: root.wd.sunset
             }
         }
 

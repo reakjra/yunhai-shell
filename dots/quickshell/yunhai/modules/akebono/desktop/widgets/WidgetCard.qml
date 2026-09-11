@@ -10,22 +10,11 @@ DesktopWidgetBase {
 
     default property alias cardContent: contentArea.data
     property int padding: 14
-    property color color: Appearance.colors.colLayer1
-    readonly property real cardRadius: Appearance.rounding.large
-
-    shadowRadius: root.cardRadius
-
-    Squircle {
-        anchors.fill: parent
-        visible: root.showBackground
-        radius: root.cardRadius
-        smoothing: AkebonoAppearance.squircleSmoothing
-        color: root.color
-    }
+    themeRadius: Appearance.rounding.large
 
     Item {
         id: contentArea
         anchors.fill: parent
-        anchors.margins: root.padding
+        anchors.margins: root.padding + root.contentInset + root.skewInset
     }
 }

@@ -47,6 +47,11 @@ Flow {
             buttonText: modelData.displayName
             toggled: root.currentValue == modelData.value
             releaseAction: modelData.releaseAction || ""
+
+            StyledToolTip {
+                extraVisibleCondition: (paletteButton.modelData.tooltip ?? "") !== ""
+                text: paletteButton.modelData.tooltip ?? ""
+            }
             middleClickAction: modelData.middleClickAction || ""
             onClicked: {
                 root.selected(modelData.value);

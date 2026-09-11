@@ -47,59 +47,23 @@ ColumnLayout {
         }
     }
 
-    ListView {
-        id: lyricList
+    Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        clip: true
 
-        model: LyricsService.model
-        currentIndex: LyricsService.currentIndex
-        highlightRangeMode: ListView.ApplyRange
-        preferredHighlightBegin: height / 2 - 24
-        preferredHighlightEnd: height / 2 + 24
-        highlightMoveDuration: 300
-        highlightMoveVelocity: -1
-        spacing: 6
-        boundsBehavior: Flickable.StopAtBounds
-
-        delegate: StyledText {
-            id: line
-
-            required property int index
-            required property real time
-            required property string lyricLine
-
-            readonly property bool current: ListView.isCurrentItem
-
-            width: lyricList.width
-            text: lyricLine === "" ? "♪" : lyricLine
-            wrapMode: Text.Wrap
-            font.pixelSize: current ? Appearance.font.pixelSize.normal : Appearance.font.pixelSize.small
-            font.weight: current ? Font.DemiBold : Font.Normal
-            color: current ? Appearance.colors.colPrimary : Appearance.colors.colSubtext
-            opacity: current ? 1 : 0.75
-
-            Behavior on opacity {
-                NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: root.player?.canSeek ?? false
-                onClicked: root.player.position = line.time
-            }
+        LyricsView {
+            anchors.fill: parent
+            centered: false
+            currentFontSize: Appearance.font.pixelSize.normal
+            otherFontSize: Appearance.font.pixelSize.small
+            otherColor: Appearance.colors.colSubtext
+            dimOpacity: 0.75
+            linePadding: 6
         }
 
-        StyledText {
+        LyricsPlaceholder {
             anchors.centerIn: parent
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            visible: !LyricsService.hasLyrics
-            text: LyricsService.loading ? Translation.tr("Searching lyrics…")
-                : LyricsService.instrumental ? Translation.tr("Instrumental ♪")
-                : Translation.tr("No lyrics")
             font.pixelSize: Appearance.font.pixelSize.small
             color: Appearance.m3colors.m3outline
         }

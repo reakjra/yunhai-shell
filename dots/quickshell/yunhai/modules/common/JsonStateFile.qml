@@ -27,6 +27,8 @@ Scope {
     FileView {
         id: view
         path: root.path
+        watchChanges: true
+        onFileChanged: reloadTimer.restart()
         onPathChanged: {
             writeTimer.stop();
             view.reload();
@@ -43,6 +45,12 @@ Scope {
             id: adapter
             property string data: "{}"
         }
+    }
+
+    Timer {
+        id: reloadTimer
+        interval: 80
+        onTriggered: view.reload()
     }
 
     Timer {

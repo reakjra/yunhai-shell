@@ -29,6 +29,11 @@ Singleton {
         }
     }
 
+    function screens() {
+        const all = store.all();
+        return Object.keys(all).filter(k => Array.isArray(all[k]) && all[k].length > 0);
+    }
+
     function widgetsFor(screen) {
         const s = store.all()[screen];
         return Array.isArray(s) ? s : [];
@@ -47,7 +52,9 @@ Singleton {
             "calendar": { "w": 260, "h": 280 },
             "media": { "w": 240, "h": 240 },
             "weather": { "w": 230, "h": 230 },
-            "deviceBattery": { "w": 190, "h": 200 }
+            "deviceBattery": { "w": 190, "h": 200 },
+            "user": { "w": 300, "h": 200 },
+            "performance": { "w": 260, "h": 200 }
         })
 
     function add(screen, type, x, y) {

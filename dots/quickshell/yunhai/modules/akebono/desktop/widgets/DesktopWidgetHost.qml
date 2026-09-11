@@ -1,18 +1,22 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.modules.common.desktop
 import qs.modules.akebono.desktop
 import qs.modules.akebono.desktop.widgets.calendar
 import qs.modules.akebono.desktop.widgets.deviceBattery
 import qs.modules.akebono.desktop.widgets.image
 import qs.modules.akebono.desktop.widgets.media
 import qs.modules.akebono.desktop.widgets.notes
+import qs.modules.akebono.desktop.widgets.performance
+import qs.modules.akebono.desktop.widgets.user
 import qs.modules.akebono.desktop.widgets.weather
 
 Item {
     id: root
 
     required property var modelData
+    required property int index
     readonly property string wid: root.modelData.id
     readonly property bool editMode: DesktopWidgets.editMode
     readonly property bool manipulating: contentLoader.item?.manipulating ?? false
@@ -23,6 +27,8 @@ Item {
             "image": imageComponent,
             "media": mediaComponent,
             "notes": notesComponent,
+            "performance": performanceComponent,
+            "user": userComponent,
             "weather": weatherComponent
         })
 
@@ -31,8 +37,12 @@ Item {
             return;
         root.x = root.modelData.x ?? 60;
         root.y = root.modelData.y ?? 60;
-        root.width = root.modelData.w ?? 190;
-        root.height = root.modelData.h ?? 190;
+        const w = root.modelData.w ?? 190;
+        const h = root.modelData.h ?? 190;
+        const side = Math.max(w, h);
+        const square = WidgetShapes.isSquare(root.modelData.shape ?? "");
+        root.width = square ? side : w;
+        root.height = square ? side : h;
     }
 
     onModelDataChanged: root.syncGeometry()
@@ -71,6 +81,18 @@ Item {
     Component {
         id: notesComponent
         NotesWidget {
+            host: root
+        }
+    }
+    Component {
+        id: performanceComponent
+        PerformanceWidget {
+            host: root
+        }
+    }
+    Component {
+        id: userComponent
+        UserWidget {
             host: root
         }
     }

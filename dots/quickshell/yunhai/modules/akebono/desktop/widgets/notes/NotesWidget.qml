@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.services
 import qs.modules.common
+import qs.modules.common.desktop
 import qs.modules.common.widgets
 import qs.modules.akebono
 import qs.modules.akebono.desktop
@@ -62,17 +63,9 @@ DesktopWidgetBase {
         }
     }
 
-    Squircle {
-        anchors.fill: parent
-        visible: root.showBackground
-        radius: 24
-        smoothing: AkebonoAppearance.squircleSmoothing
-        color: Appearance.colors.colLayer1
-    }
-
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 14
+        anchors.margins: 14 + root.contentInset + root.skewInset
         spacing: 8
 
         RowLayout {

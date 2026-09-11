@@ -10,7 +10,7 @@ import qs.modules.akebono.desktop.widgets
 
 DesktopWidgetBase {
     id: root
-    shadowRadius: 28
+    themeRadius: 28
     readonly property string imgSource: widgetData.source ?? ""
 
     onImgSourceChanged: {
@@ -18,35 +18,12 @@ DesktopWidgetBase {
         gifLoader.sourceComponent = gifComponent;
     }
 
-    Squircle {
+    backdropVisible: root.imgSource !== ""
+    backdrop: Loader {
+        id: gifLoader
         anchors.fill: parent
-        visible: root.showBackground
-        radius: 28
-        smoothing: AkebonoAppearance.squircleSmoothing
-        color: Appearance.colors.colLayer1
-    }
-
-    Item {
-        id: imgHost
-        anchors.fill: parent
-        visible: root.imgSource !== ""
-        layer.enabled: true
-        layer.effect: OpacityMask {
-            maskSource: Squircle {
-                width: imgHost.width
-                height: imgHost.height
-                radius: 28
-                smoothing: AkebonoAppearance.squircleSmoothing
-                color: "white"
-            }
-        }
-
-        Loader {
-            id: gifLoader
-            anchors.fill: parent
-            active: root.imgSource !== ""
-            sourceComponent: gifComponent
-        }
+        active: root.imgSource !== ""
+        sourceComponent: gifComponent
     }
 
     Component {
@@ -63,7 +40,7 @@ DesktopWidgetBase {
 
     ColumnLayout {
         anchors.centerIn: parent
-        visible: !imgHost.visible
+        visible: !root.backdropVisible
         spacing: 4
         MaterialSymbol {
             Layout.alignment: Qt.AlignHCenter
