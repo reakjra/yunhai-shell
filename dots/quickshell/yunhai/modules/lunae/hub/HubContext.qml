@@ -10,6 +10,7 @@ Singleton {
         "dash":    { icon: "dashboard",   label: "Dashboard" },
         "media":   { icon: "queue_music", label: "Media" },
         "weather": { icon: "cloud",       label: "Weather" },
+        "system":  { icon: "speed",       label: "Performance" },
     })
 
     readonly property list<var> availableTabs: {

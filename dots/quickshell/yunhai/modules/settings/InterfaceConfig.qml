@@ -158,14 +158,73 @@ ContentPage {
                 text: Translation.tr("Minimize/maximize/close icons instead of blank semaphore dots")
             }
         }
-        ConfigSwitch {
+        ContentSubsection {
             visible: hyprbarsSection.enabledHere
-            buttonIcon: "palette"
-            text: Translation.tr("macOS colors")
-            checked: hyprbarsSection.cfg.macColors
-            onCheckedChanged: hyprbarsSection.cfg.macColors = checked
-            StyledToolTip {
-                text: Translation.tr("Classic red / yellow / green instead of your theme accents")
+            title: Translation.tr("Button colors")
+
+            ConfigSelectionArray {
+                currentValue: hyprbarsSection.cfg.buttonColors
+                onSelected: newValue => hyprbarsSection.cfg.buttonColors = newValue
+                options: [
+                    {
+                        displayName: Translation.tr("Muted"),
+                        icon: "contrast",
+                        value: "muted"
+                    },
+                    {
+                        displayName: Translation.tr("Accent"),
+                        icon: "palette",
+                        value: "accent"
+                    },
+                    {
+                        displayName: Translation.tr("macOS"),
+                        icon: "circle",
+                        value: "mac"
+                    }
+                ]
+            }
+        }
+        ContentSubsection {
+            visible: hyprbarsSection.enabledHere
+            title: Translation.tr("Sizes")
+
+            ConfigSpinBox {
+                icon: "height"
+                text: Translation.tr("Bar height")
+                from: 16
+                to: 80
+                stepSize: 1
+                value: hyprbarsSection.cfg.height
+                onValueChanged: hyprbarsSection.cfg.height = value
+            }
+            ConfigSpinBox {
+                icon: "format_size"
+                text: Translation.tr("Title size")
+                from: 8
+                to: 40
+                stepSize: 1
+                value: hyprbarsSection.cfg.textSize
+                onValueChanged: hyprbarsSection.cfg.textSize = value
+            }
+            ConfigSpinBox {
+                visible: !hyprbarsSection.cfg.glyphs
+                icon: "radio_button_unchecked"
+                text: Translation.tr("Button size")
+                from: 6
+                to: 60
+                stepSize: 1
+                value: hyprbarsSection.cfg.buttonSize
+                onValueChanged: hyprbarsSection.cfg.buttonSize = value
+            }
+            ConfigSpinBox {
+                visible: hyprbarsSection.cfg.glyphs
+                icon: "crop_square"
+                text: Translation.tr("Glyph size")
+                from: 6
+                to: 60
+                stepSize: 1
+                value: hyprbarsSection.cfg.glyphSize
+                onValueChanged: hyprbarsSection.cfg.glyphSize = value
             }
         }
         MaterialTextField {

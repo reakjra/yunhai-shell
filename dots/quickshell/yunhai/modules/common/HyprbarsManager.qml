@@ -10,22 +10,24 @@ Scope {
     readonly property bool desired: cfg.enable
     readonly property string barFont: cfg.font || Appearance.font.family.title
     readonly property bool glyphs: cfg.glyphs
-    readonly property bool macColors: cfg.macColors
+    readonly property string buttonColors: cfg.buttonColors
+    readonly property int buttonSize: glyphs ? cfg.glyphSize : cfg.buttonSize
+    readonly property string layoutKey: [barFont, cfg.height, cfg.textSize, cfg.buttonSize, cfg.glyphSize].join()
 
     function run(action) {
-        Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", root.macColors ? "mac" : "themed"]);
+        Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", root.buttonColors, cfg.height, cfg.textSize, root.buttonSize]);
     }
 
     onDesiredChanged: run(desired ? "load" : "disable")
-    onBarFontChanged: if (desired) fontApply.restart()
+    onLayoutKeyChanged: if (desired) layoutApply.restart()
     onGlyphsChanged: if (desired) run("reload")
-    onMacColorsChanged: if (desired) run("reload")
+    onButtonColorsChanged: if (desired) run("reload")
     Component.onCompleted: if (desired) run("load")
 
     Timer {
-        id: fontApply
+        id: layoutApply
         interval: 600
-        onTriggered: root.run("font")
+        onTriggered: root.run("layout")
     }
 
     Connections {

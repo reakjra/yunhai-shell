@@ -16,6 +16,8 @@ pub mod qobject {
         #[qproperty(bool, poll_cpu, cxx_name = "pollCpu")]
         #[qproperty(bool, poll_memory, cxx_name = "pollMemory")]
         #[qproperty(bool, poll_gpu, cxx_name = "pollGpu")]
+        #[qproperty(bool, poll_network, cxx_name = "pollNetwork")]
+        #[qproperty(bool, poll_storage, cxx_name = "pollStorage")]
         #[qproperty(QString, cpu_model, cxx_name = "cpuModel")]
         #[qproperty(i32, cpu_threads, cxx_name = "cpuThreads")]
         #[qproperty(f64, cpu_max_frequency, cxx_name = "cpuMaxFrequency")]
@@ -50,6 +52,15 @@ pub mod qobject {
         #[qproperty(QList_f64, gpu_fan_percents, cxx_name = "gpuFanPercents")]
         #[qproperty(QList_f64, gpu_power, cxx_name = "gpuPower")]
         #[qproperty(QList_f64, gpu_power_limits, cxx_name = "gpuPowerLimits")]
+        #[qproperty(f64, net_down_rate, cxx_name = "netDownRate")]
+        #[qproperty(f64, net_up_rate, cxx_name = "netUpRate")]
+        #[qproperty(f64, net_down_total, cxx_name = "netDownTotal")]
+        #[qproperty(f64, net_up_total, cxx_name = "netUpTotal")]
+        #[qproperty(QList_QString, storage_devices, cxx_name = "storageDevices")]
+        #[qproperty(QList_QString, storage_mounts, cxx_name = "storageMounts")]
+        #[qproperty(QList_f64, storage_total, cxx_name = "storageTotal")]
+        #[qproperty(QList_f64, storage_used, cxx_name = "storageUsed")]
+        #[qproperty(QList_f64, storage_usages, cxx_name = "storageUsages")]
         type SysMon = super::SysMonRust;
     }
 
@@ -68,12 +79,24 @@ use core::pin::Pin;
 use cxx_qt::CxxQtType;
 use cxx_qt_lib::{QList, QString};
 use std::path::PathBuf;
-use sysinfo::{cpu, gpu, memory};
+use sysinfo::{cpu, gpu, memory, network, storage};
 
 pub struct SysMonRust {
     poll_cpu: bool,
     poll_memory: bool,
     poll_gpu: bool,
+    poll_network: bool,
+    poll_storage: bool,
+    net_down_rate: f64,
+    net_up_rate: f64,
+    net_down_total: f64,
+    net_up_total: f64,
+    net_reader: network::Reader,
+    storage_devices: QList<QString>,
+    storage_mounts: QList<QString>,
+    storage_total: QList<f64>,
+    storage_used: QList<f64>,
+    storage_usages: QList<f64>,
     cpu_model: QString,
     cpu_threads: i32,
     cpu_max_frequency: f64,
@@ -115,6 +138,18 @@ impl Default for SysMonRust {
         Self {
             poll_cpu: true,
             poll_memory: true,
+            poll_network: true,
+            poll_storage: true,
+            net_down_rate: 0.0,
+            net_up_rate: 0.0,
+            net_down_total: 0.0,
+            net_up_total: 0.0,
+            net_reader: network::Reader::default(),
+            storage_devices: QList::default(),
+            storage_mounts: QList::default(),
+            storage_total: QList::default(),
+            storage_used: QList::default(),
+            storage_usages: QList::default(),
             poll_gpu: true,
             cpu_model: QString::default(),
             cpu_threads: 0,
@@ -200,6 +235,12 @@ impl qobject::SysMon {
         if *self.poll_gpu() {
             self.as_mut().refresh_gpu();
         }
+        if *self.poll_network() {
+            self.as_mut().refresh_network();
+        }
+        if *self.poll_storage() {
+            self.as_mut().refresh_storage();
+        }
         self.refreshed();
     }
 
@@ -236,6 +277,35 @@ impl qobject::SysMon {
         self.as_mut().set_swap_used(sample.swap_used);
         self.as_mut().set_swap_free(sample.swap_free);
         self.as_mut().set_swap_usage(sample.swap_usage);
+    }
+
+    fn refresh_network(mut self: Pin<&mut Self>) {
+        let sample = self.as_mut().rust_mut().net_reader.sample();
+        self.as_mut().set_net_down_rate(sample.down_rate);
+        self.as_mut().set_net_up_rate(sample.up_rate);
+        self.as_mut().set_net_down_total(sample.down_total);
+        self.as_mut().set_net_up_total(sample.up_total);
+    }
+
+    fn refresh_storage(mut self: Pin<&mut Self>) {
+        let mounts = storage::mounts();
+        let mut devices = QList::<QString>::default();
+        let mut points = QList::<QString>::default();
+        let mut total = QList::<f64>::default();
+        let mut used = QList::<f64>::default();
+        let mut usages = QList::<f64>::default();
+        for mount in &mounts {
+            devices.append(QString::from(&mount.device));
+            points.append(QString::from(&mount.mount_point));
+            total.append(mount.total);
+            used.append(mount.used);
+            usages.append(mount.usage);
+        }
+        self.as_mut().set_storage_devices(devices);
+        self.as_mut().set_storage_mounts(points);
+        self.as_mut().set_storage_total(total);
+        self.as_mut().set_storage_used(used);
+        self.as_mut().set_storage_usages(usages);
     }
 
     fn refresh_gpu(mut self: Pin<&mut Self>) {

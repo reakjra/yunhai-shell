@@ -28,6 +28,7 @@ Item {
 
     property alias contentColumn: contentColumn
     property alias hubTabs: hubTabs
+    readonly property bool popupOpen: hubContent.popupOpen
 
     readonly property bool systemTabActive: {
         const tabs = HubContext.availableTabs;

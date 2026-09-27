@@ -6,6 +6,7 @@ import Quickshell
 import qs.modules.common
 import qs.modules.lunae.hub.dash
 import qs.modules.lunae.hub.media
+import qs.modules.lunae.hub.performance
 import qs.modules.lunae.hub.weather
 
 Item {
@@ -15,30 +16,26 @@ Item {
     property bool hubVisible: false
     signal tabChangeRequested(int newTab)
 
-    readonly property real preferredWidth: {
-        const tabs = HubContext.availableTabs;
-        if (currentTab < 0 || currentTab >= tabs.length) return 800;
-        switch (tabs[currentTab].identifier) {
-            case "dash": return 780;
-            case "media": return 730;
-            case "weather": return 700;
-            default: return 780;
-        }
+    readonly property real inset: 8
+    readonly property var tabSizes: ({
+        "dash": Qt.size(780, 375),
+        "media": Qt.size(730, 310),
+        "weather": Qt.size(700, 370),
+        "system": Qt.size(1000, 390),
+    })
+
+    function sizeFor(identifier: string): size {
+        return tabSizes[identifier] ?? Qt.size(780, 400);
     }
 
-    readonly property real preferredHeight: {
+    readonly property size currentSize: {
         const tabs = HubContext.availableTabs;
-        if (currentTab < 0 || currentTab >= tabs.length) return 430;
-        switch (tabs[currentTab].identifier) {
-            case "dash": return 375;
-            case "media": return 310;
-            case "weather": return 370;
-            default: return 400;
-        }
+        return currentTab >= 0 && currentTab < tabs.length ? sizeFor(tabs[currentTab].identifier) : Qt.size(800, 430);
     }
+    readonly property real preferredWidth: currentSize.width
+    readonly property real preferredHeight: currentSize.height
 
-    readonly property real slotWidth: preferredWidth - 16
-    readonly property real slotHeight: preferredHeight - 16
+    readonly property bool popupOpen: tabRepeater.count > 0 && (tabRepeater.itemAt(currentTab)?.item?.popupOpen ?? false)
 
     Behavior on height {
         enabled: root.hubVisible
@@ -51,6 +48,7 @@ Item {
         "dash": dashComp,
         "media": mediaComp,
         "weather": weatherComp,
+        "system": performanceComp,
     })
 
     Component {
@@ -65,18 +63,28 @@ Item {
         id: weatherComp
         HubWeatherTab {}
     }
+    Component {
+        id: performanceComp
+        HubPerformanceTab {}
+    }
 
     Item {
         id: viewport
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: root.inset
         clip: true
 
         Row {
             id: contentRow
             height: parent.height
 
-            x: -root.currentTab * root.slotWidth
+            x: {
+                const tabs = HubContext.availableTabs;
+                let offset = 0;
+                for (let i = 0; i < root.currentTab && i < tabs.length; i++)
+                    offset += root.sizeFor(tabs[i].identifier).width - root.inset * 2;
+                return -offset;
+            }
             Behavior on x {
                 NumberAnimation {
                     duration: Appearance.animation.elementMove.duration
@@ -85,6 +93,7 @@ Item {
             }
 
             Repeater {
+                id: tabRepeater
                 model: HubContext.availableTabs
 
                 Loader {
@@ -93,8 +102,8 @@ Item {
                     required property int index
                     clip: true
 
-                    width: root.slotWidth
-                    height: root.slotHeight
+                    width: root.sizeFor(modelData.identifier).width - root.inset * 2
+                    height: root.sizeFor(modelData.identifier).height - root.inset * 2
 
                     sourceComponent: root.tabComponents[modelData.identifier] ?? null
 

@@ -18,6 +18,8 @@ Singleton {
     readonly property real swapUsed: SysMon.swapUsed
     readonly property real swapUsedPercentage: SysMon.swapUsage
 
+    readonly property string cpuModel: SysMon.cpuModel
+    readonly property int cpuThreads: SysMon.cpuThreads
     readonly property real cpuUsage: SysMon.cpuUsage
     readonly property double cpuFrequency: SysMon.cpuFrequency
     readonly property double cpuTemperature: SysMon.cpuTemperature

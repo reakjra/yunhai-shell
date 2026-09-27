@@ -116,28 +116,26 @@ hl.config({
 
 -- ##### AKEBONO HYPRBARS #####
 if hl.plugin and hl.plugin.hyprbars then
-	local fontFile = io.open(os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars-font.txt")
-	local barFont = fontFile and fontFile:read("l") or nil
-	if fontFile then
-		fontFile:close()
+	local hyprbars = {
+		bar_blur = false,
+		bar_height = 34,
+		bar_text_size = 16,
+		bar_padding = 14,
+		bar_button_padding = 8,
+		bar_buttons_alignment = "right",
+		bar_text_align = "center",
+		bar_part_of_window = true,
+		bar_precedence_over_border = true,
+	}
+
+	local ok, layout = pcall(dofile, os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars.lua")
+	if ok then
+		for key, value in pairs(layout) do
+			hyprbars[key] = value
+		end
 	end
 
-	hl.config({
-		plugin = {
-			hyprbars = {
-				bar_blur = false,
-				bar_height = 34,
-				bar_text_font = barFont,
-				bar_text_size = 16,
-				bar_padding = 14,
-				bar_button_padding = 8,
-				bar_buttons_alignment = "right",
-				bar_text_align = "center",
-				bar_part_of_window = true,
-				bar_precedence_over_border = true,
-			},
-		},
-	})
+	hl.config({ plugin = { hyprbars = hyprbars } })
 end
 
 -- Curves

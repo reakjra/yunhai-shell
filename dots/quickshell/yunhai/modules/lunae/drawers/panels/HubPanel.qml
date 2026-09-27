@@ -20,7 +20,7 @@ Panel {
     onDrawerWidthChanged: if (drawerWidth > 0) _frozenW = drawerWidth
     readonly property real _effW: drawerWidth > 0 ? drawerWidth : _frozenW
 
-    property alias hoverHandler: hoverHandler
+    readonly property bool held: hoverHandler.hovered || hubDrawer.popupOpen
 
     axis: Panel.Axis.Vertical
     shouldShow: GlobalStates.hubOpen

@@ -5,6 +5,7 @@ import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import qs
 import qs.services
 import qs.modules.common
@@ -31,7 +32,15 @@ Item {
     readonly property int labelH: 34
     readonly property int cellW: view.iconSize + view.cfg.iconSpacingX
     readonly property int cellH: view.iconSize + view.labelH + view.cfg.iconSpacingY
-    readonly property var reserved: HyprlandData.monitors.find(m => m.name === view.screenName)?.reserved ?? [0, 0, 0, 0]
+    readonly property var liveReserved: HyprlandData.monitors.find(m => m.name === view.screenName)?.reserved ?? [0, 0, 0, 0]
+    readonly property list<HyprlandWorkspace> workspacesForMonitor: Hyprland.workspaces.values.filter(workspace => workspace.monitor && workspace.monitor.name == view.screenName)
+    readonly property var activeWorkspaceWithFullscreen: workspacesForMonitor.filter(workspace => ((workspace.toplevels.values.filter(window => window.wayland?.fullscreen)[0] != undefined) && workspace.active))[0]
+    readonly property bool screenFullscreen: activeWorkspaceWithFullscreen != undefined
+    property var reserved: view.liveReserved
+    onLiveReservedChanged: if (!view.screenFullscreen)
+        view.reserved = view.liveReserved
+    onScreenFullscreenChanged: if (!view.screenFullscreen)
+        view.reserved = view.liveReserved
     readonly property int edgePad: view.cfg.edgePadding
     readonly property int marginLeft: view.reserved[0] + view.edgePad
     readonly property int marginTop: view.reserved[1] + view.edgePad

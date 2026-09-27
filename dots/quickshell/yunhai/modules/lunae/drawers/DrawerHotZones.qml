@@ -31,7 +31,7 @@ Scope {
         id: hubCloseTimer
         interval: 400
         onTriggered: {
-            if (!root.panels.hubPanel.hoverHandler.hovered && !hubHotZone.containsMouse)
+            if (!root.panels.hubPanel.held && !hubHotZone.containsMouse)
                 GlobalStates.hubOpen = false
         }
     }
@@ -82,9 +82,9 @@ Scope {
     }
 
     Connections {
-        target: root.panels.hubPanel.hoverHandler
-        function onHoveredChanged() {
-            if (root.panels.hubPanel.hoverHandler.hovered) {
+        target: root.panels.hubPanel
+        function onHeldChanged() {
+            if (root.panels.hubPanel.held) {
                 hubCloseTimer.stop()
             } else if (GlobalStates.hubOpen && !hubHotZone.containsMouse
                 && !root.hubShortcutActive) {
@@ -170,7 +170,7 @@ Scope {
                     hubOpenTimer.restart()
                 } else {
                     hubOpenTimer.stop()
-                    if (GlobalStates.hubOpen && !root.panels.hubPanel.hoverHandler.hovered
+                    if (GlobalStates.hubOpen && !root.panels.hubPanel.held
                         && !root.hubShortcutActive)
                         hubCloseTimer.restart()
                 }

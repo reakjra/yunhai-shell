@@ -327,8 +327,12 @@ Singleton {
     component HyprbarsOptions: JsonObject {
         property bool enable: false
         property bool glyphs: false
-        property bool macColors: false
+        property string buttonColors: "muted" // "muted", "accent", "mac"
         property string font: ""
+        property int height: 34
+        property int textSize: 16
+        property int buttonSize: 15
+        property int glyphSize: 28
     }
 
     component SquircleOptions: JsonObject {
@@ -1047,7 +1051,7 @@ Singleton {
                 property bool bouncyAnimations: true
                 property real deformStrength: 1.5
                 property JsonObject hub: JsonObject {
-                    property list<string> tabs: ["dash", "media", "weather", "system"]
+                    property list<string> tabs: ["dash", "media", "system", "weather"]
                     property JsonObject dash: JsonObject {
                         property string gifSource: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDZrc3VrazR2eHN3dWZjaGJlNHU0djM1ZDZqYzVvcTczYWZhdTVhZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/oz45ELYgMoYVsZqmor/giphy.gif"
                     }
