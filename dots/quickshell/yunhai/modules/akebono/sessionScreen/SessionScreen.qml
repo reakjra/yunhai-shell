@@ -310,9 +310,7 @@ Scope {
         implicitHeight: descriptionLabelText.implicitHeight + 10 * 2
         implicitWidth: descriptionLabelText.implicitWidth + 15 * 2
 
-        Behavior on implicitWidth {
-            animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
-        }
+        MotionBehavior on implicitWidth {}
 
         StyledText {
             id: descriptionLabelText

@@ -67,9 +67,7 @@ MouseArea {
         root.introScale = 1;
         root.introOpacity = 1;
     }
-    Behavior on introScale {
-        animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
-    }
+    MotionBehavior on introScale {}
     Behavior on introOpacity {
         animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
     }

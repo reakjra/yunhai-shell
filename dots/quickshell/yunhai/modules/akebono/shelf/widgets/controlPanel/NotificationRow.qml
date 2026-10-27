@@ -31,7 +31,7 @@ Squircle {
     radius: 18
     smoothing: AkebonoAppearance.squircleSmoothing
     color: on ? Appearance.colors.colSecondaryContainer : Appearance.colors.colLayer2
-    Behavior on color { ColorAnimation { duration: 240; easing.type: Easing.OutCubic } }
+    Behavior on color { animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this) }
 
     RowLayout {
         anchors.fill: parent

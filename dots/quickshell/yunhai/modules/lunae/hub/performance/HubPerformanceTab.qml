@@ -235,9 +235,7 @@ Item {
                 topLeftRadius: height >= batteryCard.height - 1 ? batteryCard.radius : 0
                 topRightRadius: height >= batteryCard.height - 1 ? batteryCard.radius : 0
 
-                Behavior on height {
-                    LunaeAnim {}
-                }
+                MotionBehavior on height {}
             }
 
             ColumnLayout {

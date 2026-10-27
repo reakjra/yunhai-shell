@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.services
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 import qs.modules.lunae.widgets
@@ -31,13 +32,7 @@ Item {
     property alias hoverHandler: hoverHandler
 
     property real progress: hasPopups ? 1 : 0
-    Behavior on progress {
-        NumberAnimation {
-            duration: LunaeAppearance.drawerOpenDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.drawerOpenCurve
-        }
-    }
+    MotionBehavior on progress {}
 
     anchors.right: parent.right
     anchors.rightMargin: root.frameInset - (root.naturalWidth + 8) * (1 - root.progress)
@@ -59,9 +54,8 @@ Item {
         amount: 0.08
     }
 
-    Behavior on implicitHeight {
+    MotionBehavior on implicitHeight {
         enabled: !notifListview.expanding
-        LunaeAnim {}
     }
 
     onVisibleChanged: {

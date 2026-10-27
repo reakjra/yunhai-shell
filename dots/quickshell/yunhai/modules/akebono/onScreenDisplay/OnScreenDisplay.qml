@@ -118,11 +118,8 @@ Scope {
 
             Component.onCompleted: anim = 1
 
-            Behavior on anim {
-                NumberAnimation {
-                    duration: 220
-                    easing.type: Easing.OutCubic
-                }
+            MotionBehavior on anim {
+                motion: Motion.spatialFast
             }
 
             ColumnLayout {

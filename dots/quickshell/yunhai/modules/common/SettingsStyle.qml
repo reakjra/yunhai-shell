@@ -13,6 +13,7 @@ Singleton {
     readonly property real cardRadius: Appearance.rounding.normal
     readonly property real cardPaddingV: 7
     readonly property real cardPaddingH: 10
+    readonly property real groupedPageMargin: 6
 
     readonly property color sectionHeaderColor: Appearance.colors.colOnLayer0
     readonly property real sectionHeaderSize: Appearance.font.pixelSize.larger

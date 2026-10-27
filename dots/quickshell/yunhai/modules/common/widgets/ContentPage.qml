@@ -87,7 +87,7 @@ StyledFlickable {
             left: SettingsStyle.grouped ? parent.left : undefined
             right: SettingsStyle.grouped ? parent.right : undefined
             horizontalCenter: SettingsStyle.grouped ? undefined : parent.horizontalCenter
-            margins: SettingsStyle.grouped ? 6 : 20
+            margins: SettingsStyle.grouped ? SettingsStyle.groupedPageMargin : 20
         }
         spacing: SettingsStyle.grouped ? 18 : 30
     }

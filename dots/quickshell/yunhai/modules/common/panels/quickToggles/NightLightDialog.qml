@@ -43,14 +43,6 @@ Column {
         onCheckedChanged: Config.options.light.antiFlashbang.enable = checked
     }
 
-    DialogConfigSwitch {
-        anchors { left: parent.left; right: parent.right }
-        buttonIcon: "light_mode"
-        text: Translation.tr("Brightness adjustment")
-        checked: Config.options.light.antiFlashbang.enableBrightness
-        onCheckedChanged: Config.options.light.antiFlashbang.enableBrightness = checked
-    }
-
     WindowDialogSlider {
         anchors { left: parent.left; right: parent.right; leftMargin: 4; rightMargin: 4 }
         text: Translation.tr("Gamma")

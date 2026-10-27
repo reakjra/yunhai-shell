@@ -2,17 +2,18 @@ import qs.modules.common.widgets
 import qs
 import qs.modules.common
 import qs.services
-import qs.services.network
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Networking as QsNet
 
 DialogListItem {
     id: root
-    required property WifiAccessPoint wifiNetwork
+    required property QsNet.WifiNetwork wifiNetwork
     property color labelColor: Appearance.colors.colOnSurfaceVariant
-    enabled: !(Network.wifiConnectTarget === root.wifiNetwork && !wifiNetwork?.active)
+    readonly property bool askingPassword: Network.passwordTarget === root.wifiNetwork
+    enabled: !root.wifiNetwork.stateChanging
 
-    active: (wifiNetwork?.askingPassword || wifiNetwork?.active) ?? false
+    active: root.askingPassword || root.wifiNetwork.connected
     onClicked: {
         Network.connectToWifiNetwork(wifiNetwork);
     }
@@ -31,20 +32,19 @@ DialogListItem {
             spacing: 10
             MaterialSymbol {
                 iconSize: Appearance.font.pixelSize.larger
-                property int strength: root.wifiNetwork?.strength ?? 0
-                text: strength > 80 ? "signal_wifi_4_bar" : strength > 60 ? "network_wifi_3_bar" : strength > 40 ? "network_wifi_2_bar" : strength > 20 ? "network_wifi_1_bar" : "signal_wifi_0_bar"
+                text: Network.strengthSymbol(Network.strengthPercent(root.wifiNetwork))
                 color: Appearance.colors.colOnSurfaceVariant
             }
             StyledText {
                 Layout.fillWidth: true
                 color: root.labelColor
                 elide: Text.ElideRight
-                text: root.wifiNetwork?.ssid ?? Translation.tr("Unknown")
+                text: root.wifiNetwork.name
                 textFormat: Text.PlainText
             }
             MaterialSymbol {
-                visible: (root.wifiNetwork?.isSecure || root.wifiNetwork?.active) ?? false
-                text: root.wifiNetwork?.active ? "check" : Network.wifiConnectTarget === root.wifiNetwork ? "settings_ethernet" : "lock"
+                visible: Network.isSecure(root.wifiNetwork) || root.wifiNetwork.connected
+                text: root.wifiNetwork.connected ? "check" : root.wifiNetwork.stateChanging ? "settings_ethernet" : "lock"
                 iconSize: Appearance.font.pixelSize.larger
                 color: Appearance.colors.colOnSurfaceVariant
             }
@@ -53,7 +53,7 @@ DialogListItem {
         ColumnLayout {
             id: passwordPrompt
             Layout.topMargin: 8
-            visible: root.wifiNetwork?.askingPassword ?? false
+            visible: root.askingPassword
 
             MaterialTextField {
                 id: passwordField
@@ -64,7 +64,7 @@ DialogListItem {
                 inputMethodHints: Qt.ImhSensitiveData
 
                 onAccepted: {
-                    Network.changePassword(root.wifiNetwork, passwordField.text);
+                    Network.connectWithPassword(root.wifiNetwork, passwordField.text);
                 }
             }
 
@@ -78,14 +78,14 @@ DialogListItem {
                 DialogButton {
                     buttonText: Translation.tr("Cancel")
                     onClicked: {
-                        root.wifiNetwork.askingPassword = false;
+                        Network.cancelPassword();
                     }
                 }
 
                 DialogButton {
                     buttonText: Translation.tr("Connect")
                     onClicked: {
-                        Network.changePassword(root.wifiNetwork, passwordField.text);
+                        Network.connectWithPassword(root.wifiNetwork, passwordField.text);
                     }
                 }
             }
@@ -94,7 +94,7 @@ DialogListItem {
         ColumnLayout {
             id: publicWifiPortal
             Layout.topMargin: 8
-            visible: (root.wifiNetwork?.active && (root.wifiNetwork?.security ?? "").trim().length === 0) ?? false
+            visible: root.wifiNetwork.connected && !Network.isSecure(root.wifiNetwork)
 
             RowLayout {
                 DialogButton {

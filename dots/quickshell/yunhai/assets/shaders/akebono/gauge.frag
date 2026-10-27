@@ -37,6 +37,5 @@ void main() {
     float liquid = clamp(0.5 + (P.y - surface), 0.0, 1.0);
 
     vec4 col = mix(bgColor, color, liquid);
-    float a = col.a * cov * qt_Opacity;
-    fragColor = vec4(col.rgb * a, a);
+    fragColor = col * (cov * qt_Opacity);
 }

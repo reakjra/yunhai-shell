@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 import qs.modules.lunae.widgets
@@ -89,28 +90,23 @@ Item {
     property real _targetWidth: 0
     onNaturalWidthChanged: if (currentPopout) _targetWidth = naturalWidth
     property real _animatedWidth: _targetWidth
-    Behavior on _animatedWidth {
-        LunaeAnim {}
-    }
+    MotionBehavior on _animatedWidth {}
 
     property real _targetHeight: 0
     onNaturalHeightChanged: if (currentPopout) _targetHeight = naturalHeight
     property real _animatedHeight: _targetHeight
-    Behavior on _animatedHeight {
+    MotionBehavior on _animatedHeight {
         enabled: root.width > root.armpitSize
-        LunaeAnim {}
     }
 
     property real _smoothPopupY: GlobalStates.barPopupY
-    Behavior on _smoothPopupY {
+    MotionBehavior on _smoothPopupY {
         enabled: root.width > 0
-        LunaeAnim {}
     }
 
     property real progress: _effectivelyOpen && !GlobalStates.screenLocked ? 1 : 0
-    Behavior on progress {
+    MotionBehavior on progress {
         enabled: !GlobalStates.screenLocked
-        LunaeAnim {}
     }
 
     readonly property alias deformX: deform.sx

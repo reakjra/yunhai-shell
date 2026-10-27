@@ -75,8 +75,8 @@ hl.config({
 		rounding = 18,
 
 		blur = {
-			enabled = true,
-			xray = true,
+			enabled = false,
+			xray = false,
 			special = false,
 			new_optimizations = true,
 			size = 10,
@@ -126,16 +126,44 @@ if hl.plugin and hl.plugin.hyprbars then
 		bar_text_align = "center",
 		bar_part_of_window = true,
 		bar_precedence_over_border = true,
+		bar_color = "term0",
 	}
 
-	local ok, layout = pcall(dofile, os.getenv("HOME") .. "/.local/state/quickshell/yunhai/user/generated/hyprbars.lua")
+	local ok, generated = pcall(dofile, HOME .. "/.local/state/quickshell/yunhai/user/generated/hyprbars.lua")
+	local buttons = ok and generated.buttons
 	if ok then
-		for key, value in pairs(layout) do
+		generated.buttons = nil
+		for key, value in pairs(generated) do
 			hyprbars[key] = value
 		end
 	end
 
+	hyprbars.bar_color = theme_color(hyprbars.bar_color, "131313")
+	hyprbars.col = { text = theme_color("on_surface", "e2e2e2") }
 	hl.config({ plugin = { hyprbars = hyprbars } })
+
+	if buttons then
+		local outline = theme_color("outline", "919191")
+		local palettes = {
+			muted = { theme_color("error", "ffb4ab"), outline, outline },
+			accent = { theme_color("error", "ffb4ab"), theme_color("primary", "ffb0cb"), theme_color("tertiary", "ffb787") },
+			mac = { "rgb(ff5f57)", "rgb(28c840)", "rgb(febc2e)" },
+		}
+		local close, float, minimize = table.unpack(palettes[buttons.colors] or palettes.muted)
+		local glyphs = buttons.style == "glyphs"
+		local function add(color, glyph, action)
+			hl.plugin.hyprbars.add_button({
+				bg_color = glyphs and "rgba(00000000)" or color,
+				fg_color = glyphs and color or hyprbars.bar_color,
+				size = buttons.size,
+				icon = glyphs and glyph or "",
+				action = action,
+			})
+		end
+		add(close, "󰖭", 'hyprctl dispatch "hl.dsp.window.close()"')
+		add(float, "󰖯", "hyprctl dispatch \"hl.dsp.window.float({ action = 'toggle' })\"")
+		add(minimize, "󰖰", 'bash "' .. buttons.minimize .. '"')
+	end
 end
 
 -- Curves

@@ -1,6 +1,8 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
+import QtQuick
 import Quickshell
+import qs
 import qs.modules.common
 
 Singleton {
@@ -52,6 +54,15 @@ Singleton {
             }
         } else {
             root.pinnedWidgetIdentifiers = root.pinnedWidgetIdentifiers.filter(id => id !== identifier)
+        }
+    }
+
+    readonly property Connections overlayConnections: Connections {
+        target: GlobalStates
+
+        function onOverlayOpenChanged() {
+            if (GlobalStates.overlayOpen && Config.options.screenRecord.stopOnOverlayOpen && Persistent.states.screenRecord.active)
+                Quickshell.execDetached([Directories.recordScriptPath, "--cut-from", String(Date.now())]);
         }
     }
 

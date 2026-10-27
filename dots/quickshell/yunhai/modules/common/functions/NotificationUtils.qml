@@ -105,7 +105,11 @@ Singleton {
         }
 
         processedBody = processedBody.replace(/<img/gi, '\n\n<img');
-        
+
         return processedBody
+    }
+
+    function plainNotificationBody(body, appName) {
+        return processNotificationBody(body, appName).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()
     }
 }

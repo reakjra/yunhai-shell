@@ -2,6 +2,8 @@ import Quickshell
 
 import qs.modules.common
 import qs.modules.akebono
+import qs.modules.akebono.chrome
+import qs.modules.akebono.controlPanel
 import qs.modules.akebono.dock
 import qs.modules.akebono.notificationPopup
 import qs.modules.akebono.overview

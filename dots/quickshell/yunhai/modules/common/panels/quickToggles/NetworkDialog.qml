@@ -5,13 +5,17 @@ import qs.modules.common
 import qs.modules.common.widgets
 
 Column {
+    id: root
     property real maxListHeight: 250
     width: parent?.width ?? 0
     spacing: 0
     topPadding: 4
 
+    Component.onCompleted: Network.setScanWanted(root, true)
+    Component.onDestruction: Network.setScanWanted(root, false)
+
     StyledIndeterminateProgressBar {
-        visible: Network.wifiScanning
+        visible: Network.wifiScanPending
         anchors { left: parent.left; right: parent.right }
     }
 

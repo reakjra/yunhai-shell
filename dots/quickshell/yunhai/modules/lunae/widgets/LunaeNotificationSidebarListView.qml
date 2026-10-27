@@ -17,7 +17,7 @@ StyledListView {
     property bool expanding: false
     Timer {
         id: expandResetTimer
-        interval: LunaeAppearance.notifExpansionDuration
+        interval: Motion.spatialFast.duration
         onTriggered: root.expanding = false
     }
 

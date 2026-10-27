@@ -21,7 +21,7 @@ Item {
 
     transformOrigin: Item.Bottom
     scale: root.dragHover ? 1.15 : (trashMouse.containsMouse ? 1.1 : 1.0)
-    Behavior on scale { NumberAnimation { duration: 130; easing.type: Easing.OutCubic } }
+    MotionBehavior on scale { motion: Motion.spatialFast }
 
     FolderListModel {
         id: trashModel

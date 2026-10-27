@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 import qs.modules.lunae.wallpaperSelector
@@ -59,13 +60,7 @@ Item {
         }
     }
 
-    Behavior on progress {
-        NumberAnimation {
-            duration: LunaeAppearance.drawerOpenDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.drawerOpenCurve
-        }
-    }
+    MotionBehavior on progress {}
 
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom

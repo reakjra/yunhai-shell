@@ -87,8 +87,8 @@ Item {
         }
     }
 
-    Behavior on x { enabled: root.placed && !root.desktop.groupSnapping; NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-    Behavior on y { enabled: root.placed && !root.desktop.groupSnapping; NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    MotionBehavior on x { enabled: root.placed && !root.desktop.groupSnapping; motion: Motion.spatialFast }
+    MotionBehavior on y { enabled: root.placed && !root.desktop.groupSnapping; motion: Motion.spatialFast }
 
     Squircle {
         id: highlight

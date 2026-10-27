@@ -2,6 +2,7 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.functions
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 import qs.modules.lunae.verticalBar
@@ -35,12 +36,9 @@ Scope {
     readonly property real barWidth: Appearance.sizes.baseVerticalBarWidth
 
     property real barProgress: barVisible ? 1 : 0
-    Behavior on barProgress {
-        NumberAnimation {
-            duration: root.barVisible ? LunaeAppearance.drawerOpenDuration : LunaeAppearance.drawerCloseDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.barVisible ? LunaeAppearance.drawerOpenCurve : LunaeAppearance.closeCurve
-        }
+    MotionBehavior on barProgress {
+        exitMotion: Motion.exit
+        exitTarget: 0
     }
 
     Connections {

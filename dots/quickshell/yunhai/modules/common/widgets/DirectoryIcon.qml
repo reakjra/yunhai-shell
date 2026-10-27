@@ -79,9 +79,9 @@ Image {
     FileView {
         id: desktopFileView
         path: (root.isDesktopFile && !root.desktopEntry?.icon) ? root.fileModelData.filePath : ""
-        onLoadedChanged: {
-            if (!desktopFileView.loaded)
-                return;
+        watchChanges: true
+        onFileChanged: desktopFileView.reload()
+        onLoaded: {
             const m = desktopFileView.text().match(/^Icon=(.+)$/m);
             root.desktopFileIcon = m ? m[1].trim() : "";
         }

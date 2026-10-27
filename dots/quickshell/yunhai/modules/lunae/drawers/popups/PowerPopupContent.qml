@@ -171,12 +171,8 @@ Column {
                     colBackgroundHover: Appearance.colors.colLayer1Hover
                     colRipple: Appearance.colors.colLayer1Active
 
-                    Behavior on buttonEffectiveRadius {
-                        NumberAnimation {
-                            duration: LunaeAppearance.morphDuration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: LunaeAppearance.morphCurve
-                        }
+                    MotionBehavior on buttonEffectiveRadius {
+                        motion: Motion.spatialFast
                     }
 
                     onClicked: modelData.action()

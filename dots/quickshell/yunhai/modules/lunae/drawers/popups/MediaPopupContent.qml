@@ -110,12 +110,8 @@ ColumnLayout {
             colRipple: Appearance.colors.colPrimaryActive
             onClicked: root.activePlayer?.togglePlaying()
 
-            Behavior on buttonEffectiveRadius {
-                NumberAnimation {
-                    duration: LunaeAppearance.morphDuration
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: LunaeAppearance.morphCurve
-                }
+            MotionBehavior on buttonEffectiveRadius {
+                motion: Motion.spatialFast
             }
 
             contentItem: MaterialSymbol {

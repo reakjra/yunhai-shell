@@ -10,10 +10,9 @@ Rectangle {
 
     property bool show: false
     default property alias data: contentColumn.data
-    property real backgroundHeight: dialogBackground.implicitHeight
+    property real backgroundHeight: contentColumn.implicitHeight + dialogBackground.radius * 2
     property real backgroundWidth: 350
-    property real backgroundAnimationMovementDistance: 60
-    
+
     signal dismiss()
     Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Escape) {
@@ -26,12 +25,7 @@ Rectangle {
     Behavior on color {
         animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
     }
-    visible: dialogBackground.implicitHeight > 0
-
-    onShowChanged: {
-        dialogBackgroundHeightAnimation.easing.bezierCurve = (show ? Appearance.animationCurves.emphasizedDecel : Appearance.animationCurves.emphasizedAccel)
-        dialogBackground.implicitHeight = show ? backgroundHeight : 0
-    }
+    visible: root.show || dialogBackground.opacity > 0
 
     radius: Appearance.rounding.screenRounding - Appearance.sizes.hyprlandGapsOut + 1
 
@@ -42,30 +36,19 @@ Rectangle {
         onPressed: root.dismiss()
     }
 
-    Rectangle {
+    RevealSquircle {
         id: dialogBackground
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.centerIn: parent
         radius: Appearance.rounding.large
+        smoothing: Config.options.squircle.smoothing
         color: Appearance.m3colors.m3surfaceContainerHigh // Use opaque version of layer3
-        
-        property real targetY: root.height / 2 - root.backgroundHeight / 2
-        y: root.show ? targetY : (targetY - root.backgroundAnimationMovementDistance)
+        shown: root.show
+
         implicitWidth: root.backgroundWidth
-        implicitHeight: contentColumn.implicitHeight + dialogBackground.radius * 2
+        implicitHeight: root.backgroundHeight
         Behavior on implicitHeight {
-            NumberAnimation {
-                id: dialogBackgroundHeightAnimation
-                duration: Appearance.animation.elementMoveFast.duration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: Appearance.animationCurves.emphasizedDecel
-            }
-        }
-        Behavior on y {
-            NumberAnimation {
-                duration: dialogBackgroundHeightAnimation.duration
-                easing.type: dialogBackgroundHeightAnimation.easing.type
-                easing.bezierCurve: dialogBackgroundHeightAnimation.easing.bezierCurve
-            }
+            enabled: dialogBackground.opacity === 1
+            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
         }
 
         MouseArea { // So clicking inside the dialog won't dismiss
@@ -81,11 +64,6 @@ Rectangle {
                 margins: dialogBackground.radius
             }
             spacing: 16
-            opacity: root.show ? 1 : 0
-            Behavior on opacity {
-                animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-            }
-
         }
     }
 }

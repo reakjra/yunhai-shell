@@ -74,6 +74,7 @@ Singleton {
     }
 
     property bool silent: false
+    onSilentChanged: if (Persistent.ready) Persistent.states.notifications.silent = root.silent
     property int unread: 0
     property var filePath: Directories.notificationsPath
     property list<Notif> list: []
@@ -204,6 +205,16 @@ Singleton {
         root.discard(id); // Emit signal
     }
 
+    function discardAppNotifications(appName) {
+        const ids = root.list.filter((notif) => notif.appName === appName).map((notif) => notif.notificationId);
+        root.list = root.list.filter((notif) => notif.appName !== appName);
+        notifFileView.setText(stringifyList(root.list));
+        notifServer.trackedNotifications.values
+            .filter((notif) => ids.includes(notif.id + root.idOffset))
+            .forEach((notif) => notif.dismiss());
+        ids.forEach((id) => root.discard(id));
+    }
+
     function discardAllNotifications() {
         root.list = []
         triggerListChange()
@@ -260,8 +271,21 @@ Singleton {
         notifFileView.reload()
     }
 
+    function load() {
+        if (Persistent.ready)
+            root.silent = Persistent.states.notifications.silent;
+    }
+
+    Connections {
+        target: Persistent
+        function onReadyChanged() {
+            root.load();
+        }
+    }
+
     Component.onCompleted: {
         refresh()
+        load()
     }
 
     FileView {

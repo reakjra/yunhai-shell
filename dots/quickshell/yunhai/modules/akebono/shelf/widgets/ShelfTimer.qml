@@ -25,14 +25,6 @@ Item {
     implicitWidth: pill.implicitWidth
     implicitHeight: barHeight * 0.7
 
-    function fmtClock(totalSec) {
-        return Math.floor(totalSec / 60).toString().padStart(2, "0") + ":" + (totalSec % 60).toString().padStart(2, "0");
-    }
-    function fmtStopwatch(t) {
-        const sec = Math.floor(t / 100);
-        return Math.floor(sec / 60).toString().padStart(2, "0") + ":" + (sec % 60).toString().padStart(2, "0") + "." + (t % 100).toString().padStart(2, "0");
-    }
-
     Squircle {
         id: pill
         anchors.verticalCenter: parent.verticalCenter
@@ -49,7 +41,7 @@ Item {
             Seg {
                 visible: root.showStop
                 icon: root.sRunning ? "timer" : "timer_pause"
-                label: root.fmtStopwatch(TimerService.stopwatchTime)
+                label: TimerService.formatStopwatch(TimerService.stopwatchTime)
                 maxLabel: "00:00.00"
                 running: root.sRunning
                 iconSize: root.segIconSize
@@ -58,7 +50,7 @@ Item {
             Seg {
                 visible: root.showPomo
                 icon: root.pRunning ? "search_activity" : "pause_circle"
-                label: root.fmtClock(TimerService.pomodoroSecondsLeft)
+                label: TimerService.formatClock(TimerService.pomodoroSecondsLeft)
                 running: root.pRunning
                 iconSize: root.segIconSize
                 onToggle: TimerService.togglePomodoro()
@@ -66,7 +58,7 @@ Item {
             Seg {
                 visible: root.showCount
                 icon: root.cRunning ? "hourglass_empty" : "hourglass_disabled"
-                label: root.fmtClock(TimerService.countdownSecondsLeft)
+                label: TimerService.formatClock(TimerService.countdownSecondsLeft)
                 running: root.cRunning
                 iconSize: root.segIconSize
                 onToggle: TimerService.toggleCountdown()

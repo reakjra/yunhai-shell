@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Bluetooth
 import qs
 import qs.services
-import qs.services.network
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.waffle.looks

@@ -115,22 +115,25 @@ Item {
         }
     }
 
-    ToggleDialog {
-        shownPropertyString: "showAudioOutputDialog"
+    WindowDialogLoader {
+        shown: root.showAudioOutputDialog
+        onDismissed: root.showAudioOutputDialog = false
         dialog: VolumeDialog {
             isSink: true
         }
     }
 
-    ToggleDialog {
-        shownPropertyString: "showAudioInputDialog"
+    WindowDialogLoader {
+        shown: root.showAudioInputDialog
+        onDismissed: root.showAudioInputDialog = false
         dialog: VolumeDialog {
             isSink: false
         }
     }
 
-    ToggleDialog {
-        shownPropertyString: "showBluetoothDialog"
+    WindowDialogLoader {
+        shown: root.showBluetoothDialog
+        onDismissed: root.showBluetoothDialog = false
         dialog: BluetoothDialog {}
         onShownChanged: {
             if (!shown) {
@@ -142,51 +145,26 @@ Item {
         }
     }
 
-    ToggleDialog {
-        shownPropertyString: "showNightLightDialog"
+    WindowDialogLoader {
+        shown: root.showNightLightDialog
+        onDismissed: root.showNightLightDialog = false
         dialog: NightLightDialog {}
     }
 
-    ToggleDialog {
-        shownPropertyString: "showWifiDialog"
+    WindowDialogLoader {
+        shown: root.showWifiDialog
+        onDismissed: root.showWifiDialog = false
         dialog: WifiDialog {}
         onShownChanged: {
             if (!shown) return;
             Network.enableWifi();
-            Network.rescanWifi();
         }
     }
 
-    ToggleDialog {
-        shownPropertyString: "showGameModeDialog"
+    WindowDialogLoader {
+        shown: root.showGameModeDialog
+        onDismissed: root.showGameModeDialog = false
         dialog: GameModeDialog {}
-    }
-
-    component ToggleDialog: Loader {
-        id: toggleDialogLoader
-        required property string shownPropertyString
-        property alias dialog: toggleDialogLoader.sourceComponent
-        readonly property bool shown: root[shownPropertyString]
-        anchors.fill: parent
-
-        onShownChanged: if (shown) toggleDialogLoader.active = true;
-        active: shown
-        onActiveChanged: {
-            if (active) {
-                item.show = true;
-                item.forceActiveFocus();
-            }
-        }
-        Connections {
-            target: toggleDialogLoader.item
-            function onDismiss() {
-                toggleDialogLoader.item.show = false
-                root[toggleDialogLoader.shownPropertyString] = false;
-            }
-            function onVisibleChanged() {
-                if (!toggleDialogLoader.item.visible && !root[toggleDialogLoader.shownPropertyString]) toggleDialogLoader.active = false;
-            }
-        }
     }
 
     component LoaderedQuickPanelImplementation: Loader {

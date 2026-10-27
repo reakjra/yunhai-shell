@@ -41,14 +41,11 @@ Column {
         height: section.panel.editMode ? editCol.implicitHeight : 0
         opacity: section.panel.editMode ? 1 : 0
 
-        Behavior on height {
-            NumberAnimation {
-                duration: Appearance.animation.elementMove.duration
-                easing.type: Appearance.animation.elementMove.type
-                easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
-            }
+        MotionBehavior on height {
+            exitMotion: Motion.exit
+            exitTarget: 0
         }
-        Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        MotionBehavior on opacity { motion: Motion.effects }
 
         Column {
             id: editCol
@@ -198,7 +195,7 @@ Column {
                 rotation: section.panel.editMode ? 90 : 0
                 iconSize: 22
                 color: Appearance.colors.colSubtext
-                Behavior on rotation { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                MotionBehavior on rotation { motion: Motion.spatialFast }
             }
             RippleArea {
                 shapeRadius: 16

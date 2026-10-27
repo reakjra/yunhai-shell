@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Networking as QsNet
 import qs
 import qs.services
-import qs.services.network
 import qs.modules.common
 import qs.modules.common.functions
 import qs.modules.common.widgets
@@ -13,7 +13,7 @@ import qs.modules.waffle.actionCenter
 
 ExpandableChoiceButton {
     id: root
-    required property WifiAccessPoint wifiNetwork
+    required property QsNet.WifiNetwork wifiNetwork
 
     contentItem: RowLayout {
         id: contentItem
@@ -22,14 +22,12 @@ ExpandableChoiceButton {
         FluentIcon { // Duotone hack
             Layout.bottomMargin: 2
             Layout.alignment: Qt.AlignTop
-            property int strength: root.wifiNetwork?.strength ?? 0
             icon: "wifi-1"
             implicitSize: 30
             color: Looks.colors.inactiveIcon
 
             FluentIcon { // Signal
-                property int strength: root.wifiNetwork?.strength ?? 0
-                icon: WIcons.wifiIconForStrength(strength)
+                icon: WIcons.wifiIconForStrength(Network.strengthPercent(root.wifiNetwork))
                 implicitSize: 30
 
                 FluentIcon { // Security
@@ -37,7 +35,7 @@ ExpandableChoiceButton {
                         right: parent.right
                         bottom: parent.bottom
                     }
-                    visible: root?.wifiNetwork?.isSecure ?? false
+                    visible: Network.isSecure(root.wifiNetwork)
                     icon: "lock-closed"
                     filled: true
                     implicitSize: 14           
@@ -60,17 +58,17 @@ ExpandableChoiceButton {
                 Layout.fillWidth: true
                 elide: Text.ElideRight
                 font.pixelSize: Looks.font.pixelSize.large
-                text: root.wifiNetwork?.ssid ?? Translation.tr("Unknown")
+                text: root.wifiNetwork.name
                 textFormat: Text.PlainText
             }
             WText { // Status
                 id: statusText
                 Layout.fillWidth: true
                 elide: Text.ElideRight
-                text: root.wifiNetwork?.active ? Translation.tr("Connected") : root.wifiNetwork?.isSecure ? Translation.tr("Secured") : Translation.tr("Not secured")
+                text: root.wifiNetwork.connected ? Translation.tr("Connected") : Network.isSecure(root.wifiNetwork) ? Translation.tr("Secured") : Translation.tr("Not secured")
                 font.pixelSize: Looks.font.pixelSize.large
                 color: Looks.colors.subfg
-                visible: root.wifiNetwork?.active || root.expanded
+                visible: root.wifiNetwork.connected || root.expanded
                 Behavior on opacity {
                     animation: Looks.transition.opacity.createObject(this)
                 }
@@ -80,16 +78,16 @@ ExpandableChoiceButton {
                 Layout.alignment: Qt.AlignRight
                 horizontalAlignment: Text.AlignHCenter
                 visible: root.expanded
-                checked: !(root.wifiNetwork?.active ?? false)
+                checked: !root.wifiNetwork.connected
                 colBackground: Looks.colors.bg2
                 colBackgroundHover: Looks.colors.bg2Hover
                 colBackgroundActive: Looks.colors.bg2Active
                 implicitHeight: 30
                 implicitWidth: 148
-                text: root.wifiNetwork?.active ? Translation.tr("Disconnect") : Translation.tr("Connect")
+                text: root.wifiNetwork.connected ? Translation.tr("Disconnect") : Translation.tr("Connect")
 
                 onClicked: {
-                    if (root.wifiNetwork?.active) {
+                    if (root.wifiNetwork.connected) {
                         Network.disconnectWifiNetwork();
                     } else {
                         Network.connectToWifiNetwork(root.wifiNetwork);

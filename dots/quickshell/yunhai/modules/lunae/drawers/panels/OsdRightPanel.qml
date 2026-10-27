@@ -55,12 +55,8 @@ Item {
     visible: width > 0
     clip: width < naturalWidth
 
-    Behavior on implicitWidth {
-        NumberAnimation {
-            duration: LunaeAppearance.osd.duration
-            easing.type: LunaeAppearance.osd.easingType
-            easing.bezierCurve: LunaeAppearance.osd.curve
-        }
+    MotionBehavior on implicitWidth {
+        motion: Motion.spatialFast
     }
 
     property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)

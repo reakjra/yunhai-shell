@@ -12,6 +12,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 import Quickshell
 import qs.services
+import qs.modules.akebono.chrome
 import qs.modules.common
 import qs.modules.common.desktop
 import qs.modules.common.widgets
@@ -102,7 +103,7 @@ ApplicationWindow {
     Loader {
         anchors.fill: parent
         active: root.ownChrome
-        source: `${root.familyDir}/settings/SettingsChrome.qml`
+        source: `${root.familyDir}/chrome/SettingsChrome.qml`
         onLoaded: {
             item.pages = Qt.binding(() => root.pages);
             item.initialSection = root.initialSection;

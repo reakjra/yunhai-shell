@@ -90,10 +90,7 @@ Item {
                 }
 
                 StyledText {
-                    text: {
-                        const t = TimerService.pomodoroSecondsLeft
-                        return Math.floor(t/60).toString().padStart(2,'0') + "\n" + (t%60).toString().padStart(2,'0')
-                    }
+                    text: TimerService.formatClock(TimerService.pomodoroSecondsLeft, "\n")
                     color: root.colText
                 }
             }
@@ -128,10 +125,7 @@ Item {
                 }
 
                 StyledText {
-                    text: {
-                        const t = TimerService.countdownSecondsLeft
-                        return Math.floor(t/60).toString().padStart(2,'0') + "\n" + (t%60).toString().padStart(2,'0')
-                    }
+                    text: TimerService.formatClock(TimerService.countdownSecondsLeft, "\n")
                     color: root.colText
                 }
             }

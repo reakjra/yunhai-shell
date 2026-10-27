@@ -39,33 +39,25 @@ MouseArea {
     SequentialAnimation {
         id: exitAnim
         ParallelAnimation {
-            NumberAnimation {
+            MotionAnimation {
                 target: background
                 property: "anchors.leftMargin"
                 to: root.width + root.dismissOvershoot
-                duration: Appearance.animationCurves.expressiveDefaultSpatialDuration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: LunaeAppearance.popupCurve
             }
-            NumberAnimation {
+            MotionAnimation {
                 target: background
                 property: "opacity"
                 to: 0
-                duration: Appearance.animationCurves.expressiveDefaultSpatialDuration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: LunaeAppearance.popupCurve
             }
         }
         ScriptAction {
             script: root.implicitHeight = root.implicitHeight
         }
-        NumberAnimation {
+        MotionAnimation {
             target: root
             property: "implicitHeight"
             to: 0
-            duration: LunaeAppearance.notifExpansionDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.notifExpansionCurve
+            motion: Motion.spatialFast
         }
         ScriptAction {
             script: root.exitComplete()
@@ -171,13 +163,9 @@ MouseArea {
             row.implicitHeight + padding * 2 :
             Math.min(80, row.implicitHeight + padding * 2)
 
-        Behavior on implicitHeight {
+        MotionBehavior on implicitHeight {
             id: implicitHeightAnim
-            NumberAnimation {
-                duration: LunaeAppearance.notifExpansionDuration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: LunaeAppearance.notifExpansionCurve
-            }
+            motion: Motion.spatialFast
         }
 
         RowLayout {

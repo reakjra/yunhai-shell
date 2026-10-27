@@ -1,4 +1,5 @@
 pragma ComponentBehavior: Bound
+import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -218,7 +219,12 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.shelf.toggleQuickSettings()
+
+            TapHoldTracker {
+                area: statusMouse
+                onTapped: root.shelf.toggleQuickSettings()
+                onHeld: GlobalStates.controlPanelOpen = true
+            }
         }
     }
 }

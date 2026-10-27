@@ -274,10 +274,11 @@ Item { // Bar content region
         onScrollDown: Audio.decrementVolume();
         onScrollUp: Audio.incrementVolume();
         onMovedAway: GlobalStates.osdVolumeOpen = false;
-        onPressed: event => {
-            if (event.button === Qt.LeftButton) {
-                GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
-            }
+
+        TapHoldTracker {
+            area: barRightSideMouseArea
+            onTapped: GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen
+            onHeld: GlobalStates.controlPanelOpen = true
         }
 
         // Visual content
@@ -325,9 +326,8 @@ Item { // Bar content region
                         animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
                     }
 
-                    onPressed: {
-                        GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
-                    }
+                    onClicked: GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen
+                    holdAction: () => GlobalStates.controlPanelOpen = true
 
                     RowLayout {
                         id: indicatorsRowLayout

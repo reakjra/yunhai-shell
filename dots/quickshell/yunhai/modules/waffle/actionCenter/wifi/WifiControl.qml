@@ -3,9 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import Quickshell
+import Quickshell.Networking as QsNet
 import qs
 import qs.services
-import qs.services.network
 import qs.modules.common
 import qs.modules.common.functions
 import qs.modules.common.widgets
@@ -15,9 +15,8 @@ import qs.modules.waffle.actionCenter
 Item {
     id: root
 
-    Component.onCompleted: {
-        Network.rescanWifi();
-    }
+    Component.onCompleted: Network.setScanWanted(root, true)
+    Component.onDestruction: Network.setScanWanted(root, false)
 
     WPanelPageColumn {
         anchors.fill: parent
@@ -47,17 +46,14 @@ Item {
                             id: toggleSwitch
                             Layout.rightMargin: 12
                             checked: Network.wifiStatus !== "disabled"
-                            onCheckedChanged: {
-                                Network.enableWifi(checked);
-                                Network.rescanWifi();
-                            }
+                            onCheckedChanged: Network.enableWifi(checked)
                         }
                     }
                     FadeLoader {
                         Layout.leftMargin: -4
                         Layout.rightMargin: -4
                         Layout.fillWidth: true
-                        shown: Network.wifiScanning
+                        shown: Network.wifiScanPending
                         visible: true
                         sourceComponent: WIndeterminateProgressBar {}
                     }
@@ -78,7 +74,7 @@ Item {
                         values: Network.friendlyWifiNetworks
                     }
                     delegate: WWifiNetworkItem {
-                        required property WifiAccessPoint modelData
+                        required property QsNet.WifiNetwork modelData
                         wifiNetwork: modelData
                         width: ListView.view.width
                     }
@@ -98,20 +94,6 @@ Item {
                 onClicked: {
                     Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "sidebarLeft", "toggle"]);
                     Quickshell.execDetached(["bash", "-c", Config.options.apps.network]);
-                }
-            }
-            WBorderlessButton {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                enabled: !Network.wifiScanning
-
-                onClicked: {
-                    Network.rescanWifi();
-                }
-
-                contentItem: FluentIcon {
-                    icon: "arrow-counterclockwise"
                 }
             }
         }

@@ -61,7 +61,7 @@ getdate() {
 }
 
 getaudiooutput() {
-    pactl list sources | grep 'Name' | grep 'monitor' | cut -d ' ' -f2
+    echo "$(pactl get-default-sink).monitor"
 }
 getactivemonitor() {
     hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name'
@@ -89,11 +89,21 @@ kill_wf_recorder() {
     sleep 0.5
 }
 
-remux_to_mp4() {
-    local mkv_file="$1"
-    [[ -f "$mkv_file" ]] || return 1
-    local mp4_file="${mkv_file%.mkv}.mp4"
-    ffmpeg -y -loglevel error -i "$mkv_file" -c copy "$mp4_file" && rm -f "$mkv_file"
+finalize_recording() {
+    local file="$1"
+    local cut_seconds="$2"
+    [[ -f "$file" ]] || return 1
+    local trim=()
+    if [[ -n "$cut_seconds" ]]; then
+        local duration keep
+        duration=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$file")
+        keep=$(awk -v d="$duration" -v c="$cut_seconds" 'BEGIN { k = d - c; if (k > 0) printf "%.3f", k }')
+        [[ -n "$keep" ]] && trim=(-t "$keep")
+    fi
+    [[ "$file" == *.mkv || ${#trim[@]} -gt 0 ]] || return 0
+    local mp4_file="${file%.*}.mp4"
+    local tmp_file="${file%.*}.tmp.mp4"
+    ffmpeg -y -loglevel error -i "$file" "${trim[@]}" -c copy "$tmp_file" && rm -f "$file" && mv "$tmp_file" "$mp4_file"
 }
 
 # Build wf-recorder command based on config
@@ -120,6 +130,7 @@ SOUND_FLAG=0
 # parse --region <value> without modifying $@ so other flags like --fullscreen still work
 ARGS=("$@")
 MANUAL_REGION=""
+CUT_FROM_MS=""
 FULLSCREEN_FLAG=0
 for ((i=0;i<${#ARGS[@]};i++)); do
     if [[ "${ARGS[i]}" == "--region" ]]; then
@@ -130,6 +141,8 @@ for ((i=0;i<${#ARGS[@]};i++)); do
             updatestate false
             exit 1
         fi
+    elif [[ "${ARGS[i]}" == "--cut-from" ]]; then
+        CUT_FROM_MS="${ARGS[i+1]}"
     elif [[ "${ARGS[i]}" == "--sound" ]]; then
         SOUND_FLAG=1
     elif [[ "${ARGS[i]}" == "--fullscreen" ]]; then
@@ -137,17 +150,20 @@ for ((i=0;i<${#ARGS[@]};i++)); do
     fi
 done
 
+if [[ -n "$CUT_FROM_MS" ]] && ! pgrep wf-recorder > /dev/null; then
+    exit 0
+fi
+
 if pgrep wf-recorder > /dev/null; then
     notify-send "Recording Stopped" "Stopped" -a 'Recorder' &
     updatestate false
     REC_FILE=""
     [[ -f "$RECORDING_PATH_FILE" ]] && REC_FILE=$(cat "$RECORDING_PATH_FILE")
+    CUT_SECONDS=""
+    [[ -n "$CUT_FROM_MS" ]] && CUT_SECONDS=$(awk -v now="$(date +%s%3N)" -v from="$CUT_FROM_MS" 'BEGIN { if (now > from) printf "%.3f", (now - from) / 1000 }')
     kill_wf_recorder
     rm -f "$RECORDING_PATH_FILE"
-    # Remux mkv → mp4 if needed
-    if [[ -n "$REC_FILE" && "$REC_FILE" == *.mkv ]]; then
-        remux_to_mp4 "$REC_FILE"
-    fi
+    [[ -n "$REC_FILE" ]] && finalize_recording "$REC_FILE" "$CUT_SECONDS"
 else
     # Hardware → mkv (crash-safe) + remux on stop, Software → mp4 directly
     if [[ "$HW_ENCODING" == "true" ]]; then

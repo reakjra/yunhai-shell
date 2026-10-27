@@ -22,7 +22,7 @@ Item {
         radius: 16
         smoothing: AkebonoAppearance.squircleSmoothing
         color: root.on ? Appearance.colors.colSecondaryContainer : Appearance.colors.colLayer2
-        Behavior on color { ColorAnimation { duration: 240; easing.type: Easing.OutCubic } }
+        Behavior on color { animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this) }
     }
     MaterialSymbol {
         anchors.centerIn: parent

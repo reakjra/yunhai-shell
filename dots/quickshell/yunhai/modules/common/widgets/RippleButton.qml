@@ -21,6 +21,7 @@ Button {
     property var downAction // When left clicking (down)
     property var releaseAction // When left clicking (release)
     property var altAction // When right clicking
+    property var holdAction // When left holding
     property var middleClickAction // When middle clicking
 
     property real topLeftRadius: buttonEffectiveRadius
@@ -73,7 +74,8 @@ Button {
         anchors.fill: parent
         cursorShape: root.pointingHandCursor ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-        onPressed: (event) => { 
+        property bool holding: false
+        onPressed: (event) => {
             if(event.button === Qt.RightButton) {
                 if (root.altAction) root.altAction(event);
                 return;
@@ -82,6 +84,7 @@ Button {
                 if (root.middleClickAction) root.middleClickAction();
                 return;
             }
+            holding = false
             root.down = true
             if (root.downAction) root.downAction();
             if (!root.rippleEnabled) return;
@@ -91,10 +94,17 @@ Button {
         onReleased: (event) => {
             root.down = false
             if (event.button != Qt.LeftButton) return;
-            if (root.releaseAction) root.releaseAction();
-            root.click() // Because the MouseArea already consumed the event
+            if (!holding) {
+                if (root.releaseAction) root.releaseAction();
+                root.click() // Because the MouseArea already consumed the event
+            }
             if (!root.rippleEnabled) return;
             rippleFadeAnim.restart();
+        }
+        onPressAndHold: {
+            if (!root.holdAction || !(pressedButtons & Qt.LeftButton)) return;
+            holding = true
+            root.holdAction()
         }
         onCanceled: (event) => {
             root.down = false

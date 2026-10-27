@@ -35,6 +35,5 @@ RowLayout {
     StyledSpinBox {
         id: spinBoxWidget
         Layout.fillWidth: false
-        value: root.value
     }
 }

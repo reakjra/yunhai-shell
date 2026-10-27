@@ -50,8 +50,8 @@ Item {
     implicitWidth: shelfEmpty ? 0 : pill.implicitWidth
     implicitHeight: pillHeight
     Layout.alignment: Qt.AlignVCenter
-    Behavior on implicitHeight {
-        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+    MotionBehavior on implicitHeight {
+        motion: Motion.spatialFast
     }
 
     Squircle {
@@ -61,8 +61,8 @@ Item {
         implicitHeight: root.pillHeight
         radius: root.iconMode ? height / 2 : Math.min(height / 2, 22)
         color: mediaMouse.containsMouse ? AkebonoAppearance.shelfPillHoverColor : AkebonoAppearance.shelfPillColor
-        Behavior on implicitHeight {
-            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+        MotionBehavior on implicitHeight {
+            motion: Motion.spatialFast
         }
 
         Component.onCompleted: root.shelf?.registerMediaAnchor(pill)
@@ -135,8 +135,8 @@ Item {
                 highlightRangeMode: ListView.ApplyRange
                 preferredHighlightBegin: root.lineH
                 preferredHighlightEnd: root.lineH * 2
-                Behavior on implicitWidth {
-                    NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+                MotionBehavior on implicitWidth {
+                    motion: Motion.spatialFast
                 }
 
                 delegate: Item {

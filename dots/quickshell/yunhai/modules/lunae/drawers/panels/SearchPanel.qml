@@ -4,6 +4,7 @@ import QtQuick
 import qs
 import qs.services
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 import qs.modules.lunae.overview
@@ -50,13 +51,7 @@ Item {
         }
     }
 
-    Behavior on progress {
-        NumberAnimation {
-            duration: LunaeAppearance.drawerOpenDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.drawerOpenCurve
-        }
-    }
+    MotionBehavior on progress {}
 
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
@@ -65,6 +60,7 @@ Item {
     implicitWidth: drawerWidth + armpitSize * 2
     implicitHeight: _effH
     visible: progress > 0.004
+    onVisibleChanged: LauncherSearch.setSurfaceVisible(root, root.visible)
     opacity: progress
     transform: Matrix4x4 { matrix: deform.matrix }
 

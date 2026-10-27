@@ -44,6 +44,7 @@ hl.bind(
 	{ description = "Shell: Toggle session menu" }
 )
 hl.bind("SUPER + J", hl.dsp.global("quickshell:barToggle"), { description = "Shell: Toggle bar" })
+hl.bind("SUPER + ALT + I", hl.dsp.global("quickshell:controlPanelToggle"), { description = "Shell: Toggle control panel" })
 hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd(qsIsAlive .. " || pkill wlogout || wlogout -p layer-shell"))
 hl.bind("SHIFT + SUPER + ALT + Slash", hl.dsp.exec_cmd("qs -p $HOME/.config/quickshell/$qsConfig/welcome.qml"))
 

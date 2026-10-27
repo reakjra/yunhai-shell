@@ -11,10 +11,14 @@ Singleton {
 
     enum MonitorSource { Monitor, Input }
 
-    property var monitorSource: SongRec.MonitorSource.Monitor
+    signal recognized(var track)
+
+    readonly property int monitorSource: Config.options.musicRecognition.source
     property int timeoutInterval: Config.options.musicRecognition.interval
     property int timeoutDuration: Config.options.musicRecognition.timeout
     readonly property bool running: recognizeMusicProc.running
+    readonly property var history: Persistent.states.musicRecognition.history.slice()
+    readonly property int historyLimit: 50
 
     function toggleRunning(running) {
         if (recognizeMusicProc.running && !running === true) root.manuallyStopped = true;
@@ -28,10 +32,10 @@ Singleton {
 
     function toggleMonitorSource(source) {
         if (source !== undefined) {
-            root.monitorSource = source
+            Config.options.musicRecognition.source = source
             return
         }
-        root.monitorSource = (root.monitorSource === SongRec.MonitorSource.Monitor) ? SongRec.MonitorSource.Input : SongRec.MonitorSource.Monitor
+        Config.options.musicRecognition.source = (root.monitorSource === SongRec.MonitorSource.Monitor) ? SongRec.MonitorSource.Input : SongRec.MonitorSource.Monitor
     }
     function monitorSourceToString(source) {
         if (source === SongRec.MonitorSource.Monitor) {
@@ -44,6 +48,22 @@ Singleton {
     property var recognizedTrack: ({ title:"", subtitle:"", url:""})
     property bool manuallyStopped: false
 
+    function openShazam(track) {
+        Qt.openUrlExternally(track.url)
+    }
+
+    function openYoutube(track) {
+        Qt.openUrlExternally(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.title} - ${track.subtitle}`)}`)
+    }
+
+    function removeFromHistory(time) {
+        Persistent.states.musicRecognition.history = root.history.filter(track => track.time !== time)
+    }
+
+    function clearHistory() {
+        Persistent.states.musicRecognition.history = []
+    }
+
     function handleRecognition(jsonText) {
         try {
             var obj = JSON.parse(jsonText)
@@ -52,6 +72,8 @@ Singleton {
                 subtitle: obj.track.subtitle,
                 url: obj.track.url
             }
+            Persistent.states.musicRecognition.history = [Object.assign({ time: Date.now() }, root.recognizedTrack), ...root.history].slice(0, root.historyLimit)
+            root.recognized(root.recognizedTrack)
             musicReconizedProc.running = true
         } catch(e) {
             Quickshell.execDetached(["notify-send", Translation.tr("Couldn't recognize music"), Translation.tr("Perhaps what you're listening to is too niche"), "-a", "Shell"])
@@ -93,9 +115,9 @@ Singleton {
             onStreamFinished: {
                 if (this.text === "") return
                 if (this.text == 0) {
-                    Qt.openUrlExternally(root.recognizedTrack.url);
+                    root.openShazam(root.recognizedTrack);
                 } else {
-                    Qt.openUrlExternally("https://www.youtube.com/results?search_query=" + root.recognizedTrack.title + " - " + root.recognizedTrack.subtitle);
+                    root.openYoutube(root.recognizedTrack);
                 }
             }
         }

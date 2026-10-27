@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.services
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae.widgets
 
 Item {
@@ -107,10 +108,7 @@ Item {
 
         Behavior on implicitHeight {
             enabled: viewHost.morphing
-            NumberAnimation {
-                duration: Appearance.animation.elementMove.duration
-                easing.type: Appearance.animation.elementMove.type
-                easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
+            MotionAnimation {
                 onFinished: viewHost.morphing = false
             }
         }

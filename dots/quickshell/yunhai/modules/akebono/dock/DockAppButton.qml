@@ -1,6 +1,7 @@
 import qs.services
 import qs.modules.common
 import qs.modules.common.functions
+import qs.modules.common.widgets
 import qs.modules.akebono
 import QtQuick
 import Qt5Compat.GraphicalEffects
@@ -50,13 +51,13 @@ Item {
 
     z: root.dragging ? 2 : 1
     opacity: root.spawned ? 1 : 0
-    Behavior on opacity {
+    MotionBehavior on opacity {
         enabled: root.fadeIn
-        NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+        motion: Motion.effects
     }
-    Behavior on x {
+    MotionBehavior on x {
         enabled: root.ready && !root.dragging
-        NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+        motion: Motion.spatialFast
     }
 
     Binding {
@@ -68,8 +69,8 @@ Item {
 
     transformOrigin: Item.Bottom
     scale: appMouseArea.containsMouse && !root.dragging ? 1.1 : 1.0
-    Behavior on scale {
-        NumberAnimation { duration: 130; easing.type: Easing.OutCubic }
+    MotionBehavior on scale {
+        motion: Motion.spatialFast
     }
 
     IconImage {
@@ -112,11 +113,11 @@ Item {
             : ColorUtils.transparentize(Appearance.colors.colOnLayer0, 0.4)
         border.width: root.minimized ? 1.5 : 0
         border.color: ColorUtils.transparentize(Appearance.colors.colOnLayer0, 0.3)
-        Behavior on implicitWidth {
-            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+        MotionBehavior on implicitWidth {
+            motion: Motion.spatialFast
         }
-        Behavior on implicitHeight {
-            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+        MotionBehavior on implicitHeight {
+            motion: Motion.spatialFast
         }
     }
 

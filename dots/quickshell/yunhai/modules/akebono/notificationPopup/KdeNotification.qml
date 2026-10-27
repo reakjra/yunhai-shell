@@ -66,14 +66,11 @@ MouseArea {
         }
     }
 
-    NumberAnimation {
+    MotionAnimation {
         id: slideOut
         target: card
         property: "x"
         to: root.width
-        duration: Appearance.animation.elementMove.duration
-        easing.type: Appearance.animation.elementMove.type
-        easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
         onFinished: root.dismiss()
     }
 
@@ -86,9 +83,8 @@ MouseArea {
         border.width: 1
         border.color: Appearance.colors.colLayer0Border
 
-        Behavior on x {
+        MotionBehavior on x {
             enabled: !root.drag.active
-            animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
         }
 
         ColumnLayout {

@@ -60,6 +60,5 @@ void main() {
     }
 
     float coverage = clamp(0.5 - d, 0.0, 1.0);
-    float a = color.a * coverage * qt_Opacity;
-    fragColor = vec4(color.rgb * a, a);
+    fragColor = color * (coverage * qt_Opacity);
 }

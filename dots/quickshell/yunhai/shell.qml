@@ -72,6 +72,8 @@ ShellRoot {
 
     PanelFamilyPicker {}
 
+    ControlPanelWindow {}
+
     HyprbarsManager {}
 
 

@@ -158,27 +158,25 @@ Item {
         }
     }
 
-    Behavior on subCY { enabled: root.subProgress > 0.5; NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-    Behavior on subHH { enabled: root.subProgress > 0.5; NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-    Behavior on crossA { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-    Behavior on crossB { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    MotionBehavior on subCY { enabled: root.subProgress > 0.5; motion: Motion.spatialFast }
+    MotionBehavior on subHH { enabled: root.subProgress > 0.5; motion: Motion.spatialFast }
+    MotionBehavior on crossA { motion: Motion.effects }
+    MotionBehavior on crossB { motion: Motion.effects }
 
-    NumberAnimation {
+    MotionAnimation {
         id: growAnim
         target: root
         property: "subProgress"
         from: 0
         to: 1
-        duration: 210
-        easing.type: Easing.OutCubic
+        motion: Motion.spatialFast
     }
-    NumberAnimation {
+    MotionAnimation {
         id: closeSubAnim
         target: root
         property: "subProgress"
         to: 0
-        duration: 380
-        easing.type: Easing.OutCubic
+        motion: Motion.exit
         onFinished: root.submenuIndex = -1
     }
     NumberAnimation {
@@ -204,7 +202,7 @@ Item {
         width: root.menuW
         height: root.menuH
         opacity: root.showing ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+        MotionBehavior on opacity { motion: Motion.effects }
 
         ShaderEffect {
             anchors.fill: parent

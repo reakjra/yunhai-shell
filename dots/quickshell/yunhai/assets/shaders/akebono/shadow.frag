@@ -13,6 +13,7 @@ layout(std140, binding = 0) uniform buf {
     float spread;
     vec2 boxHalf;
     vec2 boxCenter;
+    vec2 cutoutCenter;
 };
 
 float sdSquircle(vec2 p, vec2 b, float r, float n) {
@@ -27,7 +28,7 @@ void main() {
     float n = max(smoothing, 2.0);
     float rB = min(radius, min(boxHalf.x, boxHalf.y));
     float d = sdSquircle(P - boxCenter, boxHalf, rB, n);
-    float coverage = 1.0 - smoothstep(-spread, spread, d);
-    float a = color.a * coverage * qt_Opacity;
-    fragColor = vec4(color.rgb * a, a);
+    float cardD = sdSquircle(P - cutoutCenter, boxHalf, rB, n);
+    float coverage = (1.0 - smoothstep(-spread, spread, d)) * smoothstep(-0.5, 0.5, cardD);
+    fragColor = color * (coverage * qt_Opacity);
 }

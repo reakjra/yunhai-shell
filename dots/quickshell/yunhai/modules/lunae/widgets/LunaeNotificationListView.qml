@@ -18,7 +18,7 @@ StyledListView {
     property bool expanding: false
     Timer {
         id: expandResetTimer
-        interval: LunaeAppearance.notifExpansionDuration
+        interval: Motion.spatialFast.duration
         onTriggered: root.expanding = false
     }
 
@@ -70,28 +70,19 @@ StyledListView {
     }
 
     add: Transition {
-        NumberAnimation {
+        MotionAnimation {
             property: "x"
             from: root.width
-            duration: Appearance.animationCurves.expressiveDefaultSpatialDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.popupCurve
         }
-        NumberAnimation {
+        MotionAnimation {
             property: "opacity"
             from: 0; to: 1
-            duration: Appearance.animationCurves.expressiveDefaultSpatialDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.popupCurve
         }
     }
 
     addDisplaced: Transition {
-        NumberAnimation {
+        MotionAnimation {
             property: "y"
-            duration: Appearance.animationCurves.expressiveDefaultSpatialDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.popupCurve
         }
     }
 

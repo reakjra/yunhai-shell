@@ -69,6 +69,7 @@ Item {
         property real spread: shadowFx.spreadPx
         property vector2d boxHalf: Qt.vector2d(root.width / 2, root.height / 2)
         property vector2d boxCenter: Qt.vector2d(width / 2, height / 2)
+        property vector2d cutoutCenter: Qt.vector2d(width / 2, height / 2 - shadowFx.offY)
         fragmentShader: Quickshell.shellPath("assets/shaders/akebono/shadow.frag.qsb")
     }
 

@@ -1,24 +1,27 @@
 import qs
 import qs.services
-import qs.services.network
 import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Networking as QsNet
 
 WindowDialog {
     id: root
     backgroundHeight: 600
 
+    Component.onCompleted: Network.setScanWanted(root, true)
+    Component.onDestruction: Network.setScanWanted(root, false)
+
     WindowDialogTitle {
         text: Translation.tr("Connect to Wi-Fi")
     }
     WindowDialogSeparator {
-        visible: !Network.wifiScanning
+        visible: !Network.wifiScanPending
     }
     StyledIndeterminateProgressBar {
-        visible: Network.wifiScanning
+        visible: Network.wifiScanPending
         Layout.fillWidth: true
         Layout.topMargin: -8
         Layout.bottomMargin: -8
@@ -40,7 +43,7 @@ WindowDialog {
             values: Network.friendlyWifiNetworks
         }
         delegate: WifiNetworkItem {
-            required property WifiAccessPoint modelData
+            required property QsNet.WifiNetwork modelData
             wifiNetwork: modelData
             width: ListView.view.width
         }

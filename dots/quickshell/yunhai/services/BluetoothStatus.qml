@@ -9,6 +9,62 @@ import QtQuick
 Singleton {
     id: root
 
+    readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
+    readonly property bool discovering: root.adapter?.discovering ?? false
+    property BluetoothDevice pairTarget: null
+    property var _discoveryConsumers: new Set()
+    property int _discoveryDemand: 0
+
+    function setDiscoveryWanted(obj, on): void {
+        if (on)
+            root._discoveryConsumers.add(obj);
+        else
+            root._discoveryConsumers.delete(obj);
+        root._discoveryDemand = root._discoveryConsumers.size;
+    }
+
+    function setEnabled(enabled: bool): void {
+        if (root.adapter)
+            root.adapter.enabled = enabled;
+    }
+
+    function isBusy(device): bool {
+        return device.pairing || device.state === BluetoothDeviceState.Connecting || device.state === BluetoothDeviceState.Disconnecting;
+    }
+
+    function batterySymbol(device): string {
+        return device.battery >= 0.95 ? "battery_full" : `battery_${Math.round(device.battery * 6)}_bar`;
+    }
+
+    function pairAndConnect(device: BluetoothDevice): void {
+        root.pairTarget = device;
+        device.pair();
+    }
+
+    Binding {
+        target: root.adapter
+        property: "discovering"
+        value: true
+        when: root.adapter?.state === BluetoothAdapterState.Enabled && root._discoveryDemand > 0
+    }
+
+    Connections {
+        target: root.pairTarget
+
+        function onPairedChanged() {
+            if (!root.pairTarget.paired)
+                return;
+            root.pairTarget.trusted = true;
+            root.pairTarget.connect();
+            root.pairTarget = null;
+        }
+
+        function onPairingChanged() {
+            if (!root.pairTarget.pairing && !root.pairTarget.paired)
+                root.pairTarget = null;
+        }
+    }
+
     readonly property bool available: Bluetooth.adapters.values.length > 0
     readonly property bool enabled: Bluetooth.defaultAdapter?.enabled ?? false
     readonly property BluetoothDevice firstActiveDevice: Bluetooth.defaultAdapter?.devices.values.find(device => device.connected) ?? null

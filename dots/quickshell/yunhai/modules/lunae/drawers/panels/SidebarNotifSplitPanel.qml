@@ -38,12 +38,8 @@ Panel {
 
     implicitHeight: naturalHeight
 
-    Behavior on implicitHeight {
-        NumberAnimation {
-            duration: LunaeAppearance.notifExpansionDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.notifExpansionCurve
-        }
+    MotionBehavior on implicitHeight {
+        motion: Motion.spatialFast
     }
 
     ColumnLayout {

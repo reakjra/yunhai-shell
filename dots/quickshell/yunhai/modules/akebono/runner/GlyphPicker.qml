@@ -34,7 +34,7 @@ Scope {
 
     Timer {
         id: exitTimer
-        interval: Appearance.animation.elementMoveFast.duration
+        interval: Motion.exitFast.duration
     }
 
     function close(): void {
@@ -107,7 +107,7 @@ Scope {
                         onClicked: root.close()
                     }
 
-                    Squircle {
+                    RevealSquircle {
                         id: surface
                         x: Math.max(root.screenMargin, Math.min(root.cursorX - screenScope.modelData.x, pickerWindow.width - root.surfaceWidth - root.screenMargin))
                         y: Math.max(root.screenMargin, Math.min(root.cursorY - screenScope.modelData.y, pickerWindow.height - root.surfaceHeight - root.screenMargin))
@@ -116,24 +116,14 @@ Scope {
                         color: Appearance.colors.colLayer0
                         radius: Appearance.rounding.normal
                         smoothing: AkebonoAppearance.squircleSmoothing
+                        shown: root.shown
+                        transformOrigin: Item.TopLeft
 
                         readonly property string query: searchInput.text
                         readonly property var source: LauncherSearch.glyphSourceFor(surface.query) ?? LauncherSearch.glyphSources[0]
                         readonly property var entries: LauncherSearch.glyphEntries(surface.query, surface.source)
 
-                        property bool revealed: false
-                        opacity: surface.revealed && root.shown ? 1 : 0
-                        layer.enabled: surface.opacity < 1
-                        layer.smooth: true
-
-                        Behavior on opacity {
-                            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                        }
-
-                        Component.onCompleted: {
-                            surface.revealed = true;
-                            searchInput.forceActiveFocus();
-                        }
+                        Component.onCompleted: searchInput.forceActiveFocus()
 
                         MouseArea {
                             anchors.fill: parent

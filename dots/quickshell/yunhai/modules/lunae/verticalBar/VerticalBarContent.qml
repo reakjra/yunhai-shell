@@ -220,10 +220,11 @@ Item {
         onScrollDown: Audio.decrementVolume();
         onScrollUp: Audio.incrementVolume();
         onMovedAway: GlobalStates.osdVolumeOpen = false;
-        onPressed: event => {
-            if (event.button === Qt.LeftButton) {
-                GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
-            }
+
+        TapHoldTracker {
+            area: barBottomSectionMouseArea
+            onTapped: GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen
+            onHeld: GlobalStates.controlPanelOpen = true
         }
 
         ColumnLayout {

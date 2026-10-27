@@ -17,13 +17,13 @@ Singleton {
 
     readonly property real gammaLowerLimit: 25
 
-    property string from: Config.options?.light?.night?.from ?? "19:00"
-    property string to: Config.options?.light?.night?.to ?? "06:30"
-    property bool automatic: Config.options?.light?.night?.automatic && (Config?.ready ?? true)
-    property int colorTemperature: Config.options?.light?.night?.colorTemperature ?? 5000
+    property string from: Config.options.light.night.from
+    property string to: Config.options.light.night.to
+    property bool automatic: Config.options.light.night.automatic && Config.ready
+    property int colorTemperature: Config.options.light.night.colorTemperature
     property bool shouldBeOn
     property bool firstEvaluation: true
-    property int gamma: 100
+    readonly property int gamma: Config.options.light.gamma
     property bool temperatureActive: false
 
     property int fromHour: Number(from.split(":")[0])
@@ -39,6 +39,8 @@ Singleton {
     property int manualActiveMinute
 
     onClockMinuteChanged: reEvaluate()
+    onFromChanged: reEvaluate()
+    onToChanged: reEvaluate()
     onAutomaticChanged: {
         root.manualActive = undefined;
         root.firstEvaluation = true;
@@ -88,7 +90,11 @@ Singleton {
 
     function load() {
         root.startHyprsunset();
-        root.ensureState();
+        updateHyprsunset.restart();
+    }
+
+    function setScheduleTime(edge: string, hour: int, minute: int): void {
+        Config.options.light.night[edge] = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
     }
 
     Timer {
@@ -115,7 +121,7 @@ Singleton {
     }
 
     function setGamma(gamma) {
-        root.gamma = Math.max(root.gammaLowerLimit, Math.min(100, gamma));
+        Config.options.light.gamma = Math.round(Math.max(root.gammaLowerLimit, Math.min(100, gamma)));
 
         root.gammaChangeAttempt();
 

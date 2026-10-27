@@ -129,6 +129,17 @@ ContentPage {
                 onValueChanged: Config.options.squircle.smoothing = value
             }
         }
+
+        ContentSubsection {
+            title: Translation.tr("Motion")
+
+            ConfigSwitch {
+                buttonIcon: "animation"
+                text: Translation.tr("Bouncy animations")
+                checked: Config.options.motion.bouncy
+                onCheckedChanged: Config.options.motion.bouncy = checked
+            }
+        }
     }
 
     ContentSection {
@@ -233,6 +244,13 @@ ContentPage {
             placeholderText: Translation.tr("Title font, empty follows the title font")
             text: hyprbarsSection.cfg.font
             onEditingFinished: hyprbarsSection.cfg.font = text
+        }
+        MaterialTextField {
+            Layout.fillWidth: true
+            visible: hyprbarsSection.enabledHere
+            placeholderText: Translation.tr("Bar color, a theme color like surface or a hex, empty follows term0")
+            text: hyprbarsSection.cfg.barColor
+            onEditingFinished: hyprbarsSection.cfg.barColor = text
         }
     }
 

@@ -6,12 +6,13 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.panels.quickToggles
 import qs.modules.ii.overlay
 
 StyledOverlayWidget {
     id: root
-    minimumWidth: 310
-    minimumHeight: 130
+    minimumWidth: contentColumn.implicitWidth + contentItem.padding * 2
+    minimumHeight: contentColumn.implicitHeight + contentItem.padding * 2
 
     contentItem: OverlayBackground {
         id: contentItem
@@ -19,7 +20,8 @@ StyledOverlayWidget {
         property real padding: 8
         ColumnLayout {
             id: contentColumn
-            anchors.centerIn: parent
+            anchors.fill: parent
+            anchors.margins: contentItem.padding
             spacing: 10
 
             Row {
@@ -49,18 +51,30 @@ StyledOverlayWidget {
                     name: "Record region"
                     onClicked: {
                         GlobalStates.overlayOpen = false;
-                        Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "recordWithSound"]);
+                        Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "record"]);
                     }
                 }
-                
+
                 BigRecorderButton {
                     materialSymbol: "capture"
                     name: "Record screen"
                     onClicked: {
                         GlobalStates.overlayOpen = false;
-                        Quickshell.execDetached([Directories.recordScriptPath, "--fullscreen", "--sound"]);
+                        Quickshell.execDetached([Directories.recordScriptPath, "--fullscreen"]);
                     }
                 }
+            }
+
+            RecordDialog {
+                Layout.fillWidth: true
+            }
+
+            DialogConfigSwitch {
+                Layout.fillWidth: true
+                buttonIcon: "stop_circle"
+                text: Translation.tr("Stop when the overlay opens")
+                checked: Config.options.screenRecord.stopOnOverlayOpen
+                onCheckedChanged: Config.options.screenRecord.stopOnOverlayOpen = checked
             }
 
             RippleButton {

@@ -331,7 +331,7 @@ Item {
                 }
 
                 displaced: Transition {
-                    NumberAnimation { properties: "y"; duration: 200; easing.type: Easing.OutCubic }
+                    MotionAnimation { properties: "y"; motion: Motion.spatialFast }
                 }
             }
         }

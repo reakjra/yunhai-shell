@@ -71,7 +71,8 @@ Scope {
                         || (Config.options?.dock.smartHide
                             ? !dockOcclusion.occluded
                             : !ToplevelManager.activeToplevel?.activated)
-                    property real hideOffset: reveal ? 0 : (dockStripHeight + bottomGap)
+                    readonly property real hiddenOffset: dockStripHeight + bottomGap
+                    property real hideOffset: reveal ? 0 : hiddenOffset
 
                     property real bumpProgress: 0
                     property real bumpX: dockSurface.width / 2
@@ -91,9 +92,7 @@ Scope {
                     readonly property real popupDetach: detachEnable * Math.max(0, Math.min(1, (bumpProgress - 0.55) / 0.45))
                     readonly property real popupLift: popupDetach * popupGap
 
-                    Behavior on detachEnable {
-                        NumberAnimation { duration: 380; easing.type: Easing.OutCubic }
-                    }
+                    MotionBehavior on detachEnable {}
 
                     function fireRipple(localX, amp, dur, halfW = 0) {
                         dockRoot.waveAmp = amp;
@@ -122,15 +121,19 @@ Scope {
                         }
                     }
 
-                    Behavior on hideOffset {
-                        NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                    MotionBehavior on hideOffset {
+                        motion: Motion.spatialFast
+                        exitMotion: Motion.exitFast
+                        exitTarget: dockRoot.hiddenOffset
                     }
-                    Behavior on bumpProgress {
-                        NumberAnimation { duration: 260; easing.type: Easing.OutCubic }
+                    MotionBehavior on bumpProgress {
+                        motion: Motion.spatialFast
+                        exitMotion: Motion.exitFast
+                        exitTarget: 0
                     }
-                    Behavior on bumpX {
+                    MotionBehavior on bumpX {
                         enabled: dockRoot.slideBump
-                        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                        motion: Motion.spatialFast
                     }
 
                     Timer {

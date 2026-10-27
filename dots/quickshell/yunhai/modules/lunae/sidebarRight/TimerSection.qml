@@ -66,11 +66,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.pixelSize: 32
                                 color: Appearance.m3colors.m3onSurface
-                                text: {
-                                    const mins = Math.floor(TimerService.pomodoroSecondsLeft / 60).toString().padStart(2, '0')
-                                    const secs = Math.floor(TimerService.pomodoroSecondsLeft % 60).toString().padStart(2, '0')
-                                    return `${mins}:${secs}`
-                                }
+                                text: TimerService.formatClock(TimerService.pomodoroSecondsLeft)
                             }
 
                             StyledText {
@@ -172,17 +168,12 @@ Item {
                         StyledText {
                             font.pixelSize: 32
                             color: Appearance.m3colors.m3onSurface
-                            text: {
-                                const total = Math.floor(TimerService.stopwatchTime) / 100
-                                const mins = Math.floor(total / 60).toString().padStart(2, '0')
-                                const secs = Math.floor(total % 60).toString().padStart(2, '0')
-                                return `${mins}:${secs}`
-                            }
+                            text: TimerService.formatClock(TimerService.stopwatchTime / 100)
                         }
                         StyledText {
                             font.pixelSize: 32
                             color: Appearance.colors.colSubtext
-                            text: `.${(Math.floor(TimerService.stopwatchTime) % 100).toString().padStart(2, '0')}`
+                            text: `.${TimerService.formatCentiseconds(TimerService.stopwatchTime)}`
                         }
                     }
 
@@ -224,14 +215,7 @@ Item {
                                     }
                                     StyledText {
                                         font.pixelSize: Appearance.font.pixelSize.smaller
-                                        text: {
-                                            const t = lapItem.modelData
-                                            const cs = (Math.floor(t) % 100).toString().padStart(2, '0')
-                                            const total = Math.floor(t) / 100
-                                            const mins = Math.floor(total / 60).toString().padStart(2, '0')
-                                            const secs = Math.floor(total % 60).toString().padStart(2, '0')
-                                            return `${mins}:${secs}.${cs}`
-                                        }
+                                        text: TimerService.formatStopwatch(lapItem.modelData)
                                     }
                                     Item { Layout.fillWidth: true }
                                     StyledText {
@@ -240,12 +224,7 @@ Item {
                                         text: {
                                             const origIdx = TimerService.stopwatchLaps.length - lapItem.index - 1
                                             const prev = origIdx > 0 ? TimerService.stopwatchLaps[origIdx - 1] : 0
-                                            const delta = lapItem.modelData - prev
-                                            const cs = (Math.floor(delta) % 100).toString().padStart(2, '0')
-                                            const total = Math.floor(delta) / 100
-                                            const mins = Math.floor(total / 60).toString().padStart(2, '0')
-                                            const secs = Math.floor(total % 60).toString().padStart(2, '0')
-                                            return `+${mins === "00" ? "" : mins + ":"}${secs}.${cs}`
+                                            return `+${TimerService.formatStopwatch(lapItem.modelData - prev).replace(/^00:/, "")}`
                                         }
                                     }
                                 }
@@ -481,11 +460,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.pixelSize: 40
                                 color: TimerService.countdownRunning ? Appearance.m3colors.m3onSurface : Appearance.colors.colSubtext
-                                text: {
-                                    const mins = Math.floor(TimerService.countdownSecondsLeft / 60).toString().padStart(2, '0')
-                                    const secs = Math.floor(TimerService.countdownSecondsLeft % 60).toString().padStart(2, '0')
-                                    return `${mins}:${secs}`
-                                }
+                                text: TimerService.formatClock(TimerService.countdownSecondsLeft)
                             }
 
                             StyledProgressBar {

@@ -13,6 +13,7 @@ SpinBox {
     property real radius: Appearance.rounding.small
     property real innerButtonRadius: Appearance.rounding.unsharpen
     editable: true
+    textFromValue: value => String(value)
 
     opacity: root.enabled ? 1 : 0.4
 
@@ -28,7 +29,7 @@ SpinBox {
         StyledTextInput {
             id: labelText
             anchors.centerIn: parent
-            text: root.value // displayText would make the numbers weird like 1,000 instead of 1000
+            text: root.textFromValue(root.value, root.locale)
             color: Appearance.colors.colOnLayer2
             font.family: Appearance.font.family.numbers
             font.variableAxes: Appearance.font.variableAxes.numbers

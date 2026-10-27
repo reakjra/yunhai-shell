@@ -60,32 +60,25 @@ Scope {
             }
 
             add: Transition {
-                NumberAnimation {
+                MotionAnimation {
                     property: "opacity"
                     from: 0
                     to: 1
-                    duration: Appearance.animation.elementMove.duration
-                    easing.type: Appearance.animation.elementMove.type
-                    easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
+                    motion: Motion.effects
                 }
             }
 
             remove: Transition {
-                NumberAnimation {
+                MotionAnimation {
                     property: "opacity"
                     to: 0
-                    duration: Appearance.animation.elementMove.duration
-                    easing.type: Appearance.animation.elementMove.type
-                    easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
+                    motion: Motion.effects
                 }
             }
 
             displaced: Transition {
-                NumberAnimation {
+                MotionAnimation {
                     properties: "x,y"
-                    duration: Appearance.animation.elementMove.duration
-                    easing.type: Appearance.animation.elementMove.type
-                    easing.bezierCurve: Appearance.animation.elementMove.bezierCurve
                 }
             }
         }

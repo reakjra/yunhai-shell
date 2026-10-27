@@ -140,8 +140,9 @@ Scope {
                     }
 
                     property real anim: 0
-                    Behavior on anim {
-                        NumberAnimation { duration: 440; easing.type: Easing.OutCubic }
+                    MotionBehavior on anim {
+                        exitMotion: Motion.exit
+                        exitTarget: 0
                     }
 
                     Connections {
@@ -282,9 +283,9 @@ Scope {
                                 yScale: 0.92 + 0.08 * ovRoot.anim
                             }
 
-                            Behavior on contentX {
+                            MotionBehavior on contentX {
                                 enabled: ovRoot.anim > 0.9 && !flick.dragging && !flick.flicking
-                                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                motion: Motion.spatialFast
                             }
 
                             Item {
@@ -322,6 +323,7 @@ Scope {
                                             property real spread: 15
                                             property vector2d boxHalf: Qt.vector2d(wsCard.width / 2, wsCard.height / 2)
                                             property vector2d boxCenter: Qt.vector2d(width / 2, height / 2)
+                                            property vector2d cutoutCenter: Qt.vector2d(width / 2, height / 2 - cardShadow.offY)
                                             fragmentShader: Quickshell.shellPath("assets/shaders/akebono/shadow.frag.qsb")
                                         }
 

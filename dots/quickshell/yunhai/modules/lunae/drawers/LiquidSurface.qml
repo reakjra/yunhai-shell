@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.widgets
 
@@ -47,9 +48,7 @@ ShaderEffect {
     property real shadowSoftness: 8
 
     property real hugT: panels.barPopupPanel.hugBottom ? 1 : 0
-    Behavior on hugT {
-        LunaeAnim {}
-    }
+    MotionBehavior on hugT {}
 
     property vector4d s0g: barProgress > 0.004 && (frameOn || flushBarBody)
         ? Qt.vector4d(barWidth * barProgress - barWidth / 2, height / 2, barWidth / 2, height / 2)

@@ -13,12 +13,8 @@ GroupButton {
     buttonRadius: toggled ? Appearance?.rounding.small : Appearance?.rounding.verysmall
     buttonRadiusPressed: Appearance?.rounding?.unsharpenmore
 
-    Behavior on radius {
-        NumberAnimation {
-            duration: LunaeAppearance.morphDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.morphCurve
-        }
+    MotionBehavior on radius {
+        motion: Motion.spatialFast
     }
 
     contentItem: MaterialSymbol {
@@ -36,7 +32,7 @@ GroupButton {
 
         Behavior on fill {
             NumberAnimation {
-                duration: LunaeAppearance.morphDuration
+                duration: Motion.spatialFast.duration
                 easing.type: Easing.OutCubic
             }
         }

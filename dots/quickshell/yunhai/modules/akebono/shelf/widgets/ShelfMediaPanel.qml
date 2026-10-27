@@ -248,7 +248,7 @@ Item {
             iconSize: 21
             color: Appearance.colors.colOnLayer0
             rotation: ct.shown ? 180 : 0
-            Behavior on rotation { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+            MotionBehavior on rotation { motion: Motion.spatialFast }
         }
         MouseArea {
             id: ctMa

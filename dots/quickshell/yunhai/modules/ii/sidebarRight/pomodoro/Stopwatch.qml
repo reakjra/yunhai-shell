@@ -54,20 +54,13 @@ Item {
                 // Layout.preferredWidth: elapsedIndicator.width * 0.6 // Prevent shakiness
                 font.pixelSize: 40
                 color: Appearance.m3colors.m3onSurface
-                text: {
-                    let totalSeconds = Math.floor(TimerService.stopwatchTime) / 100
-                    let minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                    let seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                    return `${minutes}:${seconds}`
-                }
+                text: TimerService.formatClock(TimerService.stopwatchTime / 100)
             }
             StyledText {
                 Layout.fillWidth: true
                 font.pixelSize: 40
                 color: Appearance.colors.colSubtext
-                text: {
-                    return `:<sub>${(Math.floor(TimerService.stopwatchTime) % 100).toString().padStart(2, '0')}</sub>`
-                }
+                text: `:<sub>${TimerService.formatCentiseconds(TimerService.stopwatchTime)}</sub>`
             }
         }
 
@@ -120,14 +113,7 @@ Item {
 
                     StyledText {
                         font.pixelSize: Appearance.font.pixelSize.small
-                        text: {
-                            const lapTime = lapItem.modelData
-                            const _10ms = (Math.floor(lapTime) % 100).toString().padStart(2, '0')
-                            const totalSeconds = Math.floor(lapTime) / 100
-                            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                            const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                            return `${minutes}:${seconds}.${_10ms}`
-                        }
+                        text: TimerService.formatStopwatch(lapItem.modelData)
                     }
 
                     Item { Layout.fillWidth: true }
@@ -138,12 +124,7 @@ Item {
                         text: {
                             const originalIndex = TimerService.stopwatchLaps.length - lapItem.index - 1
                             const lastTime = originalIndex > 0 ? TimerService.stopwatchLaps[originalIndex - 1] : 0
-                            const lapTime = lapItem.modelData - lastTime
-                            const _10ms = (Math.floor(lapTime) % 100).toString().padStart(2, '0')
-                            const totalSeconds = Math.floor(lapTime) / 100
-                            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                            const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                            return `+${minutes == "00" ? "" : minutes + ":"}${seconds}.${_10ms}`
+                            return `+${TimerService.formatStopwatch(lapItem.modelData - lastTime).replace(/^00:/, "")}`
                         }
                     }
                 }

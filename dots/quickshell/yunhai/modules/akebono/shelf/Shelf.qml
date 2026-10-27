@@ -23,6 +23,11 @@ import Quickshell.Io
 Scope {
     id: root
 
+    component PopupBehavior: MotionBehavior {
+        exitMotion: Motion.exit
+        exitTarget: 0
+    }
+
     component PopupContainer: Item {
         id: pc
         required property var shelf
@@ -106,6 +111,7 @@ Scope {
                     property real launcherProgress: 0
                     property real launcherRawX: 0
                     readonly property bool launcherActive: shelfRoot.runnerOpen || launcherProgress > 0.001
+                    onLauncherActiveChanged: LauncherSearch.setSurfaceVisible(shelfRoot, shelfRoot.launcherActive)
                     readonly property real bumpRoom: Math.max(250, launcherFullH + 40)
                     readonly property real bottomGap: Appearance.sizes.hyprlandGapsOut
                     readonly property string shape: Config.options.akebono?.shelf.shape ?? "inverseHug"
@@ -132,9 +138,7 @@ Scope {
                     readonly property real popupDetach: detachEnable * Math.max(0, Math.min(1, (activePopupProgress - 0.55) / 0.45))
                     readonly property real popupLift: popupDetach * popupGap
 
-                    Behavior on detachEnable {
-                        NumberAnimation { duration: 380; easing.type: Easing.OutCubic }
-                    }
+                    MotionBehavior on detachEnable {}
 
                     readonly property real previewInset: 8
                     readonly property var previewClient: HyprlandData.clientForToplevel(previewCard.toplevel)
@@ -208,8 +212,8 @@ Scope {
                     property real mediaProgress: 0
                     readonly property bool mediaActive: mediaOpen || mediaProgress > 0.001
 
-                    Behavior on mediaFullH {
-                        NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
+                    MotionBehavior on mediaFullH {
+                        motion: Motion.spatialFast
                     }
 
                     property vector4d mediaAudio: Qt.vector4d(0, 0, 0, 0)
@@ -502,34 +506,22 @@ Scope {
                         m.lyricsShown = !m.lyricsShown;
                     }
 
-                    Behavior on bumpProgress {
-                        NumberAnimation { duration: 260; easing.type: Easing.OutCubic }
+                    MotionBehavior on bumpProgress {
+                        motion: Motion.spatialFast
+                        exitMotion: Motion.exitFast
+                        exitTarget: 0
                     }
-                    Behavior on bumpX {
+                    MotionBehavior on bumpX {
                         enabled: shelfRoot.slideBump
-                        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                        motion: Motion.spatialFast
                     }
-                    Behavior on launcherProgress {
-                        NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on trayProgress {
-                        NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on qsProgress {
-                        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on mediaProgress {
-                        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on calProgress {
-                        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on weatherProgress {
-                        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-                    }
-                    Behavior on resourcesProgress {
-                        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-                    }
+                    PopupBehavior on launcherProgress {}
+                    PopupBehavior on trayProgress {}
+                    PopupBehavior on qsProgress {}
+                    PopupBehavior on mediaProgress {}
+                    PopupBehavior on calProgress {}
+                    PopupBehavior on weatherProgress {}
+                    PopupBehavior on resourcesProgress {}
 
                     onTrayOverflowOpenChanged: {
                         shelfRoot.trayProgress = shelfRoot.trayOverflowOpen ? 1 : 0;
@@ -707,8 +699,8 @@ Scope {
                         property real hugRadius: shelfRoot.hugMode ? shelfRoot.cornerRadius : 0
                         fragmentShader: Quickshell.shellPath("assets/shaders/akebono/dock.frag.qsb")
 
-                        Behavior on width {
-                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                        MotionBehavior on width {
+                            motion: Motion.spatialFast
                         }
 
                         onWidthChanged: shelfRoot.publishLauncher()

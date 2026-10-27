@@ -177,6 +177,12 @@ Singleton {
                 property int seconds: 0
             }
 
+            property JsonObject notifications: JsonObject {
+                property bool silent: false
+            }
+            property JsonObject musicRecognition: JsonObject {
+                property list<var> history: []
+            }
             property JsonObject timer: JsonObject {
                 property JsonObject pomodoro: JsonObject {
                     property bool running: false

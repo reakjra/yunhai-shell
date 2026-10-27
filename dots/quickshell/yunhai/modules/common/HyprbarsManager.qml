@@ -10,31 +10,28 @@ Scope {
     readonly property bool desired: cfg.enable
     readonly property string barFont: cfg.font || Appearance.font.family.title
     readonly property bool glyphs: cfg.glyphs
-    readonly property string buttonColors: cfg.buttonColors
     readonly property int buttonSize: glyphs ? cfg.glyphSize : cfg.buttonSize
-    readonly property string layoutKey: [barFont, cfg.height, cfg.textSize, cfg.buttonSize, cfg.glyphSize].join()
+    readonly property string configKey: [barFont, glyphs, cfg.buttonColors, cfg.barColor, cfg.height, cfg.textSize, buttonSize].join()
 
     function run(action) {
-        Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", root.buttonColors, cfg.height, cfg.textSize, root.buttonSize]);
+        Quickshell.execDetached(["bash", root.script, action, root.barFont, root.glyphs ? "glyphs" : "semaphore", cfg.buttonColors, cfg.height, cfg.textSize, root.buttonSize, cfg.barColor]);
     }
 
     onDesiredChanged: run(desired ? "load" : "disable")
-    onLayoutKeyChanged: if (desired) layoutApply.restart()
-    onGlyphsChanged: if (desired) run("reload")
-    onButtonColorsChanged: if (desired) run("reload")
+    onConfigKeyChanged: if (desired) applyTimer.restart()
     Component.onCompleted: if (desired) run("load")
 
     Timer {
-        id: layoutApply
+        id: applyTimer
         interval: 600
-        onTriggered: root.run("layout")
+        onTriggered: root.run("apply")
     }
 
     Connections {
         target: Hyprland
         function onRawEvent(event) {
-            if (event.name === "configreloaded")
-                root.run(root.desired ? "style" : "disable");
+            if (event.name === "configreloaded" && !root.desired)
+                root.run("disable");
         }
     }
 }

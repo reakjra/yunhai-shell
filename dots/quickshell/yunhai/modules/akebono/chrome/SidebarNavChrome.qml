@@ -2,9 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import Quickshell
-import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 
@@ -13,20 +11,15 @@ Item {
 
     property var pages: []
     property int currentPage: 0
-    property string initialSection: ""
+    property Component header
+    property real pageRightMargin: 0
 
     property var history: [0]
     property int historyPos: 0
 
-    readonly property real squircleSmoothing: Config.options.squircle.smoothing
+    signal pageLoaded(var item)
 
-    component LSquircle: ShaderEffect {
-        property color color: "#000000"
-        property real radius: 24
-        property real smoothing: 4.0
-        property vector2d size: Qt.vector2d(width, height)
-        fragmentShader: Quickshell.shellPath("assets/shaders/akebono/squircle.frag.qsb")
-    }
+    readonly property real squircleSmoothing: Config.options.squircle.smoothing
 
     component StickyPill: ShaderEffect {
         property vector2d size: Qt.vector2d(width, height)
@@ -94,7 +87,7 @@ Item {
             Layout.preferredWidth: 248
             Layout.fillHeight: true
 
-            LSquircle {
+            Squircle {
                 anchors.fill: parent
                 color: Appearance.colors.colLayer1
                 radius: 26
@@ -106,64 +99,9 @@ Item {
                 anchors.margins: 12
                 spacing: 12
 
-                RowLayout {
+                Loader {
                     Layout.fillWidth: true
-                    spacing: 10
-
-                    Rectangle {
-                        id: avatarContainer
-                        Layout.preferredWidth: 44
-                        Layout.preferredHeight: 44
-                        radius: Appearance.rounding.small
-                        color: Appearance.colors.colLayer2
-
-                        MaterialSymbol {
-                            anchors.centerIn: parent
-                            text: "person"
-                            iconSize: 22
-                            color: Appearance.m3colors.m3onSurfaceVariant
-                            visible: avatarImg.status !== Image.Ready
-                        }
-                        Item {
-                            anchors.fill: parent
-                            layer.enabled: avatarImg.status === Image.Ready
-                            layer.effect: OpacityMask {
-                                maskSource: Rectangle {
-                                    width: avatarContainer.width
-                                    height: avatarContainer.height
-                                    radius: avatarContainer.radius
-                                }
-                            }
-                            Image {
-                                id: avatarImg
-                                anchors.fill: parent
-                                sourceSize: Qt.size(44, 44)
-                                source: (Directories.userAvatarPathAccountsService && !Directories.userAvatarPathAccountsService.endsWith("/user")) ? Directories.userAvatarPathAccountsService : ""
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
-                            }
-                        }
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 1
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: SystemInfo.username
-                            font.pixelSize: Appearance.font.pixelSize.normal
-                            font.variableAxes: { "wght": 600 }
-                            color: Appearance.colors.colOnLayer1
-                            elide: Text.ElideRight
-                        }
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: SystemInfo.distroName ?? "Linux"
-                            font.pixelSize: Appearance.font.pixelSize.small
-                            color: Appearance.colors.colSubtext
-                            elide: Text.ElideRight
-                        }
-                    }
+                    sourceComponent: root.header
                 }
 
                 Rectangle {
@@ -206,6 +144,7 @@ Item {
                     StickyPill {
                         id: pill
                         anchors.fill: parent
+                        visible: root.pages.length > 0
                         color: Appearance.colors.colPrimaryContainer
                         radius: 13
                         smoothing: root.squircleSmoothing
@@ -329,15 +268,11 @@ Item {
                 id: pageLoader
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.rightMargin: root.pageRightMargin
                 active: Config.ready
                 source: root.pages[root.currentPage] ? Quickshell.shellPath(root.pages[root.currentPage].component) : ""
 
-                onLoaded: {
-                    if (root.initialSection === "" || !item.scrollToSection)
-                        return;
-                    item.scrollToSection(root.initialSection);
-                    root.initialSection = "";
-                }
+                onLoaded: root.pageLoaded(item)
 
                 Connections {
                     target: root
@@ -346,14 +281,13 @@ Item {
                         fadeIn.restart();
                     }
                 }
-                NumberAnimation {
+                MotionAnimation {
                     id: fadeIn
                     target: pageLoader
                     property: "opacity"
                     from: 0
                     to: 1
-                    duration: 190
-                    easing.type: Easing.OutCubic
+                    motion: Motion.effects
                 }
             }
         }

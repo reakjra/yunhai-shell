@@ -10,6 +10,18 @@ function is_file_exists(name)
 	end
 end
 
+function theme_color(value, fallback)
+	local hex = value:match("^#?(%x%x%x%x%x%x)$")
+	if not hex then
+		local f = io.open(HOME .. "/.local/state/quickshell/yunhai/user/generated/colors.json", "r")
+		if f ~= nil then
+			hex = f:read("*a"):match('"' .. value .. '"%s*:%s*"#(%x%x%x%x%x%x)"')
+			io.close(f)
+		end
+	end
+	return "rgb(" .. (hex or fallback) .. ")"
+end
+
 function create_if_not_exists(path)
 	if not is_file_exists(path) then
 		os.execute('mkdir -p "$(dirname "' .. path .. '")"')

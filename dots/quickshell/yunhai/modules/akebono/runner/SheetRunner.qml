@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import qs
+import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.akebono
@@ -23,7 +24,7 @@ Scope {
 
     Timer {
         id: exitTimer
-        interval: Appearance.animation.elementMoveFast.duration
+        interval: Motion.exitFast.duration
     }
 
     Variants {
@@ -45,6 +46,9 @@ Scope {
                     WlrLayershell.namespace: "quickshell:akebonoSheetRunner"
                     WlrLayershell.layer: WlrLayer.Overlay
                     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+
+                    Component.onCompleted: LauncherSearch.setSurfaceVisible(sheetWindow, true)
+                    Component.onDestruction: LauncherSearch.setSurfaceVisible(sheetWindow, false)
 
                     anchors {
                         top: true
@@ -68,7 +72,7 @@ Scope {
                         onClicked: GlobalStates.desktopRunnerOpen = false
                     }
 
-                    Squircle {
+                    RevealSquircle {
                         id: surface
                         anchors.centerIn: parent
                         implicitWidth: root.surfaceWidth
@@ -76,20 +80,9 @@ Scope {
                         color: Appearance.colors.colLayer0
                         radius: Appearance.rounding.large
                         smoothing: AkebonoAppearance.squircleSmoothing
+                        shown: root.shown
 
-                        property bool revealed: false
-                        opacity: surface.revealed && root.shown ? 1 : 0
-                        layer.enabled: surface.opacity < 1
-                        layer.smooth: true
-
-                        Behavior on opacity {
-                            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                        }
-
-                        Component.onCompleted: {
-                            surface.revealed = true;
-                            sheetPanel.focusSearch();
-                        }
+                        Component.onCompleted: sheetPanel.focusSearch()
                         Component.onDestruction: sheetPanel.resetQuery()
 
                         MouseArea {

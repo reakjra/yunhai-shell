@@ -329,6 +329,7 @@ Singleton {
         property bool glyphs: false
         property string buttonColors: "muted" // "muted", "accent", "mac"
         property string font: ""
+        property string barColor: ""
         property int height: 34
         property int textSize: 16
         property int buttonSize: 15
@@ -337,6 +338,10 @@ Singleton {
 
     component SquircleOptions: JsonObject {
         property real smoothing: 2.0 // 2 = circular corners, higher = squircle
+    }
+
+    component MotionOptions: JsonObject {
+        property bool bouncy: true
     }
 
     component DesktopOptions: JsonObject {
@@ -746,6 +751,7 @@ Singleton {
                     property string to: "06:30"   // Format: "HH:mm", 24-hour time
                     property int colorTemperature: 5000
                 }
+                property int gamma: 100
                 property JsonObject antiFlashbang: JsonObject {
                     property bool enable: false
                 }
@@ -908,6 +914,7 @@ Singleton {
             property JsonObject musicRecognition: JsonObject {
                 property int timeout: 16
                 property int interval: 4
+                property int source: 0 // SongRec.MonitorSource
             }
 
             property JsonObject search: JsonObject {
@@ -940,6 +947,7 @@ Singleton {
                 property int maxFps: 30
                 property bool hardwareEncoding: false
                 property bool recordAudio: false
+                property bool stopOnOverlayOpen: false
                 property bool showBreathingBorder: true
             }
 
@@ -1028,6 +1036,7 @@ Singleton {
             property HyprbarsOptions hyprbars: HyprbarsOptions {}
             property DesktopOptions desktop: DesktopOptions {}
             property SquircleOptions squircle: SquircleOptions {}
+            property MotionOptions motion: MotionOptions {}
         }
     }
 
@@ -1044,11 +1053,11 @@ Singleton {
             property HyprbarsOptions hyprbars: HyprbarsOptions {}
             property DesktopOptions desktop: DesktopOptions {}
             property SquircleOptions squircle: SquircleOptions {}
+            property MotionOptions motion: MotionOptions {}
 
             property JsonObject lunae: JsonObject {
                 property string monitor: "" // Output name to pin the shell to, empty = first screen
                 property bool colorful: true
-                property bool bouncyAnimations: true
                 property real deformStrength: 1.5
                 property JsonObject hub: JsonObject {
                     property list<string> tabs: ["dash", "media", "system", "weather"]
@@ -1106,6 +1115,7 @@ Singleton {
             property HyprbarsOptions hyprbars: HyprbarsOptions {}
             property DesktopOptions desktop: DesktopOptions {}
             property SquircleOptions squircle: SquircleOptions {}
+            property MotionOptions motion: MotionOptions {}
 
             property JsonObject waffles: JsonObject {
                 // Some spots are kinda janky/awkward. Setting the following to
@@ -1143,6 +1153,7 @@ Singleton {
             property HyprbarsOptions hyprbars: HyprbarsOptions { enable: true }
             property DesktopOptions desktop: DesktopOptions { enable: true }
             property SquircleOptions squircle: SquircleOptions { smoothing: 4.0 }
+            property MotionOptions motion: MotionOptions {}
 
             property JsonObject akebono: JsonObject {
                 property JsonObject preview: JsonObject {
@@ -1302,6 +1313,7 @@ Singleton {
         readonly property var hyprbars: root.activeFamilyAdapter.hyprbars
         readonly property var desktop: root.activeFamilyAdapter.desktop
         readonly property var squircle: root.activeFamilyAdapter.squircle
+        readonly property var motion: root.activeFamilyAdapter.motion
 
         readonly property bool hasDesktop: PanelFamilies.hasDesktop(globalAdapter.panelFamily)
         readonly property var family: root.activeFamilyAdapter[globalAdapter.panelFamily] ?? null

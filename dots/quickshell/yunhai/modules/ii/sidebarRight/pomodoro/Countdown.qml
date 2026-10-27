@@ -155,11 +155,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     font.pixelSize: 48
                     color: TimerService.countdownRunning ? Appearance.m3colors.m3onSurface : Appearance.colors.colSubtext
-                    text: {
-                        const mins = Math.floor(TimerService.countdownSecondsLeft / 60).toString().padStart(2, '0')
-                        const secs = Math.floor(TimerService.countdownSecondsLeft % 60).toString().padStart(2, '0')
-                        return `${mins}:${secs}`
-                    }
+                    text: TimerService.formatClock(TimerService.countdownSecondsLeft)
                 }
 
                 StyledProgressBar {

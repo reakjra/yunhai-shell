@@ -17,12 +17,8 @@ RippleButton {
     buttonRadius: root.toggled ? Appearance.rounding.small : Appearance.rounding.verysmall
     buttonRadiusPressed: Appearance.rounding.unsharpenmore
 
-    Behavior on buttonEffectiveRadius {
-        NumberAnimation {
-            duration: LunaeAppearance.morphDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: LunaeAppearance.morphCurve
-        }
+    MotionBehavior on buttonEffectiveRadius {
+        motion: Motion.spatialFast
     }
 
     colBackground: "transparent"
@@ -47,7 +43,7 @@ RippleButton {
 
         Behavior on fill {
             NumberAnimation {
-                duration: LunaeAppearance.morphDuration
+                duration: Motion.spatialFast.duration
                 easing.type: Easing.OutCubic
             }
         }

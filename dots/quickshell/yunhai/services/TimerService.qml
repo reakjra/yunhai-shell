@@ -51,6 +51,18 @@ Singleton {
         return Math.floor(Date.now() / 10);
     }
 
+    function formatClock(seconds, separator = ":") {
+        return `${String(Math.floor(seconds / 60)).padStart(2, "0")}${separator}${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+    }
+
+    function formatCentiseconds(time) {
+        return String(Math.floor(time) % 100).padStart(2, "0");
+    }
+
+    function formatStopwatch(time, separator = ":") {
+        return `${formatClock(Math.floor(time / 100), separator)}.${formatCentiseconds(time)}`;
+    }
+
     // Pomodoro
     function refreshPomodoro() {
         // Work <-> break ?
@@ -143,7 +155,7 @@ Singleton {
     }
 
     function stopwatchRecordLap() {
-        Persistent.states.timer.stopwatch.laps.push(stopwatchTime);
+        Persistent.states.timer.stopwatch.laps = [...Persistent.states.timer.stopwatch.laps, stopwatchTime];
     }
 
     // Countdown

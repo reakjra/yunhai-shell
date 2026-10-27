@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.modules.common
+import qs.modules.common.widgets
 import qs.modules.lunae
 import qs.modules.lunae.drawers.panels
 
@@ -18,9 +19,6 @@ Item {
 
     readonly property alias deformX: deform.sx
     readonly property alias deformY: deform.sy
-
-    property int openDuration: LunaeAppearance.drawerOpenDuration
-    property var openCurve: LunaeAppearance.drawerOpenCurve
 
     readonly property bool _vertical: axis === Panel.Axis.Vertical
 
@@ -41,13 +39,7 @@ Item {
         amount: root.deformAmount
     }
 
-    Behavior on progress {
-        NumberAnimation {
-            duration: root.openDuration
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.openCurve
-        }
-    }
+    MotionBehavior on progress {}
 
     Binding on implicitHeight {
         when: root._vertical

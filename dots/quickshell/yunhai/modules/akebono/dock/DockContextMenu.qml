@@ -58,8 +58,12 @@ Item {
         opacity: root.showing ? 1 : 0
         transformOrigin: root.openAbove ? Item.Bottom : Item.Top
 
-        Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+        MotionBehavior on scale {
+            motion: Motion.spatialFast
+            exitMotion: Motion.exitFast
+            exitTarget: 0.9
+        }
+        MotionBehavior on opacity { motion: Motion.effects }
 
         ColumnLayout {
             id: col

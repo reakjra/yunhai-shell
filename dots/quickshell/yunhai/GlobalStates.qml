@@ -14,6 +14,7 @@ Singleton {
     property real barPopupY: 0
     property var trayMenuHandle: null
     property string trayMenuItemId: ""
+    property bool controlPanelOpen: false
     property bool crosshairOpen: false
     property bool hubOpen: false
     property bool sidebarLeftOpen: false

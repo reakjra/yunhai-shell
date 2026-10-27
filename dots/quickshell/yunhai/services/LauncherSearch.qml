@@ -193,10 +193,31 @@ Singleton {
         sortField: FolderListModel.Name
     }
 
+    property var visibleSurfaces: []
+    property var pendingScreenActions: []
+
+    function setSurfaceVisible(owner, visible) {
+        const others = root.visibleSurfaces.filter(surface => surface !== owner);
+        root.visibleSurfaces = visible ? [...others, owner] : others;
+        if (root.visibleSurfaces.length > 0)
+            return;
+        const pending = root.pendingScreenActions;
+        root.pendingScreenActions = [];
+        pending.forEach(run => Qt.callLater(run));
+    }
+
+    function runWhenSurfacesHidden(run) {
+        if (root.visibleSurfaces.length === 0)
+            run();
+        else
+            root.pendingScreenActions = [...root.pendingScreenActions, run];
+    }
+
     property var searchActions: [
         {
             action: "accentcolor",
             icon: "palette",
+            capturesScreen: true,
             execute: args => {
                 Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--noswitch", "--color", ...(args != '' ? [`${args}`] : [])]);
             }
@@ -509,7 +530,12 @@ Singleton {
                     iconName: action.icon ?? 'settings_suggest',
                     iconType: LauncherSearchResult.IconType.Material,
                     execute: () => {
-                        action.execute(root.query.split(" ").slice(1).join(" "));
+                        const args = root.query.split(" ").slice(1).join(" ");
+                        const run = () => action.execute(args);
+                        if (action.capturesScreen)
+                            root.runWhenSurfacesHidden(run);
+                        else
+                            run();
                     }
                 });
             }
