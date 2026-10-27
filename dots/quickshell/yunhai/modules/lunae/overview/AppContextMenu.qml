@@ -124,6 +124,7 @@ Item {
 
                 ContextMenuItem {
                     iconName: "play_arrow"
+                    iconFilled: true
                     label: Translation.tr("Launch")
                     onClicked: {
                         const de = root.entry?.id ? DesktopEntries.byId(root.entry.id) : null;
@@ -207,6 +208,7 @@ Item {
 
                 ContextMenuItem {
                     iconName: "play_arrow"
+                    iconFilled: true
                     label: Translation.tr("Launch")
                     onClicked: {
                         const de = root.entry?.id ? DesktopEntries.byId(root.entry.id) : null;
@@ -339,6 +341,7 @@ Item {
     component ContextMenuItem: Item {
         id: menuItem
         property string iconName: ""
+        property bool iconFilled: false
         property string label: ""
         property bool danger: false
         property bool hasSubmenu: false
@@ -374,6 +377,7 @@ Item {
 
                 MaterialSymbol {
                     text: menuItem.iconName
+                    fill: menuItem.iconFilled ? 1 : 0
                     iconSize: Appearance.font.pixelSize.large
                     color: menuItem.danger ? Appearance.colors.colError
                         : menuItem.isBack ? Appearance.colors.colSubtext

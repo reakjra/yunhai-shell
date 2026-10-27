@@ -19,7 +19,7 @@ MouseArea {
     readonly property real cardSpacing: 10
     readonly property real imageSize: Appearance.font.pixelSize.huge * 2.4
     readonly property real appIconSize: Appearance.font.pixelSize.normal
-    readonly property real headerIconSize: Appearance.font.pixelSize.large
+    readonly property real headerIconSize: Appearance.font.pixelSize.huge
     readonly property real dragDismissThreshold: 100
 
     hoverEnabled: true

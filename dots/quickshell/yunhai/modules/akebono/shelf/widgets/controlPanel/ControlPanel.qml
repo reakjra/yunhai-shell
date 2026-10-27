@@ -122,9 +122,13 @@ Item {
 
             Header { panel: root }
 
-            TogglesSection {
-                panel: root
+            Card {
                 Layout.fillWidth: true
+
+                TogglesSection {
+                    panel: root
+                    Layout.fillWidth: true
+                }
             }
 
             Card {

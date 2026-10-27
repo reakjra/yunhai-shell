@@ -317,30 +317,11 @@ LunaeCard {
             width: parent.width
             implicitHeight: Math.max(toggleFlickable.height, chevronBtn.implicitHeight)
 
-            MouseArea {
-                id: wheelScrollArea
+            HorizontalWheelArea {
                 anchors.fill: toggleFlickable
                 z: 1
                 visible: root.flickableMode && !root.editMode
-                acceptedButtons: Qt.NoButton
-                property real targetX: toggleFlickable.contentX
-                onWheel: (event) => {
-                    targetX = Math.max(0,
-                        Math.min(toggleFlickable.contentWidth - toggleFlickable.width,
-                            targetX - event.angleDelta.y))
-                    scrollAnim.stop()
-                    scrollAnim.from = toggleFlickable.contentX
-                    scrollAnim.to = targetX
-                    scrollAnim.restart()
-                    event.accepted = true
-                }
-            }
-            NumberAnimation {
-                id: scrollAnim
-                target: toggleFlickable
-                property: "contentX"
-                duration: 300
-                easing.type: Easing.OutCubic
+                flickable: toggleFlickable
             }
 
             Flickable {

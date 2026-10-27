@@ -25,7 +25,6 @@ Item {
     readonly property bool pinnedShown: !panel.hasQuery && panel.browsingAll && panel.pinnedEntries.length > 0
 
     readonly property int searchHeight: Math.round(Appearance.font.pixelSize.larger * 2.8)
-    readonly property int chipHeight: Math.round(Appearance.font.pixelSize.normal * 2.3)
 
     function focusSearch(): void {
         if (GlobalStates.desktopRunnerPendingQuery !== "") {
@@ -45,6 +44,13 @@ Item {
         anchors.fill: parent
         anchors.margins: 14
         spacing: 10
+
+        CategoryFilterBar {
+            Layout.fillWidth: true
+            backgroundColor: Appearance.colors.colLayer1
+            radius: Appearance.rounding.normal
+            smoothing: AkebonoAppearance.squircleSmoothing
+        }
 
         Squircle {
             Layout.fillWidth: true
@@ -100,54 +106,6 @@ Item {
             }
         }
 
-        ListView {
-            id: chipRow
-            Layout.fillWidth: true
-            Layout.preferredHeight: panel.chipHeight
-            visible: !panel.hasQuery
-            orientation: Qt.Horizontal
-            spacing: 8
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            model: LauncherSearch.sections.filter(section => section.key !== LauncherSearch.pinnedSection)
-
-            delegate: Squircle {
-                id: chip
-                required property var modelData
-                readonly property bool selected: LauncherSearch.categoryForSection(chip.modelData.key) === LauncherSearch.activeCategory
-
-                implicitWidth: chipLabel.implicitWidth + 30
-                height: chipRow.height
-                radius: height / 2
-                smoothing: AkebonoAppearance.squircleSmoothing
-                color: chip.selected ? Appearance.colors.colPrimaryContainer
-                    : chipMouse.containsMouse ? Appearance.colors.colLayer2Hover
-                    : Appearance.colors.colLayer1
-
-                StyledText {
-                    id: chipLabel
-                    anchors.centerIn: parent
-                    text: chip.modelData.label
-                    font.pixelSize: Appearance.font.pixelSize.normal
-                    color: chip.selected ? Appearance.colors.colOnPrimaryContainer : Appearance.colors.colOnLayer1
-                }
-
-                MouseArea {
-                    id: chipMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: LauncherSearch.activeCategory = LauncherSearch.categoryForSection(chip.modelData.key)
-                }
-            }
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: Appearance.colors.colOutlineVariant
-        }
-
         Item {
             id: body
             Layout.fillWidth: true
@@ -163,39 +121,39 @@ Item {
                 spacing: 0
                 visible: !panel.hasQuery
 
-                ListView {
-                    id: pinnedRow
+                Squircle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: body.cellHeight
+                    Layout.preferredHeight: body.cellHeight + 12
+                    Layout.bottomMargin: 10
                     visible: panel.pinnedShown
-                    orientation: Qt.Horizontal
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-                    model: panel.pinnedEntries
+                    color: Appearance.colors.colLayer1
+                    radius: Appearance.rounding.normal
+                    smoothing: AkebonoAppearance.squircleSmoothing
 
-                    delegate: AppTile {
-                        id: pinnedTile
-                        required property var modelData
-                        appEntry: pinnedTile.modelData
-                        width: body.cellWidth
-                        height: body.cellHeight
-                        iconSize: body.iconSize
+                    ListView {
+                        id: pinnedRow
+                        anchors.fill: parent
+                        anchors.margins: 6
+                        orientation: Qt.Horizontal
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
+                        model: panel.pinnedEntries
 
-                        onActivated: {
-                            pinnedTile.modelData.execute();
-                            panel.requestClose();
+                        delegate: AppTile {
+                            id: pinnedTile
+                            required property var modelData
+                            appEntry: pinnedTile.modelData
+                            width: body.cellWidth
+                            height: body.cellHeight
+                            iconSize: body.iconSize
+
+                            onActivated: {
+                                pinnedTile.modelData.execute();
+                                panel.requestClose();
+                            }
+                            onRightClicked: (entry, sceneX, sceneY) => panel.rightClicked(entry, sceneX, sceneY)
                         }
-                        onRightClicked: (entry, sceneX, sceneY) => panel.rightClicked(entry, sceneX, sceneY)
                     }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    Layout.topMargin: 6
-                    Layout.bottomMargin: 6
-                    visible: panel.pinnedShown
-                    color: Appearance.colors.colOutlineVariant
                 }
 
                 GridView {

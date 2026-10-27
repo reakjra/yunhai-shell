@@ -7,12 +7,19 @@ import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.akebono
+import qs.modules.akebono.shelf.widgets.controlPanel
 
 RowLayout {
     id: header
     required property var panel
     Layout.fillWidth: true
     spacing: 12
+
+    component HeaderButton: ActionButton {
+        size: Appearance.font.pixelSize.huge * 1.7
+        iconSize: Appearance.font.pixelSize.huge
+        flat: true
+    }
 
     Item {
         implicitWidth: 42
@@ -57,7 +64,7 @@ RowLayout {
         StyledText {
             Layout.fillWidth: true
             text: SystemInfo.username
-            font.pixelSize: Appearance.font.pixelSize.normal
+            font.pixelSize: Appearance.font.pixelSize.larger
             font.weight: Font.DemiBold
             color: Appearance.colors.colOnLayer0
             elide: Text.ElideRight
@@ -67,7 +74,7 @@ RowLayout {
             text: Battery.available
                 ? `${Math.round(Battery.percentage * 100)}%${Battery.isCharging ? " ⚡" : ""} · ${DateTime.shortDate}`
                 : DateTime.shortDate
-            font.pixelSize: Appearance.font.pixelSize.smaller
+            font.pixelSize: Appearance.font.pixelSize.small
             color: Appearance.colors.colSubtext
             elide: Text.ElideRight
         }
@@ -75,27 +82,18 @@ RowLayout {
     RowLayout {
         spacing: 2
 
-        ActionButton {
-            size: 30
-            iconSize: 19
-            flat: true
+        HeaderButton {
             icon: "refresh"
             onClicked: Quickshell.reload(true)
         }
-        ActionButton {
-            size: 30
-            iconSize: 19
-            flat: true
+        HeaderButton {
             icon: "settings"
             onClicked: {
                 Quickshell.execDetached(["qs", "-p", Quickshell.shellPath("settings.qml")]);
                 header.panel.closeRequested();
             }
         }
-        ActionButton {
-            size: 30
-            iconSize: 19
-            flat: true
+        HeaderButton {
             icon: "power_settings_new"
             danger: true
             onClicked: {

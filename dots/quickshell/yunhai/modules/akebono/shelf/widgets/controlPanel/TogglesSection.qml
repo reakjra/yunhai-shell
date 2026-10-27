@@ -96,28 +96,11 @@ Column {
         width: parent.width
         implicitHeight: Math.max(toggleFlick.height, 48)
 
-        MouseArea {
-            id: wheelScrollArea
+        HorizontalWheelArea {
             anchors.fill: toggleFlick
             z: 1
             visible: section.panel.flickMode && !section.panel.editMode
-            acceptedButtons: Qt.NoButton
-            property real targetX: toggleFlick.contentX
-            onWheel: event => {
-                targetX = Math.max(0, Math.min(toggleFlick.contentWidth - toggleFlick.width, targetX - event.angleDelta.y));
-                scrollAnim.stop();
-                scrollAnim.from = toggleFlick.contentX;
-                scrollAnim.to = targetX;
-                scrollAnim.restart();
-                event.accepted = true;
-            }
-        }
-        NumberAnimation {
-            id: scrollAnim
-            target: toggleFlick
-            property: "contentX"
-            duration: 300
-            easing.type: Easing.OutCubic
+            flickable: toggleFlick
         }
 
         Flickable {

@@ -21,7 +21,7 @@ Item {
         anchors.fill: parent
         radius: 16
         smoothing: AkebonoAppearance.squircleSmoothing
-        color: root.on ? Appearance.colors.colSecondaryContainer : Appearance.colors.colLayer2
+        color: root.on ? Appearance.colors.colSecondaryContainer : Qt.alpha(Appearance.colors.colSecondaryContainer, 0)
         Behavior on color { animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this) }
     }
     MaterialSymbol {
